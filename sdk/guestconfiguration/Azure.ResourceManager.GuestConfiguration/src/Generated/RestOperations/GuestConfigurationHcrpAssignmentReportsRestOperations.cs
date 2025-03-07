@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.GuestConfiguration.Models;
@@ -33,8 +32,25 @@ namespace Azure.ResourceManager.GuestConfiguration
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
-            _apiVersion = apiVersion ?? "2022-01-25";
+            _apiVersion = apiVersion ?? "2024-04-05";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.HybridCompute/machines/", false);
+            uri.AppendPath(machineName, true);
+            uri.AppendPath("/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/", false);
+            uri.AppendPath(guestConfigurationAssignmentName, true);
+            uri.AppendPath("/reports", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName)
@@ -70,38 +86,10 @@ namespace Azure.ResourceManager.GuestConfiguration
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="machineName"/> or <paramref name="guestConfigurationAssignmentName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<GuestConfigurationAssignmentReportList>> ListAsync(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (machineName == null)
-            {
-                throw new ArgumentNullException(nameof(machineName));
-            }
-            if (machineName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(machineName));
-            }
-            if (guestConfigurationAssignmentName == null)
-            {
-                throw new ArgumentNullException(nameof(guestConfigurationAssignmentName));
-            }
-            if (guestConfigurationAssignmentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(guestConfigurationAssignmentName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(machineName, nameof(machineName));
+            Argument.AssertNotNullOrEmpty(guestConfigurationAssignmentName, nameof(guestConfigurationAssignmentName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, machineName, guestConfigurationAssignmentName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -110,7 +98,7 @@ namespace Azure.ResourceManager.GuestConfiguration
                 case 200:
                     {
                         GuestConfigurationAssignmentReportList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = GuestConfigurationAssignmentReportList.DeserializeGuestConfigurationAssignmentReportList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -129,38 +117,10 @@ namespace Azure.ResourceManager.GuestConfiguration
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="machineName"/> or <paramref name="guestConfigurationAssignmentName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<GuestConfigurationAssignmentReportList> List(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (machineName == null)
-            {
-                throw new ArgumentNullException(nameof(machineName));
-            }
-            if (machineName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(machineName));
-            }
-            if (guestConfigurationAssignmentName == null)
-            {
-                throw new ArgumentNullException(nameof(guestConfigurationAssignmentName));
-            }
-            if (guestConfigurationAssignmentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(guestConfigurationAssignmentName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(machineName, nameof(machineName));
+            Argument.AssertNotNullOrEmpty(guestConfigurationAssignmentName, nameof(guestConfigurationAssignmentName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, machineName, guestConfigurationAssignmentName);
             _pipeline.Send(message, cancellationToken);
@@ -169,13 +129,31 @@ namespace Azure.ResourceManager.GuestConfiguration
                 case 200:
                     {
                         GuestConfigurationAssignmentReportList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = GuestConfigurationAssignmentReportList.DeserializeGuestConfigurationAssignmentReportList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, string reportId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.HybridCompute/machines/", false);
+            uri.AppendPath(machineName, true);
+            uri.AppendPath("/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/", false);
+            uri.AppendPath(guestConfigurationAssignmentName, true);
+            uri.AppendPath("/reports/", false);
+            uri.AppendPath(reportId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, string reportId)
@@ -213,46 +191,11 @@ namespace Azure.ResourceManager.GuestConfiguration
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="machineName"/>, <paramref name="guestConfigurationAssignmentName"/> or <paramref name="reportId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<GuestConfigurationAssignmentReport>> GetAsync(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, string reportId, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (machineName == null)
-            {
-                throw new ArgumentNullException(nameof(machineName));
-            }
-            if (machineName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(machineName));
-            }
-            if (guestConfigurationAssignmentName == null)
-            {
-                throw new ArgumentNullException(nameof(guestConfigurationAssignmentName));
-            }
-            if (guestConfigurationAssignmentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(guestConfigurationAssignmentName));
-            }
-            if (reportId == null)
-            {
-                throw new ArgumentNullException(nameof(reportId));
-            }
-            if (reportId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(reportId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(machineName, nameof(machineName));
+            Argument.AssertNotNullOrEmpty(guestConfigurationAssignmentName, nameof(guestConfigurationAssignmentName));
+            Argument.AssertNotNullOrEmpty(reportId, nameof(reportId));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, machineName, guestConfigurationAssignmentName, reportId);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -261,7 +204,7 @@ namespace Azure.ResourceManager.GuestConfiguration
                 case 200:
                     {
                         GuestConfigurationAssignmentReport value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = GuestConfigurationAssignmentReport.DeserializeGuestConfigurationAssignmentReport(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -281,46 +224,11 @@ namespace Azure.ResourceManager.GuestConfiguration
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="machineName"/>, <paramref name="guestConfigurationAssignmentName"/> or <paramref name="reportId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<GuestConfigurationAssignmentReport> Get(string subscriptionId, string resourceGroupName, string machineName, string guestConfigurationAssignmentName, string reportId, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (machineName == null)
-            {
-                throw new ArgumentNullException(nameof(machineName));
-            }
-            if (machineName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(machineName));
-            }
-            if (guestConfigurationAssignmentName == null)
-            {
-                throw new ArgumentNullException(nameof(guestConfigurationAssignmentName));
-            }
-            if (guestConfigurationAssignmentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(guestConfigurationAssignmentName));
-            }
-            if (reportId == null)
-            {
-                throw new ArgumentNullException(nameof(reportId));
-            }
-            if (reportId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(reportId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(machineName, nameof(machineName));
+            Argument.AssertNotNullOrEmpty(guestConfigurationAssignmentName, nameof(guestConfigurationAssignmentName));
+            Argument.AssertNotNullOrEmpty(reportId, nameof(reportId));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, machineName, guestConfigurationAssignmentName, reportId);
             _pipeline.Send(message, cancellationToken);
@@ -329,7 +237,7 @@ namespace Azure.ResourceManager.GuestConfiguration
                 case 200:
                     {
                         GuestConfigurationAssignmentReport value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = GuestConfigurationAssignmentReport.DeserializeGuestConfigurationAssignmentReport(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

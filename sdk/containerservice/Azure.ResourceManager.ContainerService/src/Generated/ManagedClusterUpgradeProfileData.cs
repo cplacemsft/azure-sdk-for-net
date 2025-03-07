@@ -58,14 +58,8 @@ namespace Azure.ResourceManager.ContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="controlPlaneProfile"/> or <paramref name="agentPoolProfiles"/> is null. </exception>
         internal ManagedClusterUpgradeProfileData(ManagedClusterPoolUpgradeProfile controlPlaneProfile, IEnumerable<ManagedClusterPoolUpgradeProfile> agentPoolProfiles)
         {
-            if (controlPlaneProfile == null)
-            {
-                throw new ArgumentNullException(nameof(controlPlaneProfile));
-            }
-            if (agentPoolProfiles == null)
-            {
-                throw new ArgumentNullException(nameof(agentPoolProfiles));
-            }
+            Argument.AssertNotNull(controlPlaneProfile, nameof(controlPlaneProfile));
+            Argument.AssertNotNull(agentPoolProfiles, nameof(agentPoolProfiles));
 
             ControlPlaneProfile = controlPlaneProfile;
             AgentPoolProfiles = agentPoolProfiles.ToList();
@@ -92,8 +86,10 @@ namespace Azure.ResourceManager.ContainerService
         }
 
         /// <summary> The list of available upgrade versions for the control plane. </summary>
+        [WirePath("properties.controlPlaneProfile")]
         public ManagedClusterPoolUpgradeProfile ControlPlaneProfile { get; }
         /// <summary> The list of available upgrade versions for agent pools. </summary>
+        [WirePath("properties.agentPoolProfiles")]
         public IReadOnlyList<ManagedClusterPoolUpgradeProfile> AgentPoolProfiles { get; }
     }
 }

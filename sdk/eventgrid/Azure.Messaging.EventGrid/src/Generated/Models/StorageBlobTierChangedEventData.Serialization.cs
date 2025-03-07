@@ -8,7 +8,6 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Azure.Core;
 
 namespace Azure.Messaging.EventGrid.SystemEvents
 {
@@ -27,6 +26,8 @@ namespace Azure.Messaging.EventGrid.SystemEvents
             string contentType = default;
             long? contentLength = default;
             string blobType = default;
+            StorageBlobAccessTier accessTier = default;
+            StorageBlobAccessTier previousTier = default;
             string url = default;
             string sequencer = default;
             string identity = default;
@@ -67,6 +68,16 @@ namespace Azure.Messaging.EventGrid.SystemEvents
                     blobType = property.Value.GetString();
                     continue;
                 }
+                if (property.NameEquals("accessTier"u8))
+                {
+                    accessTier = new StorageBlobAccessTier(property.Value.GetString());
+                    continue;
+                }
+                if (property.NameEquals("previousTier"u8))
+                {
+                    previousTier = new StorageBlobAccessTier(property.Value.GetString());
+                    continue;
+                }
                 if (property.NameEquals("url"u8))
                 {
                     url = property.Value.GetString();
@@ -99,10 +110,20 @@ namespace Azure.Messaging.EventGrid.SystemEvents
                 contentType,
                 contentLength,
                 blobType,
+                accessTier,
+                previousTier,
                 url,
                 sequencer,
                 identity,
                 storageDiagnostics);
+        }
+
+        /// <summary> Deserializes the model from a raw response. </summary>
+        /// <param name="response"> The response to deserialize the model from. </param>
+        internal static StorageBlobTierChangedEventData FromResponse(Response response)
+        {
+            using var document = JsonDocument.Parse(response.Content, ModelSerializationExtensions.JsonDocumentOptions);
+            return DeserializeStorageBlobTierChangedEventData(document.RootElement);
         }
 
         internal partial class StorageBlobTierChangedEventDataConverter : JsonConverter<StorageBlobTierChangedEventData>
@@ -111,6 +132,7 @@ namespace Azure.Messaging.EventGrid.SystemEvents
             {
                 throw new NotImplementedException();
             }
+
             public override StorageBlobTierChangedEventData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 using var document = JsonDocument.ParseValue(ref reader);

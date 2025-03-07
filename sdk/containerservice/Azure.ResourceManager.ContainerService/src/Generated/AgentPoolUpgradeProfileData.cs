@@ -57,10 +57,7 @@ namespace Azure.ResourceManager.ContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="kubernetesVersion"/> is null. </exception>
         internal AgentPoolUpgradeProfileData(string kubernetesVersion, ContainerServiceOSType osType)
         {
-            if (kubernetesVersion == null)
-            {
-                throw new ArgumentNullException(nameof(kubernetesVersion));
-            }
+            Argument.AssertNotNull(kubernetesVersion, nameof(kubernetesVersion));
 
             KubernetesVersion = kubernetesVersion;
             OSType = osType;
@@ -92,12 +89,16 @@ namespace Azure.ResourceManager.ContainerService
         }
 
         /// <summary> The Kubernetes version (major.minor.patch). </summary>
+        [WirePath("properties.kubernetesVersion")]
         public string KubernetesVersion { get; }
         /// <summary> The operating system type. The default is Linux. </summary>
+        [WirePath("properties.osType")]
         public ContainerServiceOSType OSType { get; }
         /// <summary> List of orchestrator types and versions available for upgrade. </summary>
+        [WirePath("properties.upgrades")]
         public IReadOnlyList<AgentPoolUpgradeProfilePropertiesUpgradesItem> Upgrades { get; }
         /// <summary> The latest AKS supported node image version. </summary>
+        [WirePath("properties.latestNodeImageVersion")]
         public string LatestNodeImageVersion { get; }
     }
 }

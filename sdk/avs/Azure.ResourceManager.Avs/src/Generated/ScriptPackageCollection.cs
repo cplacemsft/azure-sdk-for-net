@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Avs
 {
@@ -54,7 +52,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a script package available to run on a private cloud
+        /// Get a ScriptPackage
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -74,20 +72,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual async Task<Response<ScriptPackageResource>> GetAsync(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.Get");
             scope.Start();
@@ -106,7 +97,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a script package available to run on a private cloud
+        /// Get a ScriptPackage
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -118,7 +109,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -126,20 +117,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual Response<ScriptPackageResource> Get(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.Get");
             scope.Start();
@@ -158,7 +142,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// List script packages available to run on the private cloud
+        /// List ScriptPackage resources by PrivateCloud
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -170,7 +154,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -188,7 +172,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// List script packages available to run on the private cloud
+        /// List ScriptPackage resources by PrivateCloud
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -200,7 +184,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -230,7 +214,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -238,20 +222,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.Exists");
             scope.Start();
@@ -280,7 +257,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -288,20 +265,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual Response<bool> Exists(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.Exists");
             scope.Start();
@@ -330,7 +300,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -338,20 +308,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual async Task<NullableResponse<ScriptPackageResource>> GetIfExistsAsync(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.GetIfExists");
             scope.Start();
@@ -382,7 +345,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -390,20 +353,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="scriptPackageName"> Name of the script package in the private cloud. </param>
+        /// <param name="scriptPackageName"> Name of the script package. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="scriptPackageName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="scriptPackageName"/> is null. </exception>
         public virtual NullableResponse<ScriptPackageResource> GetIfExists(string scriptPackageName, CancellationToken cancellationToken = default)
         {
-            if (scriptPackageName == null)
-            {
-                throw new ArgumentNullException(nameof(scriptPackageName));
-            }
-            if (scriptPackageName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(scriptPackageName));
-            }
+            Argument.AssertNotNullOrEmpty(scriptPackageName, nameof(scriptPackageName));
 
             using var scope = _scriptPackageClientDiagnostics.CreateScope("ScriptPackageCollection.GetIfExists");
             scope.Start();

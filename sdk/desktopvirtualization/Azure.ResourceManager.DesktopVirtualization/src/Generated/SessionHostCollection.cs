@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.DesktopVirtualization
 {
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -80,14 +78,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual async Task<Response<SessionHostResource>> GetAsync(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.Get");
             scope.Start();
@@ -118,7 +109,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -132,14 +123,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual Response<SessionHostResource> Get(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.Get");
             scope.Start();
@@ -170,7 +154,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -203,7 +187,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -236,7 +220,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -250,14 +234,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.Exists");
             scope.Start();
@@ -286,7 +263,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -300,14 +277,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual Response<bool> Exists(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.Exists");
             scope.Start();
@@ -336,7 +306,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -350,14 +320,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual async Task<NullableResponse<SessionHostResource>> GetIfExistsAsync(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.GetIfExists");
             scope.Start();
@@ -388,7 +351,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-09-05</description>
+        /// <description>2024-04-03</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -402,14 +365,7 @@ namespace Azure.ResourceManager.DesktopVirtualization
         /// <exception cref="ArgumentNullException"> <paramref name="sessionHostName"/> is null. </exception>
         public virtual NullableResponse<SessionHostResource> GetIfExists(string sessionHostName, CancellationToken cancellationToken = default)
         {
-            if (sessionHostName == null)
-            {
-                throw new ArgumentNullException(nameof(sessionHostName));
-            }
-            if (sessionHostName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(sessionHostName));
-            }
+            Argument.AssertNotNullOrEmpty(sessionHostName, nameof(sessionHostName));
 
             using var scope = _sessionHostClientDiagnostics.CreateScope("SessionHostCollection.GetIfExists");
             scope.Start();

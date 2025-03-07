@@ -18,20 +18,17 @@ namespace Azure.ResourceManager.Avs.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         public ScriptSecureStringExecutionParameterDetails(string name) : base(name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             ParameterType = ScriptExecutionParameterType.SecureValue;
         }
 
         /// <summary> Initializes a new instance of <see cref="ScriptSecureStringExecutionParameterDetails"/>. </summary>
+        /// <param name="parameterType"> script execution parameter type. </param>
         /// <param name="name"> The parameter name. </param>
-        /// <param name="parameterType"> The type of execution parameter. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
         /// <param name="secureValue"> A secure value for the passed parameter, not to be stored in logs. </param>
-        internal ScriptSecureStringExecutionParameterDetails(string name, ScriptExecutionParameterType parameterType, IDictionary<string, BinaryData> serializedAdditionalRawData, string secureValue) : base(name, parameterType, serializedAdditionalRawData)
+        internal ScriptSecureStringExecutionParameterDetails(ScriptExecutionParameterType parameterType, string name, IDictionary<string, BinaryData> serializedAdditionalRawData, string secureValue) : base(parameterType, name, serializedAdditionalRawData)
         {
             SecureValue = secureValue;
             ParameterType = parameterType;

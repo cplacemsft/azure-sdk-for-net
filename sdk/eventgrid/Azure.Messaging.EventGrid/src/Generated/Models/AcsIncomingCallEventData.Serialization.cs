@@ -26,6 +26,7 @@ namespace Azure.Messaging.EventGrid.SystemEvents
             string callerDisplayName = default;
             AcsIncomingCallCustomContext customContext = default;
             string incomingCallContext = default;
+            CommunicationIdentifierModel onBehalfOfCallee = default;
             string correlationId = default;
             foreach (var property in element.EnumerateObject())
             {
@@ -71,6 +72,15 @@ namespace Azure.Messaging.EventGrid.SystemEvents
                     incomingCallContext = property.Value.GetString();
                     continue;
                 }
+                if (property.NameEquals("onBehalfOfCallee"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        continue;
+                    }
+                    onBehalfOfCallee = CommunicationIdentifierModel.DeserializeCommunicationIdentifierModel(property.Value);
+                    continue;
+                }
                 if (property.NameEquals("correlationId"u8))
                 {
                     correlationId = property.Value.GetString();
@@ -84,7 +94,16 @@ namespace Azure.Messaging.EventGrid.SystemEvents
                 callerDisplayName,
                 customContext,
                 incomingCallContext,
+                onBehalfOfCallee,
                 correlationId);
+        }
+
+        /// <summary> Deserializes the model from a raw response. </summary>
+        /// <param name="response"> The response to deserialize the model from. </param>
+        internal static AcsIncomingCallEventData FromResponse(Response response)
+        {
+            using var document = JsonDocument.Parse(response.Content, ModelSerializationExtensions.JsonDocumentOptions);
+            return DeserializeAcsIncomingCallEventData(document.RootElement);
         }
 
         internal partial class AcsIncomingCallEventDataConverter : JsonConverter<AcsIncomingCallEventData>
@@ -93,6 +112,7 @@ namespace Azure.Messaging.EventGrid.SystemEvents
             {
                 throw new NotImplementedException();
             }
+
             public override AcsIncomingCallEventData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 using var document = JsonDocument.ParseValue(ref reader);

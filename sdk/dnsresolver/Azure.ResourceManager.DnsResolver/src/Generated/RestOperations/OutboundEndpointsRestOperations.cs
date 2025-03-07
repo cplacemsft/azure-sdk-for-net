@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.DnsResolver.Models;
@@ -33,8 +32,24 @@ namespace Azure.ResourceManager.DnsResolver
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
-            _apiVersion = apiVersion ?? "2022-07-01";
+            _apiVersion = apiVersion ?? "2023-07-01-preview";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateCreateOrUpdateRequestUri(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointData data, string ifMatch, string ifNoneMatch)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/dnsResolvers/", false);
+            uri.AppendPath(dnsResolverName, true);
+            uri.AppendPath("/outboundEndpoints/", false);
+            uri.AppendPath(outboundEndpointName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateCreateOrUpdateRequest(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointData data, string ifMatch, string ifNoneMatch)
@@ -65,14 +80,14 @@ namespace Azure.ResourceManager.DnsResolver
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
         }
 
         /// <summary> Creates or updates an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -84,42 +99,11 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> CreateOrUpdateAsync(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, data, ifMatch, ifNoneMatch);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -135,7 +119,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Creates or updates an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -147,42 +131,11 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response CreateOrUpdate(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, data, ifMatch, ifNoneMatch);
             _pipeline.Send(message, cancellationToken);
@@ -195,6 +148,22 @@ namespace Azure.ResourceManager.DnsResolver
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateUpdateRequestUri(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointPatch patch, string ifMatch)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/dnsResolvers/", false);
+            uri.AppendPath(dnsResolverName, true);
+            uri.AppendPath("/outboundEndpoints/", false);
+            uri.AppendPath(outboundEndpointName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateUpdateRequest(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointPatch patch, string ifMatch)
@@ -221,14 +190,14 @@ namespace Azure.ResourceManager.DnsResolver
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(patch);
+            content.JsonWriter.WriteObjectValue(patch, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
         }
 
         /// <summary> Updates an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -239,42 +208,11 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> UpdateAsync(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var message = CreateUpdateRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, patch, ifMatch);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -289,7 +227,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Updates an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -300,42 +238,11 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response Update(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, DnsResolverOutboundEndpointPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var message = CreateUpdateRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, patch, ifMatch);
             _pipeline.Send(message, cancellationToken);
@@ -347,6 +254,22 @@ namespace Azure.ResourceManager.DnsResolver
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateDeleteRequestUri(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, string ifMatch)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/dnsResolvers/", false);
+            uri.AppendPath(dnsResolverName, true);
+            uri.AppendPath("/outboundEndpoints/", false);
+            uri.AppendPath(outboundEndpointName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateDeleteRequest(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, string ifMatch)
@@ -376,7 +299,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Deletes an outbound endpoint for a DNS resolver. WARNING: This operation cannot be undone. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -386,38 +309,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> DeleteAsync(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
 
             using var message = CreateDeleteRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, ifMatch);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -433,7 +328,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Deletes an outbound endpoint for a DNS resolver. WARNING: This operation cannot be undone. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -443,38 +338,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response Delete(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
 
             using var message = CreateDeleteRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName, ifMatch);
             _pipeline.Send(message, cancellationToken);
@@ -487,6 +354,22 @@ namespace Azure.ResourceManager.DnsResolver
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/dnsResolvers/", false);
+            uri.AppendPath(dnsResolverName, true);
+            uri.AppendPath("/outboundEndpoints/", false);
+            uri.AppendPath(outboundEndpointName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName)
@@ -512,7 +395,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Gets properties of an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -521,38 +404,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<DnsResolverOutboundEndpointData>> GetAsync(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -561,7 +416,7 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         DnsResolverOutboundEndpointData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DnsResolverOutboundEndpointData.DeserializeDnsResolverOutboundEndpointData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -573,7 +428,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Gets properties of an outbound endpoint for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="outboundEndpointName"> The name of the outbound endpoint for the DNS resolver. </param>
@@ -582,38 +437,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="dnsResolverName"/> or <paramref name="outboundEndpointName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<DnsResolverOutboundEndpointData> Get(string subscriptionId, string resourceGroupName, string dnsResolverName, string outboundEndpointName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
-            if (outboundEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(outboundEndpointName));
-            }
-            if (outboundEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(outboundEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
+            Argument.AssertNotNullOrEmpty(outboundEndpointName, nameof(outboundEndpointName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, dnsResolverName, outboundEndpointName);
             _pipeline.Send(message, cancellationToken);
@@ -622,7 +449,7 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         DnsResolverOutboundEndpointData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DnsResolverOutboundEndpointData.DeserializeDnsResolverOutboundEndpointData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -631,6 +458,25 @@ namespace Azure.ResourceManager.DnsResolver
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string resourceGroupName, string dnsResolverName, int? top)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/dnsResolvers/", false);
+            uri.AppendPath(dnsResolverName, true);
+            uri.AppendPath("/outboundEndpoints", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (top != null)
+            {
+                uri.AppendQuery("$top", top.Value, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string resourceGroupName, string dnsResolverName, int? top)
@@ -659,7 +505,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Lists outbound endpoints for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="top"> The maximum number of results to return. If not specified, returns up to 100 results. </param>
@@ -668,30 +514,9 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="dnsResolverName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<OutboundEndpointListResult>> ListAsync(string subscriptionId, string resourceGroupName, string dnsResolverName, int? top = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, dnsResolverName, top);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -700,7 +525,7 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         OutboundEndpointListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = OutboundEndpointListResult.DeserializeOutboundEndpointListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -710,7 +535,7 @@ namespace Azure.ResourceManager.DnsResolver
         }
 
         /// <summary> Lists outbound endpoints for a DNS resolver. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="top"> The maximum number of results to return. If not specified, returns up to 100 results. </param>
@@ -719,30 +544,9 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="dnsResolverName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<OutboundEndpointListResult> List(string subscriptionId, string resourceGroupName, string dnsResolverName, int? top = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, dnsResolverName, top);
             _pipeline.Send(message, cancellationToken);
@@ -751,13 +555,21 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         OutboundEndpointListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = OutboundEndpointListResult.DeserializeOutboundEndpointListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string dnsResolverName, int? top)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string dnsResolverName, int? top)
@@ -776,7 +588,7 @@ namespace Azure.ResourceManager.DnsResolver
 
         /// <summary> Lists outbound endpoints for a DNS resolver. </summary>
         /// <param name="nextLink"> The URL to the next page of results. </param>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="top"> The maximum number of results to return. If not specified, returns up to 100 results. </param>
@@ -785,34 +597,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="dnsResolverName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<OutboundEndpointListResult>> ListNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string dnsResolverName, int? top = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, dnsResolverName, top);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -821,7 +609,7 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         OutboundEndpointListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = OutboundEndpointListResult.DeserializeOutboundEndpointListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -832,7 +620,7 @@ namespace Azure.ResourceManager.DnsResolver
 
         /// <summary> Lists outbound endpoints for a DNS resolver. </summary>
         /// <param name="nextLink"> The URL to the next page of results. </param>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="dnsResolverName"> The name of the DNS resolver. </param>
         /// <param name="top"> The maximum number of results to return. If not specified, returns up to 100 results. </param>
@@ -841,34 +629,10 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="dnsResolverName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<OutboundEndpointListResult> ListNextPage(string nextLink, string subscriptionId, string resourceGroupName, string dnsResolverName, int? top = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (dnsResolverName == null)
-            {
-                throw new ArgumentNullException(nameof(dnsResolverName));
-            }
-            if (dnsResolverName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsResolverName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(dnsResolverName, nameof(dnsResolverName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, dnsResolverName, top);
             _pipeline.Send(message, cancellationToken);
@@ -877,7 +641,7 @@ namespace Azure.ResourceManager.DnsResolver
                 case 200:
                     {
                         OutboundEndpointListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = OutboundEndpointListResult.DeserializeOutboundEndpointListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

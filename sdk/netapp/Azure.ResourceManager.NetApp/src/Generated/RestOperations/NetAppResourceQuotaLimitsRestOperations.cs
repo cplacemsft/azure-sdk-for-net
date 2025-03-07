@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.NetApp.Models;
@@ -33,8 +32,21 @@ namespace Azure.ResourceManager.NetApp
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
-            _apiVersion = apiVersion ?? "2023-05-01-preview";
+            _apiVersion = apiVersion ?? "2024-09-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, AzureLocation location)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.NetApp/locations/", false);
+            uri.AppendPath(location, true);
+            uri.AppendPath("/quotaLimits", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, AzureLocation location)
@@ -64,14 +76,7 @@ namespace Azure.ResourceManager.NetApp
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<SubscriptionQuotaItemList>> ListAsync(string subscriptionId, AzureLocation location, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
 
             using var message = CreateListRequest(subscriptionId, location);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -80,7 +85,7 @@ namespace Azure.ResourceManager.NetApp
                 case 200:
                     {
                         SubscriptionQuotaItemList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SubscriptionQuotaItemList.DeserializeSubscriptionQuotaItemList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -97,14 +102,7 @@ namespace Azure.ResourceManager.NetApp
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<SubscriptionQuotaItemList> List(string subscriptionId, AzureLocation location, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
 
             using var message = CreateListRequest(subscriptionId, location);
             _pipeline.Send(message, cancellationToken);
@@ -113,13 +111,27 @@ namespace Azure.ResourceManager.NetApp
                 case 200:
                     {
                         SubscriptionQuotaItemList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SubscriptionQuotaItemList.DeserializeSubscriptionQuotaItemList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, AzureLocation location, string quotaLimitName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.NetApp/locations/", false);
+            uri.AppendPath(location, true);
+            uri.AppendPath("/quotaLimits/", false);
+            uri.AppendPath(quotaLimitName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, AzureLocation location, string quotaLimitName)
@@ -151,22 +163,8 @@ namespace Azure.ResourceManager.NetApp
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="quotaLimitName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<NetAppSubscriptionQuotaItem>> GetAsync(string subscriptionId, AzureLocation location, string quotaLimitName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (quotaLimitName == null)
-            {
-                throw new ArgumentNullException(nameof(quotaLimitName));
-            }
-            if (quotaLimitName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(quotaLimitName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(quotaLimitName, nameof(quotaLimitName));
 
             using var message = CreateGetRequest(subscriptionId, location, quotaLimitName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -175,7 +173,7 @@ namespace Azure.ResourceManager.NetApp
                 case 200:
                     {
                         NetAppSubscriptionQuotaItem value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = NetAppSubscriptionQuotaItem.DeserializeNetAppSubscriptionQuotaItem(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -193,22 +191,8 @@ namespace Azure.ResourceManager.NetApp
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="quotaLimitName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<NetAppSubscriptionQuotaItem> Get(string subscriptionId, AzureLocation location, string quotaLimitName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (quotaLimitName == null)
-            {
-                throw new ArgumentNullException(nameof(quotaLimitName));
-            }
-            if (quotaLimitName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(quotaLimitName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(quotaLimitName, nameof(quotaLimitName));
 
             using var message = CreateGetRequest(subscriptionId, location, quotaLimitName);
             _pipeline.Send(message, cancellationToken);
@@ -217,7 +201,7 @@ namespace Azure.ResourceManager.NetApp
                 case 200:
                     {
                         NetAppSubscriptionQuotaItem value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = NetAppSubscriptionQuotaItem.DeserializeNetAppSubscriptionQuotaItem(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

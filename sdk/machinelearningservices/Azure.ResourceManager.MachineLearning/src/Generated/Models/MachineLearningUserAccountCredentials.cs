@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="adminUserName"/> is null. </exception>
         public MachineLearningUserAccountCredentials(string adminUserName)
         {
-            if (adminUserName == null)
-            {
-                throw new ArgumentNullException(nameof(adminUserName));
-            }
+            Argument.AssertNotNull(adminUserName, nameof(adminUserName));
 
             AdminUserName = adminUserName;
         }
@@ -77,10 +74,13 @@ namespace Azure.ResourceManager.MachineLearning.Models
         }
 
         /// <summary> Name of the administrator user account which can be used to SSH to nodes. </summary>
+        [WirePath("adminUserName")]
         public string AdminUserName { get; set; }
         /// <summary> SSH public key of the administrator user account. </summary>
+        [WirePath("adminUserSshPublicKey")]
         public string AdminUserSshPublicKey { get; set; }
         /// <summary> Password of the administrator user account. </summary>
+        [WirePath("adminUserPassword")]
         public string AdminUserPassword { get; set; }
     }
 }

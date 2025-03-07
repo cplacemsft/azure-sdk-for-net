@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="password"/> is null. </exception>
         public ContainerRegistryImportSourceCredentials(string password)
         {
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
+            Argument.AssertNotNull(password, nameof(password));
 
             Password = password;
         }
@@ -75,8 +72,10 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The username to authenticate with the source registry. </summary>
+        [WirePath("username")]
         public string Username { get; set; }
         /// <summary> The password used to authenticate with the source registry. </summary>
+        [WirePath("password")]
         public string Password { get; }
     }
 }

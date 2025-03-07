@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         public ContainerRegistryTimerTriggerUpdateContent(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             Name = name;
         }
@@ -77,10 +74,13 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The CRON expression for the task schedule. </summary>
+        [WirePath("schedule")]
         public string Schedule { get; set; }
         /// <summary> The current status of trigger. </summary>
+        [WirePath("status")]
         public ContainerRegistryTriggerStatus? Status { get; set; }
         /// <summary> The name of the trigger. </summary>
+        [WirePath("name")]
         public string Name { get; }
     }
 }

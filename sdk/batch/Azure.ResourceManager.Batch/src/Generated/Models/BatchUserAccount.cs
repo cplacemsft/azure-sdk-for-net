@@ -51,14 +51,8 @@ namespace Azure.ResourceManager.Batch.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="password"/> is null. </exception>
         public BatchUserAccount(string name, string password)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(password, nameof(password));
 
             Name = name;
             Password = password;
@@ -96,7 +90,7 @@ namespace Azure.ResourceManager.Batch.Models
         public BatchLinuxUserConfiguration LinuxUserConfiguration { get; set; }
         /// <summary> This property can only be specified if the user is on a Windows pool. If not specified and on a Windows pool, the user is created with the default options. </summary>
         internal BatchWindowsUserConfiguration WindowsUserConfiguration { get; set; }
-        /// <summary> Specifies login mode for the user. The default value for VirtualMachineConfiguration pools is interactive mode and for CloudServiceConfiguration pools is batch mode. </summary>
+        /// <summary> Specifies login mode for the user. The default value is Interactive. </summary>
         public BatchWindowsLoginMode? WindowsUserLoginMode
         {
             get => WindowsUserConfiguration is null ? default : WindowsUserConfiguration.LoginMode;

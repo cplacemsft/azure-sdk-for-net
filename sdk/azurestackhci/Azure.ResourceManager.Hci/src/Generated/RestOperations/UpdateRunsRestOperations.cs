@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Hci.Models;
@@ -33,8 +32,25 @@ namespace Azure.ResourceManager.Hci
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
-            _apiVersion = apiVersion ?? "2023-02-01";
+            _apiVersion = apiVersion ?? "2024-04-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string resourceGroupName, string clusterName, string updateName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.AzureStackHCI/clusters/", false);
+            uri.AppendPath(clusterName, true);
+            uri.AppendPath("/updates/", false);
+            uri.AppendPath(updateName, true);
+            uri.AppendPath("/updateRuns", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string resourceGroupName, string clusterName, string updateName)
@@ -61,7 +77,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> List all Update runs for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -70,38 +86,10 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/> or <paramref name="updateName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<UpdateRunList>> ListAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, clusterName, updateName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -110,7 +98,7 @@ namespace Azure.ResourceManager.Hci
                 case 200:
                     {
                         UpdateRunList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = UpdateRunList.DeserializeUpdateRunList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -120,7 +108,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> List all Update runs for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -129,38 +117,10 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/> or <paramref name="updateName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<UpdateRunList> List(string subscriptionId, string resourceGroupName, string clusterName, string updateName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, clusterName, updateName);
             _pipeline.Send(message, cancellationToken);
@@ -169,13 +129,31 @@ namespace Azure.ResourceManager.Hci
                 case 200:
                     {
                         UpdateRunList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = UpdateRunList.DeserializeUpdateRunList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateDeleteRequestUri(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.AzureStackHCI/clusters/", false);
+            uri.AppendPath(clusterName, true);
+            uri.AppendPath("/updates/", false);
+            uri.AppendPath(updateName, true);
+            uri.AppendPath("/updateRuns/", false);
+            uri.AppendPath(updateRunName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateDeleteRequest(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName)
@@ -203,7 +181,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> Delete specified Update Run. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -213,46 +191,11 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> DeleteAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
 
             using var message = CreateDeleteRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -268,7 +211,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> Delete specified Update Run. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -278,46 +221,11 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response Delete(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
 
             using var message = CreateDeleteRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName);
             _pipeline.Send(message, cancellationToken);
@@ -332,7 +240,25 @@ namespace Azure.ResourceManager.Hci
             }
         }
 
-        internal HttpMessage CreatePutRequest(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, UpdateRunData data)
+        internal RequestUriBuilder CreatePutRequestUri(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, HciClusterUpdateRunData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.AzureStackHCI/clusters/", false);
+            uri.AppendPath(clusterName, true);
+            uri.AppendPath("/updates/", false);
+            uri.AppendPath(updateName, true);
+            uri.AppendPath("/updateRuns/", false);
+            uri.AppendPath(updateRunName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
+        }
+
+        internal HttpMessage CreatePutRequest(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, HciClusterUpdateRunData data)
         {
             var message = _pipeline.CreateMessage();
             var request = message.Request;
@@ -354,14 +280,14 @@ namespace Azure.ResourceManager.Hci
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
         }
 
         /// <summary> Put Update runs for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -370,52 +296,14 @@ namespace Azure.ResourceManager.Hci
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/>, <paramref name="updateRunName"/> or <paramref name="data"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
-        public async Task<Response<UpdateRunData>> PutAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, UpdateRunData data, CancellationToken cancellationToken = default)
+        public async Task<Response<HciClusterUpdateRunData>> PutAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, HciClusterUpdateRunData data, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreatePutRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -423,9 +311,9 @@ namespace Azure.ResourceManager.Hci
             {
                 case 200:
                     {
-                        UpdateRunData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
-                        value = UpdateRunData.DeserializeUpdateRunData(document.RootElement);
+                        HciClusterUpdateRunData value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
+                        value = HciClusterUpdateRunData.DeserializeHciClusterUpdateRunData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
@@ -434,7 +322,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> Put Update runs for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -443,52 +331,14 @@ namespace Azure.ResourceManager.Hci
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/>, <paramref name="updateRunName"/> or <paramref name="data"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
-        public Response<UpdateRunData> Put(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, UpdateRunData data, CancellationToken cancellationToken = default)
+        public Response<HciClusterUpdateRunData> Put(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, HciClusterUpdateRunData data, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreatePutRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName, data);
             _pipeline.Send(message, cancellationToken);
@@ -496,14 +346,32 @@ namespace Azure.ResourceManager.Hci
             {
                 case 200:
                     {
-                        UpdateRunData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
-                        value = UpdateRunData.DeserializeUpdateRunData(document.RootElement);
+                        HciClusterUpdateRunData value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
+                        value = HciClusterUpdateRunData.DeserializeHciClusterUpdateRunData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.AzureStackHCI/clusters/", false);
+            uri.AppendPath(clusterName, true);
+            uri.AppendPath("/updates/", false);
+            uri.AppendPath(updateName, true);
+            uri.AppendPath("/updateRuns/", false);
+            uri.AppendPath(updateRunName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName)
@@ -531,7 +399,7 @@ namespace Azure.ResourceManager.Hci
         }
 
         /// <summary> Get the Update run for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -539,48 +407,13 @@ namespace Azure.ResourceManager.Hci
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
-        public async Task<Response<UpdateRunData>> GetAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
+        public async Task<Response<HciClusterUpdateRunData>> GetAsync(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -588,20 +421,20 @@ namespace Azure.ResourceManager.Hci
             {
                 case 200:
                     {
-                        UpdateRunData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
-                        value = UpdateRunData.DeserializeUpdateRunData(document.RootElement);
+                        HciClusterUpdateRunData value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
+                        value = HciClusterUpdateRunData.DeserializeHciClusterUpdateRunData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 case 404:
-                    return Response.FromValue((UpdateRunData)null, message.Response);
+                    return Response.FromValue((HciClusterUpdateRunData)null, message.Response);
                 default:
                     throw new RequestFailedException(message.Response);
             }
         }
 
         /// <summary> Get the Update run for a specified update. </summary>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -609,48 +442,13 @@ namespace Azure.ResourceManager.Hci
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/>, <paramref name="updateName"/> or <paramref name="updateRunName"/> is an empty string, and was expected to be non-empty. </exception>
-        public Response<UpdateRunData> Get(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
+        public Response<HciClusterUpdateRunData> Get(string subscriptionId, string resourceGroupName, string clusterName, string updateName, string updateRunName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
-            if (updateRunName == null)
-            {
-                throw new ArgumentNullException(nameof(updateRunName));
-            }
-            if (updateRunName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateRunName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
+            Argument.AssertNotNullOrEmpty(updateRunName, nameof(updateRunName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, clusterName, updateName, updateRunName);
             _pipeline.Send(message, cancellationToken);
@@ -658,16 +456,24 @@ namespace Azure.ResourceManager.Hci
             {
                 case 200:
                     {
-                        UpdateRunData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
-                        value = UpdateRunData.DeserializeUpdateRunData(document.RootElement);
+                        HciClusterUpdateRunData value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
+                        value = HciClusterUpdateRunData.DeserializeHciClusterUpdateRunData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 case 404:
-                    return Response.FromValue((UpdateRunData)null, message.Response);
+                    return Response.FromValue((HciClusterUpdateRunData)null, message.Response);
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string clusterName, string updateName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string clusterName, string updateName)
@@ -686,7 +492,7 @@ namespace Azure.ResourceManager.Hci
 
         /// <summary> List all Update runs for a specified update. </summary>
         /// <param name="nextLink"> The URL to the next page of results. </param>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -695,42 +501,11 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/> or <paramref name="updateName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<UpdateRunList>> ListNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string clusterName, string updateName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, clusterName, updateName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -739,7 +514,7 @@ namespace Azure.ResourceManager.Hci
                 case 200:
                     {
                         UpdateRunList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = UpdateRunList.DeserializeUpdateRunList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -750,7 +525,7 @@ namespace Azure.ResourceManager.Hci
 
         /// <summary> List all Update runs for a specified update. </summary>
         /// <param name="nextLink"> The URL to the next page of results. </param>
-        /// <param name="subscriptionId"> The ID of the target subscription. </param>
+        /// <param name="subscriptionId"> The ID of the target subscription. The value must be an UUID. </param>
         /// <param name="resourceGroupName"> The name of the resource group. The name is case insensitive. </param>
         /// <param name="clusterName"> The name of the cluster. </param>
         /// <param name="updateName"> The name of the Update. </param>
@@ -759,42 +534,11 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="clusterName"/> or <paramref name="updateName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<UpdateRunList> ListNextPage(string nextLink, string subscriptionId, string resourceGroupName, string clusterName, string updateName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (updateName == null)
-            {
-                throw new ArgumentNullException(nameof(updateName));
-            }
-            if (updateName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(updateName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNullOrEmpty(updateName, nameof(updateName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, clusterName, updateName);
             _pipeline.Send(message, cancellationToken);
@@ -803,7 +547,7 @@ namespace Azure.ResourceManager.Hci
                 case 200:
                     {
                         UpdateRunList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = UpdateRunList.DeserializeUpdateRunList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

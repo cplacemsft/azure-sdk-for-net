@@ -18,17 +18,14 @@ namespace Azure.ResourceManager.Avs.Models
         /// <exception cref="ArgumentNullException"> <paramref name="offer"/> is null. </exception>
         public AddonHcxProperties(string offer)
         {
-            if (offer == null)
-            {
-                throw new ArgumentNullException(nameof(offer));
-            }
+            Argument.AssertNotNull(offer, nameof(offer));
 
             Offer = offer;
             AddonType = AddonType.HCX;
         }
 
         /// <summary> Initializes a new instance of <see cref="AddonHcxProperties"/>. </summary>
-        /// <param name="addonType"> The type of private cloud addon. </param>
+        /// <param name="addonType"> Addon type. </param>
         /// <param name="provisioningState"> The state of the addon provisioning. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
         /// <param name="offer"> The HCX offer, example VMware MaaS Cloud Provider (Enterprise). </param>

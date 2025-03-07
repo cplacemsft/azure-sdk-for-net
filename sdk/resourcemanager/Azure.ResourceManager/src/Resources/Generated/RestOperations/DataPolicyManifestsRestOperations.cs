@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Resources.Models;
@@ -37,6 +36,16 @@ namespace Azure.ResourceManager.Resources
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
         }
 
+        internal RequestUriBuilder CreateGetByPolicyModeRequestUri(string policyMode)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Authorization/dataPolicyManifests/", false);
+            uri.AppendPath(policyMode, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
+        }
+
         internal HttpMessage CreateGetByPolicyModeRequest(string policyMode)
         {
             var message = _pipeline.CreateMessage();
@@ -60,14 +69,7 @@ namespace Azure.ResourceManager.Resources
         /// <exception cref="ArgumentException"> <paramref name="policyMode"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<DataPolicyManifestData>> GetByPolicyModeAsync(string policyMode, CancellationToken cancellationToken = default)
         {
-            if (policyMode == null)
-            {
-                throw new ArgumentNullException(nameof(policyMode));
-            }
-            if (policyMode.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(policyMode));
-            }
+            Argument.AssertNotNullOrEmpty(policyMode, nameof(policyMode));
 
             using var message = CreateGetByPolicyModeRequest(policyMode);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -76,7 +78,7 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DataPolicyManifestData.DeserializeDataPolicyManifestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -94,14 +96,7 @@ namespace Azure.ResourceManager.Resources
         /// <exception cref="ArgumentException"> <paramref name="policyMode"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<DataPolicyManifestData> GetByPolicyMode(string policyMode, CancellationToken cancellationToken = default)
         {
-            if (policyMode == null)
-            {
-                throw new ArgumentNullException(nameof(policyMode));
-            }
-            if (policyMode.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(policyMode));
-            }
+            Argument.AssertNotNullOrEmpty(policyMode, nameof(policyMode));
 
             using var message = CreateGetByPolicyModeRequest(policyMode);
             _pipeline.Send(message, cancellationToken);
@@ -110,7 +105,7 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DataPolicyManifestData.DeserializeDataPolicyManifestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -119,6 +114,19 @@ namespace Azure.ResourceManager.Resources
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string filter)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Authorization/dataPolicyManifests", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, false);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string filter)
@@ -152,7 +160,7 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DataPolicyManifestListResult.DeserializeDataPolicyManifestListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -173,13 +181,21 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DataPolicyManifestListResult.DeserializeDataPolicyManifestListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string filter)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string filter)
@@ -203,10 +219,7 @@ namespace Azure.ResourceManager.Resources
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public async Task<Response<DataPolicyManifestListResult>> ListNextPageAsync(string nextLink, string filter = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListNextPageRequest(nextLink, filter);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -215,7 +228,7 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DataPolicyManifestListResult.DeserializeDataPolicyManifestListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -231,10 +244,7 @@ namespace Azure.ResourceManager.Resources
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public Response<DataPolicyManifestListResult> ListNextPage(string nextLink, string filter = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListNextPageRequest(nextLink, filter);
             _pipeline.Send(message, cancellationToken);
@@ -243,7 +253,7 @@ namespace Azure.ResourceManager.Resources
                 case 200:
                     {
                         DataPolicyManifestListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DataPolicyManifestListResult.DeserializeDataPolicyManifestListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

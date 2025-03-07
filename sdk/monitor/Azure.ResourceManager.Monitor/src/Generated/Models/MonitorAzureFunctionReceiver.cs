@@ -54,22 +54,10 @@ namespace Azure.ResourceManager.Monitor.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/>, <paramref name="functionAppResourceId"/>, <paramref name="functionName"/> or <paramref name="httpTriggerUri"/> is null. </exception>
         public MonitorAzureFunctionReceiver(string name, ResourceIdentifier functionAppResourceId, string functionName, Uri httpTriggerUri)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (functionAppResourceId == null)
-            {
-                throw new ArgumentNullException(nameof(functionAppResourceId));
-            }
-            if (functionName == null)
-            {
-                throw new ArgumentNullException(nameof(functionName));
-            }
-            if (httpTriggerUri == null)
-            {
-                throw new ArgumentNullException(nameof(httpTriggerUri));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(functionAppResourceId, nameof(functionAppResourceId));
+            Argument.AssertNotNull(functionName, nameof(functionName));
+            Argument.AssertNotNull(httpTriggerUri, nameof(httpTriggerUri));
 
             Name = name;
             FunctionAppResourceId = functionAppResourceId;
@@ -83,14 +71,16 @@ namespace Azure.ResourceManager.Monitor.Models
         /// <param name="functionName"> The function name in the function app. </param>
         /// <param name="httpTriggerUri"> The http trigger url where http request sent to. </param>
         /// <param name="useCommonAlertSchema"> Indicates whether to use common alert schema. </param>
+        /// <param name="managedIdentity"> The principal id of the managed identity. The value can be "None", "SystemAssigned". </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal MonitorAzureFunctionReceiver(string name, ResourceIdentifier functionAppResourceId, string functionName, Uri httpTriggerUri, bool? useCommonAlertSchema, IDictionary<string, BinaryData> serializedAdditionalRawData)
+        internal MonitorAzureFunctionReceiver(string name, ResourceIdentifier functionAppResourceId, string functionName, Uri httpTriggerUri, bool? useCommonAlertSchema, string managedIdentity, IDictionary<string, BinaryData> serializedAdditionalRawData)
         {
             Name = name;
             FunctionAppResourceId = functionAppResourceId;
             FunctionName = functionName;
             HttpTriggerUri = httpTriggerUri;
             UseCommonAlertSchema = useCommonAlertSchema;
+            ManagedIdentity = managedIdentity;
             _serializedAdditionalRawData = serializedAdditionalRawData;
         }
 
@@ -109,5 +99,7 @@ namespace Azure.ResourceManager.Monitor.Models
         public Uri HttpTriggerUri { get; set; }
         /// <summary> Indicates whether to use common alert schema. </summary>
         public bool? UseCommonAlertSchema { get; set; }
+        /// <summary> The principal id of the managed identity. The value can be "None", "SystemAssigned". </summary>
+        public string ManagedIdentity { get; set; }
     }
 }

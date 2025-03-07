@@ -11,7 +11,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Data.Tables.Models;
@@ -90,7 +89,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         TableQueryResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = TableQueryResponse.DeserializeTableQueryResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -113,7 +112,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         TableQueryResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = TableQueryResponse.DeserializeTableQueryResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -170,7 +169,7 @@ namespace Azure.Data.Tables
                 case 201:
                     {
                         TableResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = TableResponse.DeserializeTableResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -202,7 +201,7 @@ namespace Azure.Data.Tables
                 case 201:
                     {
                         TableResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = TableResponse.DeserializeTableResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -257,10 +256,7 @@ namespace Azure.Data.Tables
         /// <returns> The response returned from the service. </returns>
         public virtual async Task<Response> CreateAsync(RequestContent content, string format = null, string responsePreference = null, RequestContext context = null)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = ClientDiagnostics.CreateScope("Table.Create");
             scope.Start();
@@ -295,10 +291,7 @@ namespace Azure.Data.Tables
         /// <returns> The response returned from the service. </returns>
         public virtual Response Create(RequestContent content, string format = null, string responsePreference = null, RequestContext context = null)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = ClientDiagnostics.CreateScope("Table.Create");
             scope.Start();
@@ -410,14 +403,7 @@ namespace Azure.Data.Tables
         /// <returns> The response returned from the service. </returns>
         public virtual async Task<Response> DeleteAsync(string table, RequestContext context = null)
         {
-            if (table == null)
-            {
-                throw new ArgumentNullException(nameof(table));
-            }
-            if (table.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(table));
-            }
+            Argument.AssertNotNullOrEmpty(table, nameof(table));
 
             using var scope = ClientDiagnostics.CreateScope("Table.Delete");
             scope.Start();
@@ -451,14 +437,7 @@ namespace Azure.Data.Tables
         /// <returns> The response returned from the service. </returns>
         public virtual Response Delete(string table, RequestContext context = null)
         {
-            if (table == null)
-            {
-                throw new ArgumentNullException(nameof(table));
-            }
-            if (table.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(table));
-            }
+            Argument.AssertNotNullOrEmpty(table, nameof(table));
 
             using var scope = ClientDiagnostics.CreateScope("Table.Delete");
             scope.Start();
@@ -542,7 +521,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         TableEntityQueryResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = TableEntityQueryResponse.DeserializeTableEntityQueryResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -574,7 +553,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         TableEntityQueryResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = TableEntityQueryResponse.DeserializeTableEntityQueryResponse(document.RootElement);
                         return ResponseWithHeaders.FromValue(value, headers, message.Response);
                     }
@@ -651,7 +630,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         IReadOnlyDictionary<string, object> value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         Dictionary<string, object> dictionary = new Dictionary<string, object>();
                         foreach (var property in document.RootElement.EnumerateObject())
                         {
@@ -703,7 +682,7 @@ namespace Azure.Data.Tables
                 case 200:
                     {
                         IReadOnlyDictionary<string, object> value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         Dictionary<string, object> dictionary = new Dictionary<string, object>();
                         foreach (var property in document.RootElement.EnumerateObject())
                         {
@@ -804,7 +783,7 @@ namespace Azure.Data.Tables
                         content.JsonWriter.WriteNullValue();
                         continue;
                     }
-                    content.JsonWriter.WriteObjectValue(item.Value);
+                    content.JsonWriter.WriteObjectValue<object>(item.Value);
                 }
                 content.JsonWriter.WriteEndObject();
                 request.Content = content;
@@ -929,7 +908,7 @@ namespace Azure.Data.Tables
                         content.JsonWriter.WriteNullValue();
                         continue;
                     }
-                    content.JsonWriter.WriteObjectValue(item.Value);
+                    content.JsonWriter.WriteObjectValue<object>(item.Value);
                 }
                 content.JsonWriter.WriteEndObject();
                 request.Content = content;
@@ -1159,7 +1138,7 @@ namespace Azure.Data.Tables
                         content.JsonWriter.WriteNullValue();
                         continue;
                     }
-                    content.JsonWriter.WriteObjectValue(item.Value);
+                    content.JsonWriter.WriteObjectValue<object>(item.Value);
                 }
                 content.JsonWriter.WriteEndObject();
                 request.Content = content;
@@ -1190,7 +1169,7 @@ namespace Azure.Data.Tables
                 case 201:
                     {
                         IReadOnlyDictionary<string, object> value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         Dictionary<string, object> dictionary = new Dictionary<string, object>();
                         foreach (var property in document.RootElement.EnumerateObject())
                         {
@@ -1236,7 +1215,7 @@ namespace Azure.Data.Tables
                 case 201:
                     {
                         IReadOnlyDictionary<string, object> value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         Dictionary<string, object> dictionary = new Dictionary<string, object>();
                         foreach (var property in document.RootElement.EnumerateObject())
                         {

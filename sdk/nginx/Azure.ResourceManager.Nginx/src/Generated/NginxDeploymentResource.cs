@@ -10,10 +10,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Nginx.Models;
 using Azure.ResourceManager.Resources;
 
@@ -92,6 +90,75 @@ namespace Azure.ResourceManager.Nginx
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid resource type {0} expected {1}", id.ResourceType, ResourceType), nameof(id));
         }
 
+        /// <summary> Gets a collection of NginxDeploymentApiKeyResources in the NginxDeployment. </summary>
+        /// <returns> An object representing collection of NginxDeploymentApiKeyResources and their operations over a NginxDeploymentApiKeyResource. </returns>
+        public virtual NginxDeploymentApiKeyCollection GetNginxDeploymentApiKeys()
+        {
+            return GetCachedClient(client => new NginxDeploymentApiKeyCollection(client, Id));
+        }
+
+        /// <summary>
+        /// Get the specified API Key of the given Nginx deployment
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/apiKeys/{apiKeyName}</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>ApiKeys_Get</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-11-01-preview</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="NginxDeploymentApiKeyResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="apiKeyName"> The resource name of the API key. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="apiKeyName"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="apiKeyName"/> is an empty string, and was expected to be non-empty. </exception>
+        [ForwardsClientCalls]
+        public virtual async Task<Response<NginxDeploymentApiKeyResource>> GetNginxDeploymentApiKeyAsync(string apiKeyName, CancellationToken cancellationToken = default)
+        {
+            return await GetNginxDeploymentApiKeys().GetAsync(apiKeyName, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Get the specified API Key of the given Nginx deployment
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Nginx.NginxPlus/nginxDeployments/{deploymentName}/apiKeys/{apiKeyName}</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>ApiKeys_Get</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-11-01-preview</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="NginxDeploymentApiKeyResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="apiKeyName"> The resource name of the API key. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="apiKeyName"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="apiKeyName"/> is an empty string, and was expected to be non-empty. </exception>
+        [ForwardsClientCalls]
+        public virtual Response<NginxDeploymentApiKeyResource> GetNginxDeploymentApiKey(string apiKeyName, CancellationToken cancellationToken = default)
+        {
+            return GetNginxDeploymentApiKeys().Get(apiKeyName, cancellationToken);
+        }
+
         /// <summary> Gets a collection of NginxCertificateResources in the NginxDeployment. </summary>
         /// <returns> An object representing collection of NginxCertificateResources and their operations over a NginxCertificateResource. </returns>
         public virtual NginxCertificateCollection GetNginxCertificates()
@@ -112,7 +179,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -143,7 +210,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -181,7 +248,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -212,7 +279,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -243,7 +310,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -283,7 +350,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -323,7 +390,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -365,7 +432,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -407,7 +474,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -421,10 +488,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual async Task<ArmOperation<NginxDeploymentResource>> UpdateAsync(WaitUntil waitUntil, NginxDeploymentPatch patch, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.Update");
             scope.Start();
@@ -456,7 +520,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -470,10 +534,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual ArmOperation<NginxDeploymentResource> Update(WaitUntil waitUntil, NginxDeploymentPatch patch, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.Update");
             scope.Start();
@@ -505,7 +566,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -519,14 +580,8 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual async Task<Response<NginxDeploymentResource>> AddTagAsync(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.AddTag");
             scope.Start();
@@ -573,7 +628,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -587,14 +642,8 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual Response<NginxDeploymentResource> AddTag(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.AddTag");
             scope.Start();
@@ -641,7 +690,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -654,10 +703,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual async Task<Response<NginxDeploymentResource>> SetTagsAsync(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.SetTags");
             scope.Start();
@@ -701,7 +747,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -714,10 +760,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual Response<NginxDeploymentResource> SetTags(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.SetTags");
             scope.Start();
@@ -761,7 +804,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -774,10 +817,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual async Task<Response<NginxDeploymentResource>> RemoveTagAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.RemoveTag");
             scope.Start();
@@ -824,7 +864,7 @@ namespace Azure.ResourceManager.Nginx
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -837,10 +877,7 @@ namespace Azure.ResourceManager.Nginx
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual Response<NginxDeploymentResource> RemoveTag(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _nginxDeploymentDeploymentsClientDiagnostics.CreateScope("NginxDeploymentResource.RemoveTag");
             scope.Start();

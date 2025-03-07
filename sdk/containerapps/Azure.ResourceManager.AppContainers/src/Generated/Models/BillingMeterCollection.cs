@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="value"/> is null. </exception>
         internal BillingMeterCollection(IEnumerable<ContainerAppBillingMeter> value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(value, nameof(value));
 
             Value = value.ToList();
         }
@@ -74,6 +71,7 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> Collection of billing meters. </summary>
+        [WirePath("value")]
         public IReadOnlyList<ContainerAppBillingMeter> Value { get; }
     }
 }

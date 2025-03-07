@@ -12,7 +12,7 @@ using Azure.Core;
 
 namespace Azure.ResourceManager.RedisEnterprise.Models
 {
-    /// <summary> Parameters for a Redis Enterprise Active Geo Replication Force Unlink operation. </summary>
+    /// <summary> Parameters for a redis enterprise active geo-replication force unlink operation. </summary>
     public partial class ForceUnlinkRedisEnterpriseDatabaseContent
     {
         /// <summary>
@@ -52,10 +52,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         /// <exception cref="ArgumentNullException"> <paramref name="ids"/> is null. </exception>
         public ForceUnlinkRedisEnterpriseDatabaseContent(IEnumerable<ResourceIdentifier> ids)
         {
-            if (ids == null)
-            {
-                throw new ArgumentNullException(nameof(ids));
-            }
+            Argument.AssertNotNull(ids, nameof(ids));
 
             Ids = ids.ToList();
         }
@@ -75,6 +72,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         }
 
         /// <summary> The resource IDs of the database resources to be unlinked. </summary>
+        [WirePath("ids")]
         public IList<ResourceIdentifier> Ids { get; }
     }
 }

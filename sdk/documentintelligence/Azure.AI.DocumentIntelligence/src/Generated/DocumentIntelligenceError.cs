@@ -51,14 +51,8 @@ namespace Azure.AI.DocumentIntelligence
         /// <exception cref="ArgumentNullException"> <paramref name="code"/> or <paramref name="message"/> is null. </exception>
         internal DocumentIntelligenceError(string code, string message)
         {
-            if (code == null)
-            {
-                throw new ArgumentNullException(nameof(code));
-            }
-            if (message == null)
-            {
-                throw new ArgumentNullException(nameof(message));
-            }
+            Argument.AssertNotNull(code, nameof(code));
+            Argument.AssertNotNull(message, nameof(message));
 
             Code = code;
             Message = message;
@@ -70,15 +64,15 @@ namespace Azure.AI.DocumentIntelligence
         /// <param name="message"> A human-readable representation of the error. </param>
         /// <param name="target"> The target of the error. </param>
         /// <param name="details"> An array of details about specific errors that led to this reported error. </param>
-        /// <param name="innererror"> An object containing more specific information than the current object about the error. </param>
+        /// <param name="innerError"> An object containing more specific information than the current object about the error. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal DocumentIntelligenceError(string code, string message, string target, IReadOnlyList<DocumentIntelligenceError> details, InnerError innererror, IDictionary<string, BinaryData> serializedAdditionalRawData)
+        internal DocumentIntelligenceError(string code, string message, string target, IReadOnlyList<DocumentIntelligenceError> details, DocumentIntelligenceInnerError innerError, IDictionary<string, BinaryData> serializedAdditionalRawData)
         {
             Code = code;
             Message = message;
             Target = target;
             Details = details;
-            Innererror = innererror;
+            InnerError = innerError;
             _serializedAdditionalRawData = serializedAdditionalRawData;
         }
 
@@ -96,6 +90,6 @@ namespace Azure.AI.DocumentIntelligence
         /// <summary> An array of details about specific errors that led to this reported error. </summary>
         public IReadOnlyList<DocumentIntelligenceError> Details { get; }
         /// <summary> An object containing more specific information than the current object about the error. </summary>
-        public InnerError Innererror { get; }
+        public DocumentIntelligenceInnerError InnerError { get; }
     }
 }

@@ -52,14 +52,8 @@ namespace Azure.ResourceManager.NetApp.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="subnetId"/> is null. </exception>
         public NetAppFilePathAvailabilityContent(string name, ResourceIdentifier subnetId)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (subnetId == null)
-            {
-                throw new ArgumentNullException(nameof(subnetId));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(subnetId, nameof(subnetId));
 
             Name = name;
             SubnetId = subnetId;
@@ -68,11 +62,13 @@ namespace Azure.ResourceManager.NetApp.Models
         /// <summary> Initializes a new instance of <see cref="NetAppFilePathAvailabilityContent"/>. </summary>
         /// <param name="name"> File path to verify. </param>
         /// <param name="subnetId"> The Azure Resource URI for a delegated subnet. Must have the delegation Microsoft.NetApp/volumes. </param>
+        /// <param name="availabilityZone"> The Azure Resource logical availability zone which is used within zone mapping lookup for the subscription and region. The lookup will retrieve the physical zone where volume is placed. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal NetAppFilePathAvailabilityContent(string name, ResourceIdentifier subnetId, IDictionary<string, BinaryData> serializedAdditionalRawData)
+        internal NetAppFilePathAvailabilityContent(string name, ResourceIdentifier subnetId, string availabilityZone, IDictionary<string, BinaryData> serializedAdditionalRawData)
         {
             Name = name;
             SubnetId = subnetId;
+            AvailabilityZone = availabilityZone;
             _serializedAdditionalRawData = serializedAdditionalRawData;
         }
 
@@ -85,5 +81,7 @@ namespace Azure.ResourceManager.NetApp.Models
         public string Name { get; }
         /// <summary> The Azure Resource URI for a delegated subnet. Must have the delegation Microsoft.NetApp/volumes. </summary>
         public ResourceIdentifier SubnetId { get; }
+        /// <summary> The Azure Resource logical availability zone which is used within zone mapping lookup for the subscription and region. The lookup will retrieve the physical zone where volume is placed. </summary>
+        public string AvailabilityZone { get; set; }
     }
 }

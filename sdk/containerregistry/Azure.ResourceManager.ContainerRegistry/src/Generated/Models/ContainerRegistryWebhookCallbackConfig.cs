@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using Azure.Core;
 
 namespace Azure.ResourceManager.ContainerRegistry.Models
 {
@@ -51,10 +50,7 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="serviceUri"/> is null. </exception>
         internal ContainerRegistryWebhookCallbackConfig(Uri serviceUri)
         {
-            if (serviceUri == null)
-            {
-                throw new ArgumentNullException(nameof(serviceUri));
-            }
+            Argument.AssertNotNull(serviceUri, nameof(serviceUri));
 
             ServiceUri = serviceUri;
             CustomHeaders = new ChangeTrackingDictionary<string, string>();
@@ -77,8 +73,10 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The service URI for the webhook to post notifications. </summary>
+        [WirePath("serviceUri")]
         public Uri ServiceUri { get; }
         /// <summary> Custom headers that will be added to the webhook notifications. </summary>
+        [WirePath("customHeaders")]
         public IReadOnlyDictionary<string, string> CustomHeaders { get; }
     }
 }

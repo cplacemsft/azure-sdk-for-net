@@ -52,18 +52,9 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/>, <paramref name="namespace"/> or <paramref name="podLabels"/> is null. </exception>
         public ManagedClusterPodIdentityException(string name, string @namespace, IDictionary<string, string> podLabels)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (@namespace == null)
-            {
-                throw new ArgumentNullException(nameof(@namespace));
-            }
-            if (podLabels == null)
-            {
-                throw new ArgumentNullException(nameof(podLabels));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(@namespace, nameof(@namespace));
+            Argument.AssertNotNull(podLabels, nameof(podLabels));
 
             Name = name;
             Namespace = @namespace;
@@ -89,10 +80,13 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> The name of the pod identity exception. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> The namespace of the pod identity exception. </summary>
+        [WirePath("namespace")]
         public string Namespace { get; set; }
         /// <summary> The pod labels to match. </summary>
+        [WirePath("podLabels")]
         public IDictionary<string, string> PodLabels { get; }
     }
 }

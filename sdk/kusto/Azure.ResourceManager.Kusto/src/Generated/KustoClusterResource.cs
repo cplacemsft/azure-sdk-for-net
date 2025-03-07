@@ -11,10 +11,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Kusto.Models;
 using Azure.ResourceManager.Resources;
 
@@ -138,7 +136,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -169,7 +167,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -207,7 +205,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -238,7 +236,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -276,7 +274,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -307,7 +305,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -345,7 +343,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -376,7 +374,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -414,7 +412,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -445,7 +443,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -483,7 +481,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -514,7 +512,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -552,7 +550,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -583,7 +581,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -614,7 +612,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -654,7 +652,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -694,7 +692,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -736,7 +734,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -778,7 +776,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -793,10 +791,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual async Task<ArmOperation<KustoClusterResource>> UpdateAsync(WaitUntil waitUntil, KustoClusterPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.Update");
             scope.Start();
@@ -828,7 +823,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -843,10 +838,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual ArmOperation<KustoClusterResource> Update(WaitUntil waitUntil, KustoClusterPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.Update");
             scope.Start();
@@ -878,7 +870,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -920,7 +912,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -962,7 +954,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1004,7 +996,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1046,7 +1038,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1060,10 +1052,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<ArmOperation> MigrateAsync(WaitUntil waitUntil, ClusterMigrateContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.Migrate");
             scope.Start();
@@ -1095,7 +1084,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1109,10 +1098,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual ArmOperation Migrate(WaitUntil waitUntil, ClusterMigrateContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.Migrate");
             scope.Start();
@@ -1140,11 +1126,69 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
+        /// <description>Clusters_ListFollowerDatabasesGet</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <returns> An async collection of <see cref="KustoFollowerDatabase"/> that may take multiple service requests to iterate over. </returns>
+        public virtual AsyncPageable<KustoFollowerDatabase> GetFollowerDatabasesGetAsync(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _kustoClusterClustersRestClient.CreateListFollowerDatabasesGetRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            return GeneratorPageableHelpers.CreateAsyncPageable(FirstPageRequest, null, e => KustoFollowerDatabase.DeserializeKustoFollowerDatabase(e), _kustoClusterClustersClientDiagnostics, Pipeline, "KustoClusterResource.GetFollowerDatabasesGet", "value", null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Returns a list of databases that are owned by this cluster and were followed by another cluster.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/listFollowerDatabases</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_ListFollowerDatabasesGet</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <returns> A collection of <see cref="KustoFollowerDatabase"/> that may take multiple service requests to iterate over. </returns>
+        public virtual Pageable<KustoFollowerDatabase> GetFollowerDatabasesGet(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _kustoClusterClustersRestClient.CreateListFollowerDatabasesGetRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            return GeneratorPageableHelpers.CreatePageable(FirstPageRequest, null, e => KustoFollowerDatabase.DeserializeKustoFollowerDatabase(e), _kustoClusterClustersClientDiagnostics, Pipeline, "KustoClusterResource.GetFollowerDatabasesGet", "value", null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Returns a list of databases that are owned by this cluster and were followed by another cluster.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/listFollowerDatabases</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
         /// <description>Clusters_ListFollowerDatabases</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1173,7 +1217,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1202,7 +1246,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1216,10 +1260,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="followerDatabaseToRemove"/> is null. </exception>
         public virtual async Task<ArmOperation> DetachFollowerDatabasesAsync(WaitUntil waitUntil, KustoFollowerDatabaseDefinition followerDatabaseToRemove, CancellationToken cancellationToken = default)
         {
-            if (followerDatabaseToRemove == null)
-            {
-                throw new ArgumentNullException(nameof(followerDatabaseToRemove));
-            }
+            Argument.AssertNotNull(followerDatabaseToRemove, nameof(followerDatabaseToRemove));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.DetachFollowerDatabases");
             scope.Start();
@@ -1251,7 +1292,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1265,10 +1306,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="followerDatabaseToRemove"/> is null. </exception>
         public virtual ArmOperation DetachFollowerDatabases(WaitUntil waitUntil, KustoFollowerDatabaseDefinition followerDatabaseToRemove, CancellationToken cancellationToken = default)
         {
-            if (followerDatabaseToRemove == null)
-            {
-                throw new ArgumentNullException(nameof(followerDatabaseToRemove));
-            }
+            Argument.AssertNotNull(followerDatabaseToRemove, nameof(followerDatabaseToRemove));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.DetachFollowerDatabases");
             scope.Start();
@@ -1300,7 +1338,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1342,7 +1380,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1384,7 +1422,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1413,7 +1451,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1442,7 +1480,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1472,7 +1510,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1490,6 +1528,248 @@ namespace Azure.ResourceManager.Kusto
         }
 
         /// <summary>
+        /// Adds a list of callout policies for engine services.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/addCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_AddCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
+        /// <param name="calloutPolicies"> The callout policies to add. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="calloutPolicies"/> is null. </exception>
+        public virtual async Task<ArmOperation> AddCalloutPoliciesAsync(WaitUntil waitUntil, CalloutPoliciesList calloutPolicies, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(calloutPolicies, nameof(calloutPolicies));
+
+            using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddCalloutPolicies");
+            scope.Start();
+            try
+            {
+                var response = await _kustoClusterClustersRestClient.AddCalloutPoliciesAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicies, cancellationToken).ConfigureAwait(false);
+                var operation = new KustoArmOperation(_kustoClusterClustersClientDiagnostics, Pipeline, _kustoClusterClustersRestClient.CreateAddCalloutPoliciesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicies).Request, response, OperationFinalStateVia.Location);
+                if (waitUntil == WaitUntil.Completed)
+                    await operation.WaitForCompletionResponseAsync(cancellationToken).ConfigureAwait(false);
+                return operation;
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Adds a list of callout policies for engine services.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/addCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_AddCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
+        /// <param name="calloutPolicies"> The callout policies to add. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="calloutPolicies"/> is null. </exception>
+        public virtual ArmOperation AddCalloutPolicies(WaitUntil waitUntil, CalloutPoliciesList calloutPolicies, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(calloutPolicies, nameof(calloutPolicies));
+
+            using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddCalloutPolicies");
+            scope.Start();
+            try
+            {
+                var response = _kustoClusterClustersRestClient.AddCalloutPolicies(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicies, cancellationToken);
+                var operation = new KustoArmOperation(_kustoClusterClustersClientDiagnostics, Pipeline, _kustoClusterClustersRestClient.CreateAddCalloutPoliciesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicies).Request, response, OperationFinalStateVia.Location);
+                if (waitUntil == WaitUntil.Completed)
+                    operation.WaitForCompletionResponse(cancellationToken);
+                return operation;
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Removes callout policy for engine services.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/removeCalloutPolicy</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_RemoveCalloutPolicy</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
+        /// <param name="calloutPolicy"> The callout policies to remove. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="calloutPolicy"/> is null. </exception>
+        public virtual async Task<ArmOperation> RemoveCalloutPolicyAsync(WaitUntil waitUntil, CalloutPolicyToRemove calloutPolicy, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(calloutPolicy, nameof(calloutPolicy));
+
+            using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveCalloutPolicy");
+            scope.Start();
+            try
+            {
+                var response = await _kustoClusterClustersRestClient.RemoveCalloutPolicyAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicy, cancellationToken).ConfigureAwait(false);
+                var operation = new KustoArmOperation(_kustoClusterClustersClientDiagnostics, Pipeline, _kustoClusterClustersRestClient.CreateRemoveCalloutPolicyRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicy).Request, response, OperationFinalStateVia.Location);
+                if (waitUntil == WaitUntil.Completed)
+                    await operation.WaitForCompletionResponseAsync(cancellationToken).ConfigureAwait(false);
+                return operation;
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Removes callout policy for engine services.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/removeCalloutPolicy</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_RemoveCalloutPolicy</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
+        /// <param name="calloutPolicy"> The callout policies to remove. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="calloutPolicy"/> is null. </exception>
+        public virtual ArmOperation RemoveCalloutPolicy(WaitUntil waitUntil, CalloutPolicyToRemove calloutPolicy, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(calloutPolicy, nameof(calloutPolicy));
+
+            using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveCalloutPolicy");
+            scope.Start();
+            try
+            {
+                var response = _kustoClusterClustersRestClient.RemoveCalloutPolicy(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicy, cancellationToken);
+                var operation = new KustoArmOperation(_kustoClusterClustersClientDiagnostics, Pipeline, _kustoClusterClustersRestClient.CreateRemoveCalloutPolicyRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, calloutPolicy).Request, response, OperationFinalStateVia.Location);
+                if (waitUntil == WaitUntil.Completed)
+                    operation.WaitForCompletionResponse(cancellationToken);
+                return operation;
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns the allowed callout policies for the specified service.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/listCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_ListCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <returns> An async collection of <see cref="KustoCalloutPolicy"/> that may take multiple service requests to iterate over. </returns>
+        public virtual AsyncPageable<KustoCalloutPolicy> GetCalloutPoliciesAsync(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _kustoClusterClustersRestClient.CreateListCalloutPoliciesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            return GeneratorPageableHelpers.CreateAsyncPageable(FirstPageRequest, null, e => KustoCalloutPolicy.DeserializeKustoCalloutPolicy(e), _kustoClusterClustersClientDiagnostics, Pipeline, "KustoClusterResource.GetCalloutPolicies", "value", null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Returns the allowed callout policies for the specified service.
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/listCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>Clusters_ListCalloutPolicies</description>
+        /// </item>
+        /// <item>
+        /// <term>Default Api Version</term>
+        /// <description>2024-04-13</description>
+        /// </item>
+        /// <item>
+        /// <term>Resource</term>
+        /// <description><see cref="KustoClusterResource"/></description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <returns> A collection of <see cref="KustoCalloutPolicy"/> that may take multiple service requests to iterate over. </returns>
+        public virtual Pageable<KustoCalloutPolicy> GetCalloutPolicies(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _kustoClusterClustersRestClient.CreateListCalloutPoliciesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            return GeneratorPageableHelpers.CreatePageable(FirstPageRequest, null, e => KustoCalloutPolicy.DeserializeKustoCalloutPolicy(e), _kustoClusterClustersClientDiagnostics, Pipeline, "KustoClusterResource.GetCalloutPolicies", "value", null, cancellationToken);
+        }
+
+        /// <summary>
         /// Returns a list of language extensions that can run within KQL queries.
         /// <list type="bullet">
         /// <item>
@@ -1502,7 +1782,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1531,7 +1811,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1560,7 +1840,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1574,10 +1854,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="languageExtensionsToAdd"/> is null. </exception>
         public virtual async Task<ArmOperation> AddLanguageExtensionsAsync(WaitUntil waitUntil, KustoLanguageExtensionList languageExtensionsToAdd, CancellationToken cancellationToken = default)
         {
-            if (languageExtensionsToAdd == null)
-            {
-                throw new ArgumentNullException(nameof(languageExtensionsToAdd));
-            }
+            Argument.AssertNotNull(languageExtensionsToAdd, nameof(languageExtensionsToAdd));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddLanguageExtensions");
             scope.Start();
@@ -1609,7 +1886,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1623,10 +1900,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="languageExtensionsToAdd"/> is null. </exception>
         public virtual ArmOperation AddLanguageExtensions(WaitUntil waitUntil, KustoLanguageExtensionList languageExtensionsToAdd, CancellationToken cancellationToken = default)
         {
-            if (languageExtensionsToAdd == null)
-            {
-                throw new ArgumentNullException(nameof(languageExtensionsToAdd));
-            }
+            Argument.AssertNotNull(languageExtensionsToAdd, nameof(languageExtensionsToAdd));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddLanguageExtensions");
             scope.Start();
@@ -1658,7 +1932,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1672,10 +1946,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="languageExtensionsToRemove"/> is null. </exception>
         public virtual async Task<ArmOperation> RemoveLanguageExtensionsAsync(WaitUntil waitUntil, KustoLanguageExtensionList languageExtensionsToRemove, CancellationToken cancellationToken = default)
         {
-            if (languageExtensionsToRemove == null)
-            {
-                throw new ArgumentNullException(nameof(languageExtensionsToRemove));
-            }
+            Argument.AssertNotNull(languageExtensionsToRemove, nameof(languageExtensionsToRemove));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveLanguageExtensions");
             scope.Start();
@@ -1707,7 +1978,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1721,10 +1992,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="languageExtensionsToRemove"/> is null. </exception>
         public virtual ArmOperation RemoveLanguageExtensions(WaitUntil waitUntil, KustoLanguageExtensionList languageExtensionsToRemove, CancellationToken cancellationToken = default)
         {
-            if (languageExtensionsToRemove == null)
-            {
-                throw new ArgumentNullException(nameof(languageExtensionsToRemove));
-            }
+            Argument.AssertNotNull(languageExtensionsToRemove, nameof(languageExtensionsToRemove));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveLanguageExtensions");
             scope.Start();
@@ -1756,7 +2024,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1769,10 +2037,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<KustoNameAvailabilityResult>> CheckKustoClusterPrincipalAssignmentNameAvailabilityAsync(KustoClusterPrincipalAssignmentNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoClusterPrincipalAssignmentClusterPrincipalAssignmentsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoClusterPrincipalAssignmentNameAvailability");
             scope.Start();
@@ -1801,7 +2066,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1814,10 +2079,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<KustoNameAvailabilityResult> CheckKustoClusterPrincipalAssignmentNameAvailability(KustoClusterPrincipalAssignmentNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoClusterPrincipalAssignmentClusterPrincipalAssignmentsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoClusterPrincipalAssignmentNameAvailability");
             scope.Start();
@@ -1846,7 +2108,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1859,10 +2121,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<KustoNameAvailabilityResult>> CheckKustoDatabaseNameAvailabilityAsync(KustoDatabaseNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoDatabaseDatabasesClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoDatabaseNameAvailability");
             scope.Start();
@@ -1891,7 +2150,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1904,10 +2163,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<KustoNameAvailabilityResult> CheckKustoDatabaseNameAvailability(KustoDatabaseNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoDatabaseDatabasesClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoDatabaseNameAvailability");
             scope.Start();
@@ -1936,7 +2192,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1949,10 +2205,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<KustoNameAvailabilityResult>> CheckKustoAttachedDatabaseConfigurationNameAvailabilityAsync(KustoAttachedDatabaseConfigurationNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoAttachedDatabaseConfigurationAttachedDatabaseConfigurationsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoAttachedDatabaseConfigurationNameAvailability");
             scope.Start();
@@ -1981,7 +2234,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -1994,10 +2247,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<KustoNameAvailabilityResult> CheckKustoAttachedDatabaseConfigurationNameAvailability(KustoAttachedDatabaseConfigurationNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoAttachedDatabaseConfigurationAttachedDatabaseConfigurationsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoAttachedDatabaseConfigurationNameAvailability");
             scope.Start();
@@ -2026,7 +2276,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2039,10 +2289,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<KustoNameAvailabilityResult>> CheckKustoManagedPrivateEndpointNameAvailabilityAsync(KustoManagedPrivateEndpointNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoManagedPrivateEndpointNameAvailability");
             scope.Start();
@@ -2071,7 +2318,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2084,10 +2331,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<KustoNameAvailabilityResult> CheckKustoManagedPrivateEndpointNameAvailability(KustoManagedPrivateEndpointNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoClusterResource.CheckKustoManagedPrivateEndpointNameAvailability");
             scope.Start();
@@ -2116,7 +2360,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2129,10 +2373,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<KustoNameAvailabilityResult>> CheckNameAvailabilitySandboxCustomImageAsync(SandboxCustomImagesCheckNameContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _sandboxCustomImageClientDiagnostics.CreateScope("KustoClusterResource.CheckNameAvailabilitySandboxCustomImage");
             scope.Start();
@@ -2161,7 +2402,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2174,10 +2415,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<KustoNameAvailabilityResult> CheckNameAvailabilitySandboxCustomImage(SandboxCustomImagesCheckNameContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _sandboxCustomImageClientDiagnostics.CreateScope("KustoClusterResource.CheckNameAvailabilitySandboxCustomImage");
             scope.Start();
@@ -2206,7 +2444,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2220,14 +2458,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual async Task<Response<KustoClusterResource>> AddTagAsync(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddTag");
             scope.Start();
@@ -2274,7 +2506,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2288,14 +2520,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual Response<KustoClusterResource> AddTag(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.AddTag");
             scope.Start();
@@ -2342,7 +2568,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2355,10 +2581,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual async Task<Response<KustoClusterResource>> SetTagsAsync(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.SetTags");
             scope.Start();
@@ -2402,7 +2625,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2415,10 +2638,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual Response<KustoClusterResource> SetTags(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.SetTags");
             scope.Start();
@@ -2462,7 +2682,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2475,10 +2695,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual async Task<Response<KustoClusterResource>> RemoveTagAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveTag");
             scope.Start();
@@ -2525,7 +2742,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -2538,10 +2755,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual Response<KustoClusterResource> RemoveTag(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterResource.RemoveTag");
             scope.Start();

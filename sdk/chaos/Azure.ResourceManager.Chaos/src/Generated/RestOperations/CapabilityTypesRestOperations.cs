@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Chaos.Models;
@@ -35,6 +34,25 @@ namespace Azure.ResourceManager.Chaos
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2024-01-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string locationName, string targetTypeName, string continuationToken)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.Chaos/locations/", false);
+            uri.AppendPath(locationName, true);
+            uri.AppendPath("/targetTypes/", false);
+            uri.AppendPath(targetTypeName, true);
+            uri.AppendPath("/capabilityTypes", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (continuationToken != null)
+            {
+                uri.AppendQuery("continuationToken", continuationToken, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string locationName, string targetTypeName, string continuationToken)
@@ -72,30 +90,9 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/> or <paramref name="targetTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<CapabilityTypeListResult>> ListAsync(string subscriptionId, string locationName, string targetTypeName, string continuationToken = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
 
             using var message = CreateListRequest(subscriptionId, locationName, targetTypeName, continuationToken);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -104,7 +101,7 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         CapabilityTypeListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = CapabilityTypeListResult.DeserializeCapabilityTypeListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -123,30 +120,9 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/> or <paramref name="targetTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<CapabilityTypeListResult> List(string subscriptionId, string locationName, string targetTypeName, string continuationToken = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
 
             using var message = CreateListRequest(subscriptionId, locationName, targetTypeName, continuationToken);
             _pipeline.Send(message, cancellationToken);
@@ -155,13 +131,29 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         CapabilityTypeListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = CapabilityTypeListResult.DeserializeCapabilityTypeListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string locationName, string targetTypeName, string capabilityTypeName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.Chaos/locations/", false);
+            uri.AppendPath(locationName, true);
+            uri.AppendPath("/targetTypes/", false);
+            uri.AppendPath(targetTypeName, true);
+            uri.AppendPath("/capabilityTypes/", false);
+            uri.AppendPath(capabilityTypeName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string locationName, string targetTypeName, string capabilityTypeName)
@@ -196,38 +188,10 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/>, <paramref name="targetTypeName"/> or <paramref name="capabilityTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ChaosCapabilityTypeData>> GetAsync(string subscriptionId, string locationName, string targetTypeName, string capabilityTypeName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
-            if (capabilityTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(capabilityTypeName));
-            }
-            if (capabilityTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(capabilityTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
+            Argument.AssertNotNullOrEmpty(capabilityTypeName, nameof(capabilityTypeName));
 
             using var message = CreateGetRequest(subscriptionId, locationName, targetTypeName, capabilityTypeName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -236,7 +200,7 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         ChaosCapabilityTypeData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ChaosCapabilityTypeData.DeserializeChaosCapabilityTypeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -257,38 +221,10 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/>, <paramref name="targetTypeName"/> or <paramref name="capabilityTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ChaosCapabilityTypeData> Get(string subscriptionId, string locationName, string targetTypeName, string capabilityTypeName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
-            if (capabilityTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(capabilityTypeName));
-            }
-            if (capabilityTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(capabilityTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
+            Argument.AssertNotNullOrEmpty(capabilityTypeName, nameof(capabilityTypeName));
 
             using var message = CreateGetRequest(subscriptionId, locationName, targetTypeName, capabilityTypeName);
             _pipeline.Send(message, cancellationToken);
@@ -297,7 +233,7 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         ChaosCapabilityTypeData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ChaosCapabilityTypeData.DeserializeChaosCapabilityTypeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -306,6 +242,14 @@ namespace Azure.ResourceManager.Chaos
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string subscriptionId, string locationName, string targetTypeName, string continuationToken)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string subscriptionId, string locationName, string targetTypeName, string continuationToken)
@@ -333,34 +277,10 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/> or <paramref name="targetTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<CapabilityTypeListResult>> ListNextPageAsync(string nextLink, string subscriptionId, string locationName, string targetTypeName, string continuationToken = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, locationName, targetTypeName, continuationToken);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -369,7 +289,7 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         CapabilityTypeListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = CapabilityTypeListResult.DeserializeCapabilityTypeListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -389,34 +309,10 @@ namespace Azure.ResourceManager.Chaos
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="locationName"/> or <paramref name="targetTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<CapabilityTypeListResult> ListNextPage(string nextLink, string subscriptionId, string locationName, string targetTypeName, string continuationToken = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (locationName == null)
-            {
-                throw new ArgumentNullException(nameof(locationName));
-            }
-            if (locationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(locationName));
-            }
-            if (targetTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(targetTypeName));
-            }
-            if (targetTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(targetTypeName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(locationName, nameof(locationName));
+            Argument.AssertNotNullOrEmpty(targetTypeName, nameof(targetTypeName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, locationName, targetTypeName, continuationToken);
             _pipeline.Send(message, cancellationToken);
@@ -425,7 +321,7 @@ namespace Azure.ResourceManager.Chaos
                 case 200:
                     {
                         CapabilityTypeListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = CapabilityTypeListResult.DeserializeCapabilityTypeListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

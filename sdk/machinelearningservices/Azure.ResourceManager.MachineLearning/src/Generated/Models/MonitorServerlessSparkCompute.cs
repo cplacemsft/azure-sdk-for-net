@@ -24,18 +24,9 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="computeIdentity"/>, <paramref name="instanceType"/> or <paramref name="runtimeVersion"/> is null. </exception>
         public MonitorServerlessSparkCompute(MonitorComputeIdentityBase computeIdentity, string instanceType, string runtimeVersion)
         {
-            if (computeIdentity == null)
-            {
-                throw new ArgumentNullException(nameof(computeIdentity));
-            }
-            if (instanceType == null)
-            {
-                throw new ArgumentNullException(nameof(instanceType));
-            }
-            if (runtimeVersion == null)
-            {
-                throw new ArgumentNullException(nameof(runtimeVersion));
-            }
+            Argument.AssertNotNull(computeIdentity, nameof(computeIdentity));
+            Argument.AssertNotNull(instanceType, nameof(instanceType));
+            Argument.AssertNotNull(runtimeVersion, nameof(runtimeVersion));
 
             ComputeIdentity = computeIdentity;
             InstanceType = instanceType;
@@ -71,10 +62,13 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// Please note <see cref="MonitorComputeIdentityBase"/> is the base class. According to the scenario, a derived class of the base class might need to be assigned here, or this property needs to be casted to one of the possible derived classes.
         /// The available derived classes include <see cref="AmlTokenComputeIdentity"/> and <see cref="ManagedComputeIdentity"/>.
         /// </summary>
+        [WirePath("computeIdentity")]
         public MonitorComputeIdentityBase ComputeIdentity { get; set; }
         /// <summary> [Required] The instance type running the Spark job. </summary>
+        [WirePath("instanceType")]
         public string InstanceType { get; set; }
         /// <summary> [Required] The Spark runtime version. </summary>
+        [WirePath("runtimeVersion")]
         public string RuntimeVersion { get; set; }
     }
 }

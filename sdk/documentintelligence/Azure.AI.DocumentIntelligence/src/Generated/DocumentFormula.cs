@@ -50,17 +50,10 @@ namespace Azure.AI.DocumentIntelligence
         /// <param name="value"> LaTex expression describing the formula. </param>
         /// <param name="span"> Location of the formula in the reading order concatenated content. </param>
         /// <param name="confidence"> Confidence of correctly extracting the formula. </param>
-        /// <exception cref="ArgumentNullException"> <paramref name="value"/> or <paramref name="span"/> is null. </exception>
+        /// <exception cref="ArgumentNullException"> <paramref name="value"/> is null. </exception>
         internal DocumentFormula(DocumentFormulaKind kind, string value, DocumentSpan span, float confidence)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            if (span == null)
-            {
-                throw new ArgumentNullException(nameof(span));
-            }
+            Argument.AssertNotNull(value, nameof(value));
 
             Kind = kind;
             Value = value;

@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.Kusto
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -85,18 +83,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<KustoClusterResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string clusterName, KustoClusterData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.CreateOrUpdate");
             scope.Start();
@@ -128,7 +116,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -146,18 +134,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<KustoClusterResource> CreateOrUpdate(WaitUntil waitUntil, string clusterName, KustoClusterData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.CreateOrUpdate");
             scope.Start();
@@ -189,7 +167,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -203,14 +181,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual async Task<Response<KustoClusterResource>> GetAsync(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.Get");
             scope.Start();
@@ -241,7 +212,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -255,14 +226,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual Response<KustoClusterResource> Get(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.Get");
             scope.Start();
@@ -293,7 +257,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -322,7 +286,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -351,7 +315,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -365,14 +329,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.Exists");
             scope.Start();
@@ -401,7 +358,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -415,14 +372,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual Response<bool> Exists(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.Exists");
             scope.Start();
@@ -451,7 +401,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -465,14 +415,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual async Task<NullableResponse<KustoClusterResource>> GetIfExistsAsync(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.GetIfExists");
             scope.Start();
@@ -503,7 +446,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -517,14 +460,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="clusterName"/> is null. </exception>
         public virtual NullableResponse<KustoClusterResource> GetIfExists(string clusterName, CancellationToken cancellationToken = default)
         {
-            if (clusterName == null)
-            {
-                throw new ArgumentNullException(nameof(clusterName));
-            }
-            if (clusterName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(clusterName));
-            }
+            Argument.AssertNotNullOrEmpty(clusterName, nameof(clusterName));
 
             using var scope = _kustoClusterClustersClientDiagnostics.CreateScope("KustoClusterCollection.GetIfExists");
             scope.Start();

@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.EventGrid.Models
         /// <exception cref="ArgumentNullException"> <paramref name="keyName"/> is null. </exception>
         public TopicRegenerateKeyContent(string keyName)
         {
-            if (keyName == null)
-            {
-                throw new ArgumentNullException(nameof(keyName));
-            }
+            Argument.AssertNotNull(keyName, nameof(keyName));
 
             KeyName = keyName;
         }
@@ -73,6 +70,7 @@ namespace Azure.ResourceManager.EventGrid.Models
         }
 
         /// <summary> Key name to regenerate key1 or key2. </summary>
+        [WirePath("keyName")]
         public string KeyName { get; }
     }
 }

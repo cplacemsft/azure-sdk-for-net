@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.Maps
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,25 +81,17 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<MapsAccountResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string accountName, MapsAccountData data, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = await _mapsAccountAccountsRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, accountName, data, cancellationToken).ConfigureAwait(false);
-                var operation = new MapsArmOperation<MapsAccountResource>(Response.FromValue(new MapsAccountResource(Client, response), response.GetRawResponse()));
+                var uri = _mapsAccountAccountsRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, accountName, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new MapsArmOperation<MapsAccountResource>(Response.FromValue(new MapsAccountResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -126,7 +116,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,25 +132,17 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<MapsAccountResource> CreateOrUpdate(WaitUntil waitUntil, string accountName, MapsAccountData data, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = _mapsAccountAccountsRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, accountName, data, cancellationToken);
-                var operation = new MapsArmOperation<MapsAccountResource>(Response.FromValue(new MapsAccountResource(Client, response), response.GetRawResponse()));
+                var uri = _mapsAccountAccountsRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, accountName, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new MapsArmOperation<MapsAccountResource>(Response.FromValue(new MapsAccountResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -185,7 +167,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +181,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual async Task<Response<MapsAccountResource>> GetAsync(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.Get");
             scope.Start();
@@ -237,7 +212,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +226,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual Response<MapsAccountResource> Get(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.Get");
             scope.Start();
@@ -289,7 +257,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +287,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +317,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +331,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.Exists");
             scope.Start();
@@ -399,7 +360,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +374,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual Response<bool> Exists(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.Exists");
             scope.Start();
@@ -449,7 +403,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +417,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual async Task<NullableResponse<MapsAccountResource>> GetIfExistsAsync(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.GetIfExists");
             scope.Start();
@@ -501,7 +448,7 @@ namespace Azure.ResourceManager.Maps
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2021-12-01-preview</description>
+        /// <description>2023-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +462,7 @@ namespace Azure.ResourceManager.Maps
         /// <exception cref="ArgumentNullException"> <paramref name="accountName"/> is null. </exception>
         public virtual NullableResponse<MapsAccountResource> GetIfExists(string accountName, CancellationToken cancellationToken = default)
         {
-            if (accountName == null)
-            {
-                throw new ArgumentNullException(nameof(accountName));
-            }
-            if (accountName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(accountName));
-            }
+            Argument.AssertNotNullOrEmpty(accountName, nameof(accountName));
 
             using var scope = _mapsAccountAccountsClientDiagnostics.CreateScope("MapsAccountCollection.GetIfExists");
             scope.Start();

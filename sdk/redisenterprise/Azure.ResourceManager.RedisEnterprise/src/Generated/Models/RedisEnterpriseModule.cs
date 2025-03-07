@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         public RedisEnterpriseModule(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             Name = name;
         }
@@ -77,10 +74,13 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         }
 
         /// <summary> The name of the module, e.g. 'RedisBloom', 'RediSearch', 'RedisTimeSeries'. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> Configuration options for the module, e.g. 'ERROR_RATE 0.01 INITIAL_SIZE 400'. </summary>
+        [WirePath("args")]
         public string Args { get; set; }
         /// <summary> The version of the module, e.g. '1.0'. </summary>
+        [WirePath("version")]
         public string Version { get; }
     }
 }

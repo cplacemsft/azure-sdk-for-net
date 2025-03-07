@@ -58,14 +58,8 @@ namespace Azure.ResourceManager.ContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="sourceResourceId"/> or <paramref name="roles"/> is null. </exception>
         public ContainerServiceTrustedAccessRoleBindingData(ResourceIdentifier sourceResourceId, IEnumerable<string> roles)
         {
-            if (sourceResourceId == null)
-            {
-                throw new ArgumentNullException(nameof(sourceResourceId));
-            }
-            if (roles == null)
-            {
-                throw new ArgumentNullException(nameof(roles));
-            }
+            Argument.AssertNotNull(sourceResourceId, nameof(sourceResourceId));
+            Argument.AssertNotNull(roles, nameof(roles));
 
             SourceResourceId = sourceResourceId;
             Roles = roles.ToList();
@@ -94,10 +88,13 @@ namespace Azure.ResourceManager.ContainerService
         }
 
         /// <summary> The current provisioning state of trusted access role binding. </summary>
+        [WirePath("properties.provisioningState")]
         public ContainerServiceTrustedAccessRoleBindingProvisioningState? ProvisioningState { get; }
         /// <summary> The ARM resource ID of source resource that trusted access is configured for. </summary>
+        [WirePath("properties.sourceResourceId")]
         public ResourceIdentifier SourceResourceId { get; set; }
         /// <summary> A list of roles to bind, each item is a resource type qualified role name. For example: 'Microsoft.MachineLearningServices/workspaces/reader'. </summary>
+        [WirePath("properties.roles")]
         public IList<string> Roles { get; }
     }
 }

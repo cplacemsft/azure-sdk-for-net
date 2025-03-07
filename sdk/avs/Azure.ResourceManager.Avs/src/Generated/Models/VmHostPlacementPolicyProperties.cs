@@ -22,14 +22,8 @@ namespace Azure.ResourceManager.Avs.Models
         /// <exception cref="ArgumentNullException"> <paramref name="vmMembers"/> or <paramref name="hostMembers"/> is null. </exception>
         public VmHostPlacementPolicyProperties(IEnumerable<ResourceIdentifier> vmMembers, IEnumerable<string> hostMembers, AvsPlacementPolicyAffinityType affinityType)
         {
-            if (vmMembers == null)
-            {
-                throw new ArgumentNullException(nameof(vmMembers));
-            }
-            if (hostMembers == null)
-            {
-                throw new ArgumentNullException(nameof(hostMembers));
-            }
+            Argument.AssertNotNull(vmMembers, nameof(vmMembers));
+            Argument.AssertNotNull(hostMembers, nameof(hostMembers));
 
             VmMembers = vmMembers.ToList();
             HostMembers = hostMembers.ToList();
@@ -38,7 +32,7 @@ namespace Azure.ResourceManager.Avs.Models
         }
 
         /// <summary> Initializes a new instance of <see cref="VmHostPlacementPolicyProperties"/>. </summary>
-        /// <param name="policyType"> placement policy type. </param>
+        /// <param name="policyType"> Placement Policy type. </param>
         /// <param name="state"> Whether the placement policy is enabled or disabled. </param>
         /// <param name="displayName"> Display name of the placement policy. </param>
         /// <param name="provisioningState"> The provisioning state. </param>

@@ -10,23 +10,30 @@ using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Text.Json;
 using Azure.Core;
-using Azure.ResourceManager.PlaywrightTesting;
 
 namespace Azure.ResourceManager.PlaywrightTesting.Models
 {
     public partial class PlaywrightTestingAccountPatch : IUtf8JsonSerializable, IJsonModel<PlaywrightTestingAccountPatch>
     {
-        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<PlaywrightTestingAccountPatch>)this).Write(writer, new ModelReaderWriterOptions("W"));
+        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<PlaywrightTestingAccountPatch>)this).Write(writer, ModelSerializationExtensions.WireOptions);
 
         void IJsonModel<PlaywrightTestingAccountPatch>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+        {
+            writer.WriteStartObject();
+            JsonModelWriteCore(writer, options);
+            writer.WriteEndObject();
+        }
+
+        /// <param name="writer"> The JSON writer. </param>
+        /// <param name="options"> The client options for reading and writing models. </param>
+        protected virtual void JsonModelWriteCore(Utf8JsonWriter writer, ModelReaderWriterOptions options)
         {
             var format = options.Format == "W" ? ((IPersistableModel<PlaywrightTestingAccountPatch>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support writing '{format}' format.");
             }
 
-            writer.WriteStartObject();
             if (Optional.IsCollectionDefined(Tags))
             {
                 writer.WritePropertyName("tags"u8);
@@ -38,24 +45,11 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
                 }
                 writer.WriteEndObject();
             }
-            writer.WritePropertyName("properties"u8);
-            writer.WriteStartObject();
-            if (Optional.IsDefined(RegionalAffinity))
+            if (Optional.IsDefined(Properties))
             {
-                writer.WritePropertyName("regionalAffinity"u8);
-                writer.WriteStringValue(RegionalAffinity.Value.ToString());
+                writer.WritePropertyName("properties"u8);
+                writer.WriteObjectValue(Properties, options);
             }
-            if (Optional.IsDefined(ScalableExecution))
-            {
-                writer.WritePropertyName("scalableExecution"u8);
-                writer.WriteStringValue(ScalableExecution.Value.ToString());
-            }
-            if (Optional.IsDefined(Reporting))
-            {
-                writer.WritePropertyName("reporting"u8);
-                writer.WriteStringValue(Reporting.Value.ToString());
-            }
-            writer.WriteEndObject();
             if (options.Format != "W" && _serializedAdditionalRawData != null)
             {
                 foreach (var item in _serializedAdditionalRawData)
@@ -64,14 +58,13 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
 #if NET6_0_OR_GREATER
 				writer.WriteRawValue(item.Value);
 #else
-                    using (JsonDocument document = JsonDocument.Parse(item.Value))
+                    using (JsonDocument document = JsonDocument.Parse(item.Value, ModelSerializationExtensions.JsonDocumentOptions))
                     {
                         JsonSerializer.Serialize(writer, document.RootElement);
                     }
 #endif
                 }
             }
-            writer.WriteEndObject();
         }
 
         PlaywrightTestingAccountPatch IJsonModel<PlaywrightTestingAccountPatch>.Create(ref Utf8JsonReader reader, ModelReaderWriterOptions options)
@@ -79,7 +72,7 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
             var format = options.Format == "W" ? ((IPersistableModel<PlaywrightTestingAccountPatch>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support reading '{format}' format.");
             }
 
             using JsonDocument document = JsonDocument.ParseValue(ref reader);
@@ -88,18 +81,16 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
 
         internal static PlaywrightTestingAccountPatch DeserializePlaywrightTestingAccountPatch(JsonElement element, ModelReaderWriterOptions options = null)
         {
-            options ??= new ModelReaderWriterOptions("W");
+            options ??= ModelSerializationExtensions.WireOptions;
 
             if (element.ValueKind == JsonValueKind.Null)
             {
                 return null;
             }
             IDictionary<string, string> tags = default;
-            EnablementStatus? regionalAffinity = default;
-            EnablementStatus? scalableExecution = default;
-            EnablementStatus? reporting = default;
+            AccountUpdateProperties properties = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
-            Dictionary<string, BinaryData> additionalPropertiesDictionary = new Dictionary<string, BinaryData>();
+            Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("tags"u8))
@@ -120,48 +111,18 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
                 {
                     if (property.Value.ValueKind == JsonValueKind.Null)
                     {
-                        property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    foreach (var property0 in property.Value.EnumerateObject())
-                    {
-                        if (property0.NameEquals("regionalAffinity"u8))
-                        {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                continue;
-                            }
-                            regionalAffinity = new EnablementStatus(property0.Value.GetString());
-                            continue;
-                        }
-                        if (property0.NameEquals("scalableExecution"u8))
-                        {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                continue;
-                            }
-                            scalableExecution = new EnablementStatus(property0.Value.GetString());
-                            continue;
-                        }
-                        if (property0.NameEquals("reporting"u8))
-                        {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                continue;
-                            }
-                            reporting = new EnablementStatus(property0.Value.GetString());
-                            continue;
-                        }
-                    }
+                    properties = AccountUpdateProperties.DeserializeAccountUpdateProperties(property.Value, options);
                     continue;
                 }
                 if (options.Format != "W")
                 {
-                    additionalPropertiesDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
+                    rawDataDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
                 }
             }
-            serializedAdditionalRawData = additionalPropertiesDictionary;
-            return new PlaywrightTestingAccountPatch(tags ?? new ChangeTrackingDictionary<string, string>(), regionalAffinity, scalableExecution, reporting, serializedAdditionalRawData);
+            serializedAdditionalRawData = rawDataDictionary;
+            return new PlaywrightTestingAccountPatch(tags ?? new ChangeTrackingDictionary<string, string>(), properties, serializedAdditionalRawData);
         }
 
         BinaryData IPersistableModel<PlaywrightTestingAccountPatch>.Write(ModelReaderWriterOptions options)
@@ -173,7 +134,7 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
                 case "J":
                     return ModelReaderWriter.Write(this, options);
                 default:
-                    throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support writing '{options.Format}' format.");
             }
         }
 
@@ -185,11 +146,11 @@ namespace Azure.ResourceManager.PlaywrightTesting.Models
             {
                 case "J":
                     {
-                        using JsonDocument document = JsonDocument.Parse(data);
+                        using JsonDocument document = JsonDocument.Parse(data, ModelSerializationExtensions.JsonDocumentOptions);
                         return DeserializePlaywrightTestingAccountPatch(document.RootElement, options);
                     }
                 default:
-                    throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(PlaywrightTestingAccountPatch)} does not support reading '{options.Format}' format.");
             }
         }
 

@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Security.KeyVault.Administration.Models;
@@ -85,7 +84,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         KeyVaultSetting value0 = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value0 = KeyVaultSetting.DeserializeKeyVaultSetting(document.RootElement);
                         return Response.FromValue(value0, message.Response);
                     }
@@ -123,7 +122,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         KeyVaultSetting value0 = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value0 = KeyVaultSetting.DeserializeKeyVaultSetting(document.RootElement);
                         return Response.FromValue(value0, message.Response);
                     }
@@ -171,7 +170,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         KeyVaultSetting value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = KeyVaultSetting.DeserializeKeyVaultSetting(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -204,7 +203,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         KeyVaultSetting value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = KeyVaultSetting.DeserializeKeyVaultSetting(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -246,7 +245,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         GetSettingsResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = GetSettingsResult.DeserializeGetSettingsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -274,7 +273,7 @@ namespace Azure.Security.KeyVault.Administration
                 case 200:
                     {
                         GetSettingsResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = GetSettingsResult.DeserializeGetSettingsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

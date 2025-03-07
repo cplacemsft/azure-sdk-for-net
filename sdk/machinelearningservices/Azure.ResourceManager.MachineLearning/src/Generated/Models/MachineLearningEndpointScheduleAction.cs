@@ -21,10 +21,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="endpointInvocationDefinition"/> is null. </exception>
         public MachineLearningEndpointScheduleAction(BinaryData endpointInvocationDefinition)
         {
-            if (endpointInvocationDefinition == null)
-            {
-                throw new ArgumentNullException(nameof(endpointInvocationDefinition));
-            }
+            Argument.AssertNotNull(endpointInvocationDefinition, nameof(endpointInvocationDefinition));
 
             EndpointInvocationDefinition = endpointInvocationDefinition;
             ActionType = ScheduleActionType.InvokeBatchEndpoint;
@@ -79,6 +76,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// </list>
         /// </para>
         /// </summary>
+        [WirePath("endpointInvocationDefinition")]
         public BinaryData EndpointInvocationDefinition { get; set; }
     }
 }

@@ -10,23 +10,31 @@ using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Text.Json;
 using Azure.Core;
-using Azure.ResourceManager.DataMigration;
 
 namespace Azure.ResourceManager.DataMigration.Models
 {
     public partial class MongoDBMigrationProgress : IUtf8JsonSerializable, IJsonModel<MongoDBMigrationProgress>
     {
-        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<MongoDBMigrationProgress>)this).Write(writer, new ModelReaderWriterOptions("W"));
+        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<MongoDBMigrationProgress>)this).Write(writer, ModelSerializationExtensions.WireOptions);
 
         void IJsonModel<MongoDBMigrationProgress>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+        {
+            writer.WriteStartObject();
+            JsonModelWriteCore(writer, options);
+            writer.WriteEndObject();
+        }
+
+        /// <param name="writer"> The JSON writer. </param>
+        /// <param name="options"> The client options for reading and writing models. </param>
+        protected override void JsonModelWriteCore(Utf8JsonWriter writer, ModelReaderWriterOptions options)
         {
             var format = options.Format == "W" ? ((IPersistableModel<MongoDBMigrationProgress>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support writing '{format}' format.");
             }
 
-            writer.WriteStartObject();
+            base.JsonModelWriteCore(writer, options);
             if (Optional.IsCollectionDefined(Databases))
             {
                 writer.WritePropertyName("databases"u8);
@@ -34,72 +42,10 @@ namespace Azure.ResourceManager.DataMigration.Models
                 foreach (var item in Databases)
                 {
                     writer.WritePropertyName(item.Key);
-                    writer.WriteObjectValue(item.Value);
+                    writer.WriteObjectValue(item.Value, options);
                 }
                 writer.WriteEndObject();
             }
-            writer.WritePropertyName("bytesCopied"u8);
-            writer.WriteNumberValue(BytesCopied);
-            writer.WritePropertyName("documentsCopied"u8);
-            writer.WriteNumberValue(DocumentsCopied);
-            writer.WritePropertyName("elapsedTime"u8);
-            writer.WriteStringValue(ElapsedTime);
-            writer.WritePropertyName("errors"u8);
-            writer.WriteStartObject();
-            foreach (var item in Errors)
-            {
-                writer.WritePropertyName(item.Key);
-                writer.WriteObjectValue(item.Value);
-            }
-            writer.WriteEndObject();
-            writer.WritePropertyName("eventsPending"u8);
-            writer.WriteNumberValue(EventsPending);
-            writer.WritePropertyName("eventsReplayed"u8);
-            writer.WriteNumberValue(EventsReplayed);
-            if (Optional.IsDefined(LastEventOn))
-            {
-                writer.WritePropertyName("lastEventTime"u8);
-                writer.WriteStringValue(LastEventOn.Value, "O");
-            }
-            if (Optional.IsDefined(LastReplayOn))
-            {
-                writer.WritePropertyName("lastReplayTime"u8);
-                writer.WriteStringValue(LastReplayOn.Value, "O");
-            }
-            if (Optional.IsDefined(Name))
-            {
-                writer.WritePropertyName("name"u8);
-                writer.WriteStringValue(Name);
-            }
-            if (Optional.IsDefined(QualifiedName))
-            {
-                writer.WritePropertyName("qualifiedName"u8);
-                writer.WriteStringValue(QualifiedName);
-            }
-            writer.WritePropertyName("resultType"u8);
-            writer.WriteStringValue(ResultType.ToString());
-            writer.WritePropertyName("state"u8);
-            writer.WriteStringValue(State.ToString());
-            writer.WritePropertyName("totalBytes"u8);
-            writer.WriteNumberValue(TotalBytes);
-            writer.WritePropertyName("totalDocuments"u8);
-            writer.WriteNumberValue(TotalDocuments);
-            if (options.Format != "W" && _serializedAdditionalRawData != null)
-            {
-                foreach (var item in _serializedAdditionalRawData)
-                {
-                    writer.WritePropertyName(item.Key);
-#if NET6_0_OR_GREATER
-				writer.WriteRawValue(item.Value);
-#else
-                    using (JsonDocument document = JsonDocument.Parse(item.Value))
-                    {
-                        JsonSerializer.Serialize(writer, document.RootElement);
-                    }
-#endif
-                }
-            }
-            writer.WriteEndObject();
         }
 
         MongoDBMigrationProgress IJsonModel<MongoDBMigrationProgress>.Create(ref Utf8JsonReader reader, ModelReaderWriterOptions options)
@@ -107,7 +53,7 @@ namespace Azure.ResourceManager.DataMigration.Models
             var format = options.Format == "W" ? ((IPersistableModel<MongoDBMigrationProgress>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support reading '{format}' format.");
             }
 
             using JsonDocument document = JsonDocument.ParseValue(ref reader);
@@ -116,7 +62,7 @@ namespace Azure.ResourceManager.DataMigration.Models
 
         internal static MongoDBMigrationProgress DeserializeMongoDBMigrationProgress(JsonElement element, ModelReaderWriterOptions options = null)
         {
-            options ??= new ModelReaderWriterOptions("W");
+            options ??= ModelSerializationExtensions.WireOptions;
 
             if (element.ValueKind == JsonValueKind.Null)
             {
@@ -138,7 +84,7 @@ namespace Azure.ResourceManager.DataMigration.Models
             long totalBytes = default;
             long totalDocuments = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
-            Dictionary<string, BinaryData> additionalPropertiesDictionary = new Dictionary<string, BinaryData>();
+            Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("databases"u8))
@@ -240,10 +186,10 @@ namespace Azure.ResourceManager.DataMigration.Models
                 }
                 if (options.Format != "W")
                 {
-                    additionalPropertiesDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
+                    rawDataDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
                 }
             }
-            serializedAdditionalRawData = additionalPropertiesDictionary;
+            serializedAdditionalRawData = rawDataDictionary;
             return new MongoDBMigrationProgress(
                 bytesCopied,
                 documentsCopied,
@@ -272,7 +218,7 @@ namespace Azure.ResourceManager.DataMigration.Models
                 case "J":
                     return ModelReaderWriter.Write(this, options);
                 default:
-                    throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support writing '{options.Format}' format.");
             }
         }
 
@@ -284,11 +230,11 @@ namespace Azure.ResourceManager.DataMigration.Models
             {
                 case "J":
                     {
-                        using JsonDocument document = JsonDocument.Parse(data);
+                        using JsonDocument document = JsonDocument.Parse(data, ModelSerializationExtensions.JsonDocumentOptions);
                         return DeserializeMongoDBMigrationProgress(document.RootElement, options);
                     }
                 default:
-                    throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(MongoDBMigrationProgress)} does not support reading '{options.Format}' format.");
             }
         }
 

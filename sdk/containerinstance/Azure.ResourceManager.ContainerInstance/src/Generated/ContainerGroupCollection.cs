@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.ContainerInstance
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<ContainerGroupResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string containerGroupName, ContainerGroupData data, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<ContainerGroupResource> CreateOrUpdate(WaitUntil waitUntil, string containerGroupName, ContainerGroupData data, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual async Task<Response<ContainerGroupResource>> GetAsync(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual Response<ContainerGroupResource> Get(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual Response<bool> Exists(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual async Task<NullableResponse<ContainerGroupResource>> GetIfExistsAsync(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-05-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.ContainerInstance
         /// <exception cref="ArgumentNullException"> <paramref name="containerGroupName"/> is null. </exception>
         public virtual NullableResponse<ContainerGroupResource> GetIfExists(string containerGroupName, CancellationToken cancellationToken = default)
         {
-            if (containerGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(containerGroupName));
-            }
-            if (containerGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(containerGroupName));
-            }
+            Argument.AssertNotNullOrEmpty(containerGroupName, nameof(containerGroupName));
 
             using var scope = _containerGroupClientDiagnostics.CreateScope("ContainerGroupCollection.GetIfExists");
             scope.Start();

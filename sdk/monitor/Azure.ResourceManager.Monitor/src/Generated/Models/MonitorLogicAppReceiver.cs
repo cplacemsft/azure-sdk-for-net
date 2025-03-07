@@ -53,18 +53,9 @@ namespace Azure.ResourceManager.Monitor.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/>, <paramref name="resourceId"/> or <paramref name="callbackUri"/> is null. </exception>
         public MonitorLogicAppReceiver(string name, ResourceIdentifier resourceId, Uri callbackUri)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (resourceId == null)
-            {
-                throw new ArgumentNullException(nameof(resourceId));
-            }
-            if (callbackUri == null)
-            {
-                throw new ArgumentNullException(nameof(callbackUri));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(resourceId, nameof(resourceId));
+            Argument.AssertNotNull(callbackUri, nameof(callbackUri));
 
             Name = name;
             ResourceId = resourceId;
@@ -76,13 +67,15 @@ namespace Azure.ResourceManager.Monitor.Models
         /// <param name="resourceId"> The azure resource id of the logic app receiver. </param>
         /// <param name="callbackUri"> The callback url where http request sent to. </param>
         /// <param name="useCommonAlertSchema"> Indicates whether to use common alert schema. </param>
+        /// <param name="managedIdentity"> The principal id of the managed identity. The value can be "None", "SystemAssigned". </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal MonitorLogicAppReceiver(string name, ResourceIdentifier resourceId, Uri callbackUri, bool? useCommonAlertSchema, IDictionary<string, BinaryData> serializedAdditionalRawData)
+        internal MonitorLogicAppReceiver(string name, ResourceIdentifier resourceId, Uri callbackUri, bool? useCommonAlertSchema, string managedIdentity, IDictionary<string, BinaryData> serializedAdditionalRawData)
         {
             Name = name;
             ResourceId = resourceId;
             CallbackUri = callbackUri;
             UseCommonAlertSchema = useCommonAlertSchema;
+            ManagedIdentity = managedIdentity;
             _serializedAdditionalRawData = serializedAdditionalRawData;
         }
 
@@ -99,5 +92,7 @@ namespace Azure.ResourceManager.Monitor.Models
         public Uri CallbackUri { get; set; }
         /// <summary> Indicates whether to use common alert schema. </summary>
         public bool? UseCommonAlertSchema { get; set; }
+        /// <summary> The principal id of the managed identity. The value can be "None", "SystemAssigned". </summary>
+        public string ManagedIdentity { get; set; }
     }
 }

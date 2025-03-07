@@ -9,11 +9,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
-using Azure.ResourceManager.RedisEnterprise;
 using Azure.ResourceManager.RedisEnterprise.Models;
 
 namespace Azure.ResourceManager.RedisEnterprise.Mocking
@@ -62,7 +59,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2024-02-01</description>
+        /// <description>2024-09-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -73,14 +70,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="operationId"/> is null. </exception>
         public virtual async Task<Response<RedisEnterpriseOperationStatus>> GetRedisEnterpriseOperationsStatusAsync(AzureLocation location, string operationId, CancellationToken cancellationToken = default)
         {
-            if (operationId == null)
-            {
-                throw new ArgumentNullException(nameof(operationId));
-            }
-            if (operationId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(operationId));
-            }
+            Argument.AssertNotNullOrEmpty(operationId, nameof(operationId));
 
             using var scope = OperationsStatusClientDiagnostics.CreateScope("MockableRedisEnterpriseSubscriptionResource.GetRedisEnterpriseOperationsStatus");
             scope.Start();
@@ -109,7 +99,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2024-02-01</description>
+        /// <description>2024-09-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -120,14 +110,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="operationId"/> is null. </exception>
         public virtual Response<RedisEnterpriseOperationStatus> GetRedisEnterpriseOperationsStatus(AzureLocation location, string operationId, CancellationToken cancellationToken = default)
         {
-            if (operationId == null)
-            {
-                throw new ArgumentNullException(nameof(operationId));
-            }
-            if (operationId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(operationId));
-            }
+            Argument.AssertNotNullOrEmpty(operationId, nameof(operationId));
 
             using var scope = OperationsStatusClientDiagnostics.CreateScope("MockableRedisEnterpriseSubscriptionResource.GetRedisEnterpriseOperationsStatus");
             scope.Start();
@@ -144,7 +127,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         }
 
         /// <summary>
-        /// Gets all RedisEnterprise clusters in the specified subscription.
+        /// Lists all Redis Enterprise clusters in the specified subscription.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -156,7 +139,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2024-02-01</description>
+        /// <description>2024-09-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -174,7 +157,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         }
 
         /// <summary>
-        /// Gets all RedisEnterprise clusters in the specified subscription.
+        /// Lists all Redis Enterprise clusters in the specified subscription.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -186,7 +169,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2024-02-01</description>
+        /// <description>2024-09-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>

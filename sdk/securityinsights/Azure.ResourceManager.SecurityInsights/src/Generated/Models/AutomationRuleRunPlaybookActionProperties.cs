@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.SecurityInsights.Models
         /// <exception cref="ArgumentNullException"> <paramref name="logicAppResourceId"/> is null. </exception>
         public AutomationRuleRunPlaybookActionProperties(ResourceIdentifier logicAppResourceId)
         {
-            if (logicAppResourceId == null)
-            {
-                throw new ArgumentNullException(nameof(logicAppResourceId));
-            }
+            Argument.AssertNotNull(logicAppResourceId, nameof(logicAppResourceId));
 
             LogicAppResourceId = logicAppResourceId;
         }
@@ -76,8 +73,10 @@ namespace Azure.ResourceManager.SecurityInsights.Models
         }
 
         /// <summary> The resource id of the playbook resource. </summary>
+        [WirePath("logicAppResourceId")]
         public ResourceIdentifier LogicAppResourceId { get; set; }
         /// <summary> The tenant id of the playbook resource. </summary>
+        [WirePath("tenantId")]
         public Guid? TenantId { get; set; }
     }
 }

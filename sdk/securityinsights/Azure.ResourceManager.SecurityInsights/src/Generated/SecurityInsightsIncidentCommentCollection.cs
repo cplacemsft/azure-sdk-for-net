@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.SecurityInsights
 {
@@ -54,7 +52,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Creates or updates a comment for a given incident.
+        /// Creates or updates the incident comment.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -82,25 +80,17 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<SecurityInsightsIncidentCommentResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string incidentCommentId, SecurityInsightsIncidentCommentData data, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = await _securityInsightsIncidentCommentIncidentCommentsRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, incidentCommentId, data, cancellationToken).ConfigureAwait(false);
-                var operation = new SecurityInsightsArmOperation<SecurityInsightsIncidentCommentResource>(Response.FromValue(new SecurityInsightsIncidentCommentResource(Client, response), response.GetRawResponse()));
+                var uri = _securityInsightsIncidentCommentIncidentCommentsRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, incidentCommentId, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new SecurityInsightsArmOperation<SecurityInsightsIncidentCommentResource>(Response.FromValue(new SecurityInsightsIncidentCommentResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -113,7 +103,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Creates or updates a comment for a given incident.
+        /// Creates or updates the incident comment.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -125,7 +115,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -141,25 +131,17 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<SecurityInsightsIncidentCommentResource> CreateOrUpdate(WaitUntil waitUntil, string incidentCommentId, SecurityInsightsIncidentCommentData data, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = _securityInsightsIncidentCommentIncidentCommentsRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, incidentCommentId, data, cancellationToken);
-                var operation = new SecurityInsightsArmOperation<SecurityInsightsIncidentCommentResource>(Response.FromValue(new SecurityInsightsIncidentCommentResource(Client, response), response.GetRawResponse()));
+                var uri = _securityInsightsIncidentCommentIncidentCommentsRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, incidentCommentId, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new SecurityInsightsArmOperation<SecurityInsightsIncidentCommentResource>(Response.FromValue(new SecurityInsightsIncidentCommentResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -172,7 +154,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Gets a comment for a given incident.
+        /// Gets an incident comment.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -184,7 +166,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -198,14 +180,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual async Task<Response<SecurityInsightsIncidentCommentResource>> GetAsync(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.Get");
             scope.Start();
@@ -224,7 +199,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Gets a comment for a given incident.
+        /// Gets an incident comment.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -236,7 +211,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -250,14 +225,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual Response<SecurityInsightsIncidentCommentResource> Get(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.Get");
             scope.Start();
@@ -276,7 +244,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Gets all comments for a given incident.
+        /// Gets all incident comments.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -288,7 +256,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -310,7 +278,7 @@ namespace Azure.ResourceManager.SecurityInsights
         }
 
         /// <summary>
-        /// Gets all comments for a given incident.
+        /// Gets all incident comments.
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -322,7 +290,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -356,7 +324,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -370,14 +338,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.Exists");
             scope.Start();
@@ -406,7 +367,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -420,14 +381,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual Response<bool> Exists(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.Exists");
             scope.Start();
@@ -456,7 +410,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -470,14 +424,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual async Task<NullableResponse<SecurityInsightsIncidentCommentResource>> GetIfExistsAsync(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.GetIfExists");
             scope.Start();
@@ -508,7 +455,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-11-01</description>
+        /// <description>2024-01-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -522,14 +469,7 @@ namespace Azure.ResourceManager.SecurityInsights
         /// <exception cref="ArgumentNullException"> <paramref name="incidentCommentId"/> is null. </exception>
         public virtual NullableResponse<SecurityInsightsIncidentCommentResource> GetIfExists(string incidentCommentId, CancellationToken cancellationToken = default)
         {
-            if (incidentCommentId == null)
-            {
-                throw new ArgumentNullException(nameof(incidentCommentId));
-            }
-            if (incidentCommentId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(incidentCommentId));
-            }
+            Argument.AssertNotNullOrEmpty(incidentCommentId, nameof(incidentCommentId));
 
             using var scope = _securityInsightsIncidentCommentIncidentCommentsClientDiagnostics.CreateScope("SecurityInsightsIncidentCommentCollection.GetIfExists");
             scope.Start();

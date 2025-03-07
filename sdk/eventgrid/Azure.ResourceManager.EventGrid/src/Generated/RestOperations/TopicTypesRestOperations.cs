@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.EventGrid.Models;
@@ -33,8 +32,17 @@ namespace Azure.ResourceManager.EventGrid
         {
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
-            _apiVersion = apiVersion ?? "2023-12-15-preview";
+            _apiVersion = apiVersion ?? "2024-06-01-preview";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri()
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.EventGrid/topicTypes", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest()
@@ -63,7 +71,7 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         TopicTypesListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = TopicTypesListResult.DeserializeTopicTypesListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -83,13 +91,23 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         TopicTypesListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = TopicTypesListResult.DeserializeTopicTypesListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string topicTypeName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.EventGrid/topicTypes/", false);
+            uri.AppendPath(topicTypeName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string topicTypeName)
@@ -115,14 +133,7 @@ namespace Azure.ResourceManager.EventGrid
         /// <exception cref="ArgumentException"> <paramref name="topicTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<TopicTypeData>> GetAsync(string topicTypeName, CancellationToken cancellationToken = default)
         {
-            if (topicTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(topicTypeName));
-            }
-            if (topicTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(topicTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(topicTypeName, nameof(topicTypeName));
 
             using var message = CreateGetRequest(topicTypeName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -131,7 +142,7 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         TopicTypeData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = TopicTypeData.DeserializeTopicTypeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -149,14 +160,7 @@ namespace Azure.ResourceManager.EventGrid
         /// <exception cref="ArgumentException"> <paramref name="topicTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<TopicTypeData> Get(string topicTypeName, CancellationToken cancellationToken = default)
         {
-            if (topicTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(topicTypeName));
-            }
-            if (topicTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(topicTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(topicTypeName, nameof(topicTypeName));
 
             using var message = CreateGetRequest(topicTypeName);
             _pipeline.Send(message, cancellationToken);
@@ -165,7 +169,7 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         TopicTypeData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = TopicTypeData.DeserializeTopicTypeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -174,6 +178,17 @@ namespace Azure.ResourceManager.EventGrid
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListEventTypesRequestUri(string topicTypeName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.EventGrid/topicTypes/", false);
+            uri.AppendPath(topicTypeName, true);
+            uri.AppendPath("/eventTypes", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListEventTypesRequest(string topicTypeName)
@@ -200,14 +215,7 @@ namespace Azure.ResourceManager.EventGrid
         /// <exception cref="ArgumentException"> <paramref name="topicTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<EventTypesListResult>> ListEventTypesAsync(string topicTypeName, CancellationToken cancellationToken = default)
         {
-            if (topicTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(topicTypeName));
-            }
-            if (topicTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(topicTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(topicTypeName, nameof(topicTypeName));
 
             using var message = CreateListEventTypesRequest(topicTypeName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -216,7 +224,7 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         EventTypesListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = EventTypesListResult.DeserializeEventTypesListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -232,14 +240,7 @@ namespace Azure.ResourceManager.EventGrid
         /// <exception cref="ArgumentException"> <paramref name="topicTypeName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<EventTypesListResult> ListEventTypes(string topicTypeName, CancellationToken cancellationToken = default)
         {
-            if (topicTypeName == null)
-            {
-                throw new ArgumentNullException(nameof(topicTypeName));
-            }
-            if (topicTypeName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(topicTypeName));
-            }
+            Argument.AssertNotNullOrEmpty(topicTypeName, nameof(topicTypeName));
 
             using var message = CreateListEventTypesRequest(topicTypeName);
             _pipeline.Send(message, cancellationToken);
@@ -248,7 +249,7 @@ namespace Azure.ResourceManager.EventGrid
                 case 200:
                     {
                         EventTypesListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = EventTypesListResult.DeserializeEventTypesListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

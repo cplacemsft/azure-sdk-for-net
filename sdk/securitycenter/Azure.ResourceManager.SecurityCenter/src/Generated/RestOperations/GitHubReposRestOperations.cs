@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.SecurityCenter.Models;
@@ -35,6 +34,23 @@ namespace Azure.ResourceManager.SecurityCenter
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2023-09-01-preview";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Security/securityConnectors/", false);
+            uri.AppendPath(securityConnectorName, true);
+            uri.AppendPath("/devops/default/gitHubOwners/", false);
+            uri.AppendPath(ownerName, true);
+            uri.AppendPath("/repos", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName)
@@ -70,38 +86,10 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/> or <paramref name="ownerName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<GitHubRepositoryListResponse>> ListAsync(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, securityConnectorName, ownerName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -110,7 +98,7 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         GitHubRepositoryListResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = GitHubRepositoryListResponse.DeserializeGitHubRepositoryListResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -129,38 +117,10 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/> or <paramref name="ownerName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<GitHubRepositoryListResponse> List(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, securityConnectorName, ownerName);
             _pipeline.Send(message, cancellationToken);
@@ -169,13 +129,31 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         GitHubRepositoryListResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = GitHubRepositoryListResponse.DeserializeGitHubRepositoryListResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, string repoName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Security/securityConnectors/", false);
+            uri.AppendPath(securityConnectorName, true);
+            uri.AppendPath("/devops/default/gitHubOwners/", false);
+            uri.AppendPath(ownerName, true);
+            uri.AppendPath("/repos/", false);
+            uri.AppendPath(repoName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, string repoName)
@@ -213,46 +191,11 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/>, <paramref name="ownerName"/> or <paramref name="repoName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<SecurityConnectorGitHubRepositoryData>> GetAsync(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, string repoName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
-            if (repoName == null)
-            {
-                throw new ArgumentNullException(nameof(repoName));
-            }
-            if (repoName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(repoName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
+            Argument.AssertNotNullOrEmpty(repoName, nameof(repoName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, securityConnectorName, ownerName, repoName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -261,7 +204,7 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         SecurityConnectorGitHubRepositoryData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SecurityConnectorGitHubRepositoryData.DeserializeSecurityConnectorGitHubRepositoryData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -283,46 +226,11 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/>, <paramref name="ownerName"/> or <paramref name="repoName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<SecurityConnectorGitHubRepositoryData> Get(string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, string repoName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
-            if (repoName == null)
-            {
-                throw new ArgumentNullException(nameof(repoName));
-            }
-            if (repoName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(repoName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
+            Argument.AssertNotNullOrEmpty(repoName, nameof(repoName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, securityConnectorName, ownerName, repoName);
             _pipeline.Send(message, cancellationToken);
@@ -331,7 +239,7 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         SecurityConnectorGitHubRepositoryData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SecurityConnectorGitHubRepositoryData.DeserializeSecurityConnectorGitHubRepositoryData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -340,6 +248,14 @@ namespace Azure.ResourceManager.SecurityCenter
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName)
@@ -367,42 +283,11 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/> or <paramref name="ownerName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<GitHubRepositoryListResponse>> ListNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, securityConnectorName, ownerName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -411,7 +296,7 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         GitHubRepositoryListResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = GitHubRepositoryListResponse.DeserializeGitHubRepositoryListResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -431,42 +316,11 @@ namespace Azure.ResourceManager.SecurityCenter
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="securityConnectorName"/> or <paramref name="ownerName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<GitHubRepositoryListResponse> ListNextPage(string nextLink, string subscriptionId, string resourceGroupName, string securityConnectorName, string ownerName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (securityConnectorName == null)
-            {
-                throw new ArgumentNullException(nameof(securityConnectorName));
-            }
-            if (securityConnectorName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(securityConnectorName));
-            }
-            if (ownerName == null)
-            {
-                throw new ArgumentNullException(nameof(ownerName));
-            }
-            if (ownerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(ownerName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(securityConnectorName, nameof(securityConnectorName));
+            Argument.AssertNotNullOrEmpty(ownerName, nameof(ownerName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, securityConnectorName, ownerName);
             _pipeline.Send(message, cancellationToken);
@@ -475,7 +329,7 @@ namespace Azure.ResourceManager.SecurityCenter
                 case 200:
                     {
                         GitHubRepositoryListResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = GitHubRepositoryListResponse.DeserializeGitHubRepositoryListResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using Azure;
 
 namespace Azure.ResourceManager.ContainerService.Models
 {
@@ -53,18 +52,9 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/>, <paramref name="namespace"/> or <paramref name="identity"/> is null. </exception>
         public ManagedClusterPodIdentity(string name, string @namespace, ContainerServiceUserAssignedIdentity identity)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (@namespace == null)
-            {
-                throw new ArgumentNullException(nameof(@namespace));
-            }
-            if (identity == null)
-            {
-                throw new ArgumentNullException(nameof(identity));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(@namespace, nameof(@namespace));
+            Argument.AssertNotNull(identity, nameof(identity));
 
             Name = name;
             Namespace = @namespace;
@@ -96,18 +86,24 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> The name of the pod identity. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> The namespace of the pod identity. </summary>
+        [WirePath("namespace")]
         public string Namespace { get; set; }
         /// <summary> The binding selector to use for the AzureIdentityBinding resource. </summary>
+        [WirePath("bindingSelector")]
         public string BindingSelector { get; set; }
         /// <summary> The user assigned identity details. </summary>
+        [WirePath("identity")]
         public ContainerServiceUserAssignedIdentity Identity { get; set; }
         /// <summary> The current provisioning state of the pod identity. </summary>
+        [WirePath("provisioningState")]
         public ManagedClusterPodIdentityProvisioningState? ProvisioningState { get; }
         /// <summary> Gets the provisioning info. </summary>
         internal ManagedClusterPodIdentityProvisioningInfo ProvisioningInfo { get; }
         /// <summary> Details about the error. </summary>
+        [WirePath("provisioningInfo.error.error")]
         public ResponseError ErrorDetail
         {
             get => ProvisioningInfo?.ErrorDetail;

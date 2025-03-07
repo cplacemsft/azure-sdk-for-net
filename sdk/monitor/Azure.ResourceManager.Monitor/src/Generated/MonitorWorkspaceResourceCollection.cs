@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.Monitor
@@ -63,11 +61,11 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>AzureMonitorWorkspaces_Create</description>
+        /// <description>AzureMonitorWorkspaces_CreateOrUpdate</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -76,32 +74,22 @@ namespace Azure.ResourceManager.Monitor
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
-        /// <param name="data"> Properties that need to be specified to create a new workspace. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<MonitorWorkspaceResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string azureMonitorWorkspaceName, MonitorWorkspaceResourceData data, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.CreateOrUpdate");
             scope.Start();
             try
             {
-                var response = await _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.CreateAsync(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data, cancellationToken).ConfigureAwait(false);
-                var operation = new MonitorArmOperation<MonitorWorkspaceResource>(Response.FromValue(new MonitorWorkspaceResource(Client, response), response.GetRawResponse()));
+                var response = await _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data, cancellationToken).ConfigureAwait(false);
+                var operation = new MonitorArmOperation<MonitorWorkspaceResource>(new MonitorWorkspaceResourceOperationSource(Client), _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics, Pipeline, _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -122,11 +110,11 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>AzureMonitorWorkspaces_Create</description>
+        /// <description>AzureMonitorWorkspaces_CreateOrUpdate</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -135,32 +123,22 @@ namespace Azure.ResourceManager.Monitor
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
-        /// <param name="data"> Properties that need to be specified to create a new workspace. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<MonitorWorkspaceResource> CreateOrUpdate(WaitUntil waitUntil, string azureMonitorWorkspaceName, MonitorWorkspaceResourceData data, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.CreateOrUpdate");
             scope.Start();
             try
             {
-                var response = _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.Create(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data, cancellationToken);
-                var operation = new MonitorArmOperation<MonitorWorkspaceResource>(Response.FromValue(new MonitorWorkspaceResource(Client, response), response.GetRawResponse()));
+                var response = _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data, cancellationToken);
+                var operation = new MonitorArmOperation<MonitorWorkspaceResource>(new MonitorWorkspaceResourceOperationSource(Client), _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics, Pipeline, _monitorWorkspaceResourceAzureMonitorWorkspacesRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, azureMonitorWorkspaceName, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -193,20 +171,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual async Task<Response<MonitorWorkspaceResource>> GetAsync(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -245,20 +216,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual Response<MonitorWorkspaceResource> Get(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -357,20 +321,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -407,20 +364,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual Response<bool> Exists(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -457,20 +407,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual async Task<NullableResponse<MonitorWorkspaceResource>> GetIfExistsAsync(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-03</description>
+        /// <description>2023-10-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -509,20 +452,13 @@ namespace Azure.ResourceManager.Monitor
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace.  The name is case insensitive. </param>
+        /// <param name="azureMonitorWorkspaceName"> The name of the Azure Monitor workspace. The name is case insensitive. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="azureMonitorWorkspaceName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="azureMonitorWorkspaceName"/> is null. </exception>
         public virtual NullableResponse<MonitorWorkspaceResource> GetIfExists(string azureMonitorWorkspaceName, CancellationToken cancellationToken = default)
         {
-            if (azureMonitorWorkspaceName == null)
-            {
-                throw new ArgumentNullException(nameof(azureMonitorWorkspaceName));
-            }
-            if (azureMonitorWorkspaceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(azureMonitorWorkspaceName));
-            }
+            Argument.AssertNotNullOrEmpty(azureMonitorWorkspaceName, nameof(azureMonitorWorkspaceName));
 
             using var scope = _monitorWorkspaceResourceAzureMonitorWorkspacesClientDiagnostics.CreateScope("MonitorWorkspaceResourceCollection.GetIfExists");
             scope.Start();

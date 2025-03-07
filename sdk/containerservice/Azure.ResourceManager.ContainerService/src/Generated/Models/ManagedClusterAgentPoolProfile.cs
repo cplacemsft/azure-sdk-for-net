@@ -19,10 +19,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         public ManagedClusterAgentPoolProfile(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             Name = name;
         }
@@ -84,6 +81,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> Windows agent pool names must be 6 characters or less. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
     }
 }

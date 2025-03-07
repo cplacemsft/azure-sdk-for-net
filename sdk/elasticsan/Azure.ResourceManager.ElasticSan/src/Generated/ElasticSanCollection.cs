@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.ElasticSan
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<ElasticSanResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string elasticSanName, ElasticSanData data, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<ElasticSanResource> CreateOrUpdate(WaitUntil waitUntil, string elasticSanName, ElasticSanData data, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual async Task<Response<ElasticSanResource>> GetAsync(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual Response<ElasticSanResource> Get(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual Response<bool> Exists(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual async Task<NullableResponse<ElasticSanResource>> GetIfExistsAsync(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-01-01</description>
+        /// <description>2024-06-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.ElasticSan
         /// <exception cref="ArgumentNullException"> <paramref name="elasticSanName"/> is null. </exception>
         public virtual NullableResponse<ElasticSanResource> GetIfExists(string elasticSanName, CancellationToken cancellationToken = default)
         {
-            if (elasticSanName == null)
-            {
-                throw new ArgumentNullException(nameof(elasticSanName));
-            }
-            if (elasticSanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(elasticSanName));
-            }
+            Argument.AssertNotNullOrEmpty(elasticSanName, nameof(elasticSanName));
 
             using var scope = _elasticSanClientDiagnostics.CreateScope("ElasticSanCollection.GetIfExists");
             scope.Start();

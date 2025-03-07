@@ -5,12 +5,10 @@
 
 #nullable disable
 
-using System.Text.Json;
+using System.ClientModel.Primitives;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Sql
 {
@@ -25,16 +23,14 @@ namespace Azure.ResourceManager.Sql
 
         SqlServerCommunicationLinkResource IOperationSource<SqlServerCommunicationLinkResource>.CreateResult(Response response, CancellationToken cancellationToken)
         {
-            using var document = JsonDocument.Parse(response.ContentStream);
-            var data = SqlServerCommunicationLinkData.DeserializeSqlServerCommunicationLinkData(document.RootElement);
+            var data = ModelReaderWriter.Read<SqlServerCommunicationLinkData>(response.Content);
             return new SqlServerCommunicationLinkResource(_client, data);
         }
 
         async ValueTask<SqlServerCommunicationLinkResource> IOperationSource<SqlServerCommunicationLinkResource>.CreateResultAsync(Response response, CancellationToken cancellationToken)
         {
-            using var document = await JsonDocument.ParseAsync(response.ContentStream, default, cancellationToken).ConfigureAwait(false);
-            var data = SqlServerCommunicationLinkData.DeserializeSqlServerCommunicationLinkData(document.RootElement);
-            return new SqlServerCommunicationLinkResource(_client, data);
+            var data = ModelReaderWriter.Read<SqlServerCommunicationLinkData>(response.Content);
+            return await Task.FromResult(new SqlServerCommunicationLinkResource(_client, data)).ConfigureAwait(false);
         }
     }
 }

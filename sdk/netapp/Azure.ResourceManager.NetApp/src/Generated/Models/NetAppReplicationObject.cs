@@ -47,16 +47,8 @@ namespace Azure.ResourceManager.NetApp.Models
         private IDictionary<string, BinaryData> _serializedAdditionalRawData;
 
         /// <summary> Initializes a new instance of <see cref="NetAppReplicationObject"/>. </summary>
-        /// <param name="remoteVolumeResourceId"> The resource ID of the remote volume. Required for cross region and cross zone replication. </param>
-        /// <exception cref="ArgumentNullException"> <paramref name="remoteVolumeResourceId"/> is null. </exception>
-        public NetAppReplicationObject(ResourceIdentifier remoteVolumeResourceId)
+        public NetAppReplicationObject()
         {
-            if (remoteVolumeResourceId == null)
-            {
-                throw new ArgumentNullException(nameof(remoteVolumeResourceId));
-            }
-
-            RemoteVolumeResourceId = remoteVolumeResourceId;
         }
 
         /// <summary> Initializes a new instance of <see cref="NetAppReplicationObject"/>. </summary>
@@ -76,11 +68,6 @@ namespace Azure.ResourceManager.NetApp.Models
             RemotePath = remotePath;
             RemoteVolumeRegion = remoteVolumeRegion;
             _serializedAdditionalRawData = serializedAdditionalRawData;
-        }
-
-        /// <summary> Initializes a new instance of <see cref="NetAppReplicationObject"/> for deserialization. </summary>
-        internal NetAppReplicationObject()
-        {
         }
         /// <summary> Indicates whether the local volume is the source or destination for the Volume Replication. </summary>
         public NetAppEndpointType? EndpointType { get; set; }

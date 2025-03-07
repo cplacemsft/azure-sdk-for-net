@@ -21,18 +21,9 @@ namespace Azure.Search.Documents.Indexes.Models
         /// <exception cref="ArgumentNullException"> <paramref name="inputs"/>, <paramref name="outputs"/> or <paramref name="uri"/> is null. </exception>
         public WebApiSkill(IEnumerable<InputFieldMappingEntry> inputs, IEnumerable<OutputFieldMappingEntry> outputs, string uri) : base(inputs, outputs)
         {
-            if (inputs == null)
-            {
-                throw new ArgumentNullException(nameof(inputs));
-            }
-            if (outputs == null)
-            {
-                throw new ArgumentNullException(nameof(outputs));
-            }
-            if (uri == null)
-            {
-                throw new ArgumentNullException(nameof(uri));
-            }
+            Argument.AssertNotNull(inputs, nameof(inputs));
+            Argument.AssertNotNull(outputs, nameof(outputs));
+            Argument.AssertNotNull(uri, nameof(uri));
 
             Uri = uri;
             HttpHeaders = new ChangeTrackingDictionary<string, string>();
@@ -70,9 +61,6 @@ namespace Azure.Search.Documents.Indexes.Models
             AuthIdentity = authIdentity;
             ODataType = oDataType ?? "#Microsoft.Skills.Custom.WebApiSkill";
         }
-
-        /// <summary> The url for the Web API. </summary>
-        public string Uri { get; set; }
         /// <summary> The method for the http request. </summary>
         public string HttpMethod { get; set; }
         /// <summary> The desired timeout for the request. Default is 30 seconds. </summary>

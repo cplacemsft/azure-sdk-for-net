@@ -18,21 +18,19 @@ namespace Azure.Health.Insights.RadiologyInsights
         /// <exception cref="ArgumentNullException"> <paramref name="code"/> is null. </exception>
         internal GenericProcedureRecommendation(FhirR4CodeableConcept code)
         {
-            if (code == null)
-            {
-                throw new ArgumentNullException(nameof(code));
-            }
+            Argument.AssertNotNull(code, nameof(code));
 
             Kind = "genericProcedureRecommendation";
             Code = code;
         }
 
         /// <summary> Initializes a new instance of <see cref="GenericProcedureRecommendation"/>. </summary>
-        /// <param name="kind"> Discriminator. </param>
+        /// <param name="kind"> Discriminator property for ProcedureRecommendation. </param>
+        /// <param name="extension"> Additional Content defined by implementations. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
         /// <param name="code"> Procedure modality : SNOMED CT code. </param>
         /// <param name="description"> Procedure description : MANAGEMENT PROCEDURE (PROCEDURE) or CONSULTATION (PROCEDURE) based on SNOMED CT. </param>
-        internal GenericProcedureRecommendation(string kind, IDictionary<string, BinaryData> serializedAdditionalRawData, FhirR4CodeableConcept code, string description) : base(kind, serializedAdditionalRawData)
+        internal GenericProcedureRecommendation(string kind, IReadOnlyList<FhirR4Extension> extension, IDictionary<string, BinaryData> serializedAdditionalRawData, FhirR4CodeableConcept code, string description) : base(kind, extension, serializedAdditionalRawData)
         {
             Code = code;
             Description = description;

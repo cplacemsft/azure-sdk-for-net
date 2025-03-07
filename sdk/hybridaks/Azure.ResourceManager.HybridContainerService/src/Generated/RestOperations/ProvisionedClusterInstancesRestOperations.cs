@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.HybridContainerService.Models;
@@ -37,6 +36,17 @@ namespace Azure.ResourceManager.HybridContainerService
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
         }
 
+        internal RequestUriBuilder CreateGetRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
+        }
+
         internal HttpMessage CreateGetRequest(string connectedClusterResourceUri)
         {
             var message = _pipeline.CreateMessage();
@@ -60,10 +70,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response<ProvisionedClusterData>> GetAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateGetRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -72,7 +79,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ProvisionedClusterData.DeserializeProvisionedClusterData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -89,10 +96,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response<ProvisionedClusterData> Get(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateGetRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -101,7 +105,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ProvisionedClusterData.DeserializeProvisionedClusterData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -110,6 +114,17 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateCreateOrUpdateRequestUri(string connectedClusterResourceUri, ProvisionedClusterData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateCreateOrUpdateRequest(string connectedClusterResourceUri, ProvisionedClusterData data)
@@ -127,7 +142,7 @@ namespace Azure.ResourceManager.HybridContainerService
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
@@ -140,14 +155,8 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> or <paramref name="data"/> is null. </exception>
         public async Task<Response> CreateOrUpdateAsync(string connectedClusterResourceUri, ProvisionedClusterData data, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(connectedClusterResourceUri, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -168,14 +177,8 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> or <paramref name="data"/> is null. </exception>
         public Response CreateOrUpdate(string connectedClusterResourceUri, ProvisionedClusterData data, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(connectedClusterResourceUri, data);
             _pipeline.Send(message, cancellationToken);
@@ -187,6 +190,17 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateDeleteRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateDeleteRequest(string connectedClusterResourceUri)
@@ -212,10 +226,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response> DeleteAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateDeleteRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -235,10 +246,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response Delete(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateDeleteRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -250,6 +258,17 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string connectedClusterResourceUri)
@@ -275,10 +294,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response<ProvisionedClusterListResult>> ListAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -287,7 +303,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ProvisionedClusterListResult.DeserializeProvisionedClusterListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -302,10 +318,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response<ProvisionedClusterListResult> List(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -314,13 +327,24 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ProvisionedClusterListResult.DeserializeProvisionedClusterListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetUpgradeProfileRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default/upgradeProfiles/default", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetUpgradeProfileRequest(string connectedClusterResourceUri)
@@ -346,10 +370,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response<ProvisionedClusterUpgradeProfileData>> GetUpgradeProfileAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateGetUpgradeProfileRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -358,7 +379,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterUpgradeProfileData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ProvisionedClusterUpgradeProfileData.DeserializeProvisionedClusterUpgradeProfileData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -375,10 +396,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response<ProvisionedClusterUpgradeProfileData> GetUpgradeProfile(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateGetUpgradeProfileRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -387,7 +405,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterUpgradeProfileData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ProvisionedClusterUpgradeProfileData.DeserializeProvisionedClusterUpgradeProfileData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -396,6 +414,17 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListUserKubeconfigRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default/listUserKubeconfig", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListUserKubeconfigRequest(string connectedClusterResourceUri)
@@ -421,10 +450,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response> ListUserKubeconfigAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListUserKubeconfigRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -444,10 +470,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response ListUserKubeconfig(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListUserKubeconfigRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -459,6 +482,17 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListAdminKubeconfigRequestUri(string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(connectedClusterResourceUri, false);
+            uri.AppendPath("/providers/Microsoft.HybridContainerService/provisionedClusterInstances/default/listAdminKubeconfig", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListAdminKubeconfigRequest(string connectedClusterResourceUri)
@@ -484,10 +518,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response> ListAdminKubeconfigAsync(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListAdminKubeconfigRequest(connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -507,10 +538,7 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response ListAdminKubeconfig(string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListAdminKubeconfigRequest(connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -522,6 +550,14 @@ namespace Azure.ResourceManager.HybridContainerService
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string connectedClusterResourceUri)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string connectedClusterResourceUri)
@@ -545,14 +581,8 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> or <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public async Task<Response<ProvisionedClusterListResult>> ListNextPageAsync(string nextLink, string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListNextPageRequest(nextLink, connectedClusterResourceUri);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -561,7 +591,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ProvisionedClusterListResult.DeserializeProvisionedClusterListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -577,14 +607,8 @@ namespace Azure.ResourceManager.HybridContainerService
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> or <paramref name="connectedClusterResourceUri"/> is null. </exception>
         public Response<ProvisionedClusterListResult> ListNextPage(string nextLink, string connectedClusterResourceUri, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (connectedClusterResourceUri == null)
-            {
-                throw new ArgumentNullException(nameof(connectedClusterResourceUri));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNull(connectedClusterResourceUri, nameof(connectedClusterResourceUri));
 
             using var message = CreateListNextPageRequest(nextLink, connectedClusterResourceUri);
             _pipeline.Send(message, cancellationToken);
@@ -593,7 +617,7 @@ namespace Azure.ResourceManager.HybridContainerService
                 case 200:
                     {
                         ProvisionedClusterListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ProvisionedClusterListResult.DeserializeProvisionedClusterListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

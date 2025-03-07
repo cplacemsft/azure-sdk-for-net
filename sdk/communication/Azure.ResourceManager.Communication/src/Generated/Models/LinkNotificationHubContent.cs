@@ -52,14 +52,8 @@ namespace Azure.ResourceManager.Communication.Models
         /// <exception cref="ArgumentNullException"> <paramref name="resourceId"/> or <paramref name="connectionString"/> is null. </exception>
         public LinkNotificationHubContent(ResourceIdentifier resourceId, string connectionString)
         {
-            if (resourceId == null)
-            {
-                throw new ArgumentNullException(nameof(resourceId));
-            }
-            if (connectionString == null)
-            {
-                throw new ArgumentNullException(nameof(connectionString));
-            }
+            Argument.AssertNotNull(resourceId, nameof(resourceId));
+            Argument.AssertNotNull(connectionString, nameof(connectionString));
 
             ResourceId = resourceId;
             ConnectionString = connectionString;
@@ -82,8 +76,10 @@ namespace Azure.ResourceManager.Communication.Models
         }
 
         /// <summary> The resource ID of the notification hub. </summary>
+        [WirePath("resourceId")]
         public ResourceIdentifier ResourceId { get; }
         /// <summary> Connection string for the notification hub. </summary>
+        [WirePath("connectionString")]
         public string ConnectionString { get; }
     }
 }

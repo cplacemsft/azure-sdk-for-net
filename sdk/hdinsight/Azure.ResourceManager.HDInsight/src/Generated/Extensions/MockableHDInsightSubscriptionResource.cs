@@ -9,11 +9,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
-using Azure.ResourceManager.HDInsight;
 using Azure.ResourceManager.HDInsight.Models;
 
 namespace Azure.ResourceManager.HDInsight.Mocking
@@ -62,7 +59,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -92,7 +89,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -122,7 +119,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -157,7 +154,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -192,7 +189,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -218,7 +215,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -244,7 +241,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -279,7 +276,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -314,7 +311,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -324,10 +321,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<HDInsightNameAvailabilityResult>> CheckHDInsightNameAvailabilityAsync(AzureLocation location, HDInsightNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = LocationsClientDiagnostics.CreateScope("MockableHDInsightSubscriptionResource.CheckHDInsightNameAvailability");
             scope.Start();
@@ -356,7 +350,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -366,10 +360,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<HDInsightNameAvailabilityResult> CheckHDInsightNameAvailability(AzureLocation location, HDInsightNameAvailabilityContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = LocationsClientDiagnostics.CreateScope("MockableHDInsightSubscriptionResource.CheckHDInsightNameAvailability");
             scope.Start();
@@ -398,7 +389,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -408,10 +399,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual async Task<Response<HDInsightClusterCreationValidateResult>> ValidateHDInsightClusterCreationAsync(AzureLocation location, HDInsightClusterCreationValidateContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = LocationsClientDiagnostics.CreateScope("MockableHDInsightSubscriptionResource.ValidateHDInsightClusterCreation");
             scope.Start();
@@ -440,7 +428,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-04-15-preview</description>
+        /// <description>2024-08-01-preview</description>
         /// </item>
         /// </list>
         /// </summary>
@@ -450,10 +438,7 @@ namespace Azure.ResourceManager.HDInsight.Mocking
         /// <exception cref="ArgumentNullException"> <paramref name="content"/> is null. </exception>
         public virtual Response<HDInsightClusterCreationValidateResult> ValidateHDInsightClusterCreation(AzureLocation location, HDInsightClusterCreationValidateContent content, CancellationToken cancellationToken = default)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = LocationsClientDiagnostics.CreateScope("MockableHDInsightSubscriptionResource.ValidateHDInsightClusterCreation");
             scope.Start();

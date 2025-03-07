@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.ServiceNetworking
@@ -63,11 +61,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_CreateOrUpdate</description>
+        /// <description>TrafficController_CreateOrUpdate</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<TrafficControllerResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string trafficControllerName, TrafficControllerData data, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.CreateOrUpdate");
             scope.Start();
@@ -122,11 +110,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_CreateOrUpdate</description>
+        /// <description>TrafficController_CreateOrUpdate</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<TrafficControllerResource> CreateOrUpdate(WaitUntil waitUntil, string trafficControllerName, TrafficControllerData data, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.CreateOrUpdate");
             scope.Start();
@@ -181,11 +159,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual async Task<Response<TrafficControllerResource>> GetAsync(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.Get");
             scope.Start();
@@ -233,11 +204,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual Response<TrafficControllerResource> Get(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.Get");
             scope.Start();
@@ -285,11 +249,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_ListByResourceGroup</description>
+        /// <description>TrafficController_ListByResourceGroup</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -315,11 +279,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_ListByResourceGroup</description>
+        /// <description>TrafficController_ListByResourceGroup</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -345,11 +309,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.Exists");
             scope.Start();
@@ -395,11 +352,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual Response<bool> Exists(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.Exists");
             scope.Start();
@@ -445,11 +395,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual async Task<NullableResponse<TrafficControllerResource>> GetIfExistsAsync(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.GetIfExists");
             scope.Start();
@@ -497,11 +440,11 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// </item>
         /// <item>
         /// <term>Operation Id</term>
-        /// <description>TrafficControllerInterface_Get</description>
+        /// <description>TrafficController_Get</description>
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-11-01</description>
+        /// <description>2025-01-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.ServiceNetworking
         /// <exception cref="ArgumentNullException"> <paramref name="trafficControllerName"/> is null. </exception>
         public virtual NullableResponse<TrafficControllerResource> GetIfExists(string trafficControllerName, CancellationToken cancellationToken = default)
         {
-            if (trafficControllerName == null)
-            {
-                throw new ArgumentNullException(nameof(trafficControllerName));
-            }
-            if (trafficControllerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(trafficControllerName));
-            }
+            Argument.AssertNotNullOrEmpty(trafficControllerName, nameof(trafficControllerName));
 
             using var scope = _trafficControllerTrafficControllerInterfaceClientDiagnostics.CreateScope("TrafficControllerCollection.GetIfExists");
             scope.Start();

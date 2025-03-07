@@ -10,10 +10,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.DnsResolver.Models;
 using Azure.ResourceManager.Resources;
 
@@ -112,7 +110,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -143,7 +141,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -181,7 +179,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -212,7 +210,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -243,7 +241,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -283,7 +281,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -323,7 +321,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -366,7 +364,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -409,7 +407,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -424,10 +422,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual async Task<ArmOperation<DnsForwardingRulesetResource>> UpdateAsync(WaitUntil waitUntil, DnsForwardingRulesetPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.Update");
             scope.Start();
@@ -459,7 +454,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -474,10 +469,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="patch"/> is null. </exception>
         public virtual ArmOperation<DnsForwardingRulesetResource> Update(WaitUntil waitUntil, DnsForwardingRulesetPatch patch, string ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (patch == null)
-            {
-                throw new ArgumentNullException(nameof(patch));
-            }
+            Argument.AssertNotNull(patch, nameof(patch));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.Update");
             scope.Start();
@@ -509,7 +501,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -523,14 +515,8 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual async Task<Response<DnsForwardingRulesetResource>> AddTagAsync(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.AddTag");
             scope.Start();
@@ -577,7 +563,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -591,14 +577,8 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual Response<DnsForwardingRulesetResource> AddTag(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.AddTag");
             scope.Start();
@@ -645,7 +625,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -658,10 +638,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual async Task<Response<DnsForwardingRulesetResource>> SetTagsAsync(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.SetTags");
             scope.Start();
@@ -705,7 +682,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -718,10 +695,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual Response<DnsForwardingRulesetResource> SetTags(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.SetTags");
             scope.Start();
@@ -765,7 +739,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -778,10 +752,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual async Task<Response<DnsForwardingRulesetResource>> RemoveTagAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.RemoveTag");
             scope.Start();
@@ -828,7 +799,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -841,10 +812,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual Response<DnsForwardingRulesetResource> RemoveTag(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetResource.RemoveTag");
             scope.Start();

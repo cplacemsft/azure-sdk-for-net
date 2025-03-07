@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Azure.ResourceManager.AppContainers;
 
 namespace Azure.ResourceManager.AppContainers.Models
 {
@@ -52,10 +51,7 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="allowedOrigins"/> is null. </exception>
         public ContainerAppCorsPolicy(IEnumerable<string> allowedOrigins)
         {
-            if (allowedOrigins == null)
-            {
-                throw new ArgumentNullException(nameof(allowedOrigins));
-            }
+            Argument.AssertNotNull(allowedOrigins, nameof(allowedOrigins));
 
             AllowedOrigins = allowedOrigins.ToList();
             AllowedMethods = new ChangeTrackingList<string>();
@@ -88,16 +84,22 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> Specifies the content for the access-control-allow-origins header. </summary>
+        [WirePath("allowedOrigins")]
         public IList<string> AllowedOrigins { get; }
         /// <summary> Specifies the content for the access-control-allow-methods header. </summary>
+        [WirePath("allowedMethods")]
         public IList<string> AllowedMethods { get; }
         /// <summary> Specifies the content for the access-control-allow-headers header. </summary>
+        [WirePath("allowedHeaders")]
         public IList<string> AllowedHeaders { get; }
         /// <summary> Specifies the content for the access-control-expose-headers header. </summary>
+        [WirePath("exposeHeaders")]
         public IList<string> ExposeHeaders { get; }
         /// <summary> Specifies the content for the access-control-max-age header. </summary>
+        [WirePath("maxAge")]
         public int? MaxAge { get; set; }
         /// <summary> Specifies whether the resource allows credentials. </summary>
+        [WirePath("allowCredentials")]
         public bool? AllowCredentials { get; set; }
     }
 }

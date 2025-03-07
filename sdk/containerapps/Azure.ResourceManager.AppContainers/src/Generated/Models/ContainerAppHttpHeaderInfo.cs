@@ -51,14 +51,8 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="value"/> is null. </exception>
         public ContainerAppHttpHeaderInfo(string name, string value)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(value, nameof(value));
 
             Name = name;
             Value = value;
@@ -81,8 +75,10 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> The header field name. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> The header field value. </summary>
+        [WirePath("value")]
         public string Value { get; set; }
     }
 }

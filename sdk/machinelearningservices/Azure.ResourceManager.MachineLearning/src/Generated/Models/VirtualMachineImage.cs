@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="id"/> is null. </exception>
         public VirtualMachineImage(string id)
         {
-            if (id == null)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
+            Argument.AssertNotNull(id, nameof(id));
 
             Id = id;
         }
@@ -73,6 +70,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         }
 
         /// <summary> Virtual Machine image path. </summary>
+        [WirePath("id")]
         public string Id { get; set; }
     }
 }

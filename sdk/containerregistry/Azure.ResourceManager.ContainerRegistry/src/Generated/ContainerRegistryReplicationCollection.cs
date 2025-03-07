@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.ContainerRegistry
 {
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -82,18 +80,8 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<ContainerRegistryReplicationResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string replicationName, ContainerRegistryReplicationData data, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.CreateOrUpdate");
             scope.Start();
@@ -125,7 +113,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -141,18 +129,8 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<ContainerRegistryReplicationResource> CreateOrUpdate(WaitUntil waitUntil, string replicationName, ContainerRegistryReplicationData data, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.CreateOrUpdate");
             scope.Start();
@@ -184,7 +162,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -198,14 +176,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual async Task<Response<ContainerRegistryReplicationResource>> GetAsync(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.Get");
             scope.Start();
@@ -236,7 +207,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -250,14 +221,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual Response<ContainerRegistryReplicationResource> Get(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.Get");
             scope.Start();
@@ -288,7 +252,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -318,7 +282,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -348,7 +312,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -362,14 +326,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.Exists");
             scope.Start();
@@ -398,7 +355,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -412,14 +369,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual Response<bool> Exists(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.Exists");
             scope.Start();
@@ -448,7 +398,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -462,14 +412,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual async Task<NullableResponse<ContainerRegistryReplicationResource>> GetIfExistsAsync(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.GetIfExists");
             scope.Start();
@@ -500,7 +443,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -514,14 +457,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="replicationName"/> is null. </exception>
         public virtual NullableResponse<ContainerRegistryReplicationResource> GetIfExists(string replicationName, CancellationToken cancellationToken = default)
         {
-            if (replicationName == null)
-            {
-                throw new ArgumentNullException(nameof(replicationName));
-            }
-            if (replicationName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(replicationName));
-            }
+            Argument.AssertNotNullOrEmpty(replicationName, nameof(replicationName));
 
             using var scope = _containerRegistryReplicationReplicationsClientDiagnostics.CreateScope("ContainerRegistryReplicationCollection.GetIfExists");
             scope.Start();

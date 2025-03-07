@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="keyData"/> is null. </exception>
         public ContainerServiceSshPublicKey(string keyData)
         {
-            if (keyData == null)
-            {
-                throw new ArgumentNullException(nameof(keyData));
-            }
+            Argument.AssertNotNull(keyData, nameof(keyData));
 
             KeyData = keyData;
         }
@@ -73,6 +70,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> Certificate public key used to authenticate with VMs through SSH. The certificate must be in PEM format with or without headers. </summary>
+        [WirePath("keyData")]
         public string KeyData { get; set; }
     }
 }

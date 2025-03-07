@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Marketplace.Models;
@@ -35,6 +34,19 @@ namespace Azure.ResourceManager.Marketplace
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2023-01-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string useCache)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (useCache != null)
+            {
+                uri.AppendQuery("use-cache", useCache, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string useCache)
@@ -68,7 +80,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = PrivateStoreList.DeserializePrivateStoreList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -89,13 +101,23 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = PrivateStoreList.DeserializePrivateStoreList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(Guid privateStoreId)
@@ -126,7 +148,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = PrivateStoreData.DeserializePrivateStoreData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -149,7 +171,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = PrivateStoreData.DeserializePrivateStoreData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -158,6 +180,16 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateCreateOrUpdateRequestUri(Guid privateStoreId, PrivateStoreData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateCreateOrUpdateRequest(Guid privateStoreId, PrivateStoreData data)
@@ -174,7 +206,7 @@ namespace Azure.ResourceManager.Marketplace
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
@@ -187,10 +219,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public async Task<Response> CreateOrUpdateAsync(Guid privateStoreId, PrivateStoreData data, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(privateStoreId, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -210,10 +239,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public Response CreateOrUpdate(Guid privateStoreId, PrivateStoreData data, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateOrUpdateRequest(privateStoreId, data);
             _pipeline.Send(message, cancellationToken);
@@ -224,6 +250,16 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateDeleteRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateDeleteRequest(Guid privateStoreId)
@@ -276,6 +312,17 @@ namespace Azure.ResourceManager.Marketplace
             }
         }
 
+        internal RequestUriBuilder CreateAnyExistingOffersInTheCollectionsRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/anyExistingOffersInTheCollections", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
+        }
+
         internal HttpMessage CreateAnyExistingOffersInTheCollectionsRequest(Guid privateStoreId)
         {
             var message = _pipeline.CreateMessage();
@@ -305,7 +352,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         AnyExistingOffersInTheCollectionsResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = AnyExistingOffersInTheCollectionsResult.DeserializeAnyExistingOffersInTheCollectionsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -326,13 +373,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         AnyExistingOffersInTheCollectionsResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = AnyExistingOffersInTheCollectionsResult.DeserializeAnyExistingOffersInTheCollectionsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateQueryOffersRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/queryOffers", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateQueryOffersRequest(Guid privateStoreId)
@@ -364,7 +422,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryOffers value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = Models.QueryOffers.DeserializeQueryOffers(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -385,13 +443,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryOffers value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = Models.QueryOffers.DeserializeQueryOffers(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateQueryUserOffersRequestUri(Guid privateStoreId, QueryUserOffersContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/queryUserOffers", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateQueryUserOffersRequest(Guid privateStoreId, QueryUserOffersContent content)
@@ -411,7 +480,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -431,7 +500,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryOffers value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = Models.QueryOffers.DeserializeQueryOffers(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -453,13 +522,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryOffers value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = Models.QueryOffers.DeserializeQueryOffers(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateBillingAccountsRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/billingAccounts", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateBillingAccountsRequest(Guid privateStoreId)
@@ -491,7 +571,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreBillingAccountsResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = PrivateStoreBillingAccountsResult.DeserializePrivateStoreBillingAccountsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -512,13 +592,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreBillingAccountsResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = PrivateStoreBillingAccountsResult.DeserializePrivateStoreBillingAccountsResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateCollectionsToSubscriptionsMappingRequestUri(Guid privateStoreId, CollectionsToSubscriptionsMappingContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/collectionsToSubscriptionsMapping", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateCollectionsToSubscriptionsMappingRequest(Guid privateStoreId, CollectionsToSubscriptionsMappingContent content)
@@ -538,7 +629,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -558,7 +649,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         CollectionsToSubscriptionsMappingResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = CollectionsToSubscriptionsMappingResult.DeserializeCollectionsToSubscriptionsMappingResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -580,13 +671,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         CollectionsToSubscriptionsMappingResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = CollectionsToSubscriptionsMappingResult.DeserializeCollectionsToSubscriptionsMappingResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateQueryApprovedPlansRequestUri(Guid privateStoreId, QueryApprovedPlansContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/queryApprovedPlans", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateQueryApprovedPlansRequest(Guid privateStoreId, QueryApprovedPlansContent content)
@@ -606,7 +708,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -626,7 +728,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryApprovedPlansResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = QueryApprovedPlansResult.DeserializeQueryApprovedPlansResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -648,13 +750,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryApprovedPlansResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = QueryApprovedPlansResult.DeserializeQueryApprovedPlansResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateBulkCollectionsActionRequestUri(Guid privateStoreId, BulkCollectionsActionContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/bulkCollectionsAction", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateBulkCollectionsActionRequest(Guid privateStoreId, BulkCollectionsActionContent content)
@@ -674,7 +787,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -694,7 +807,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         BulkCollectionsActionResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = BulkCollectionsActionResult.DeserializeBulkCollectionsActionResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -716,13 +829,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         BulkCollectionsActionResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = BulkCollectionsActionResult.DeserializeBulkCollectionsActionResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetApprovalRequestsListRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/requestApprovals", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetApprovalRequestsListRequest(Guid privateStoreId)
@@ -754,7 +878,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         RequestApprovalsList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = RequestApprovalsList.DeserializeRequestApprovalsList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -775,13 +899,25 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         RequestApprovalsList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = RequestApprovalsList.DeserializeRequestApprovalsList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestApprovalRequestUri(Guid privateStoreId, string requestApprovalId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/requestApprovals/", false);
+            uri.AppendPath(requestApprovalId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequestApprovalRequest(Guid privateStoreId, string requestApprovalId)
@@ -810,14 +946,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<MarketplaceApprovalRequestData>> GetRequestApprovalAsync(Guid privateStoreId, string requestApprovalId, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateGetRequestApprovalRequest(privateStoreId, requestApprovalId);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -826,7 +955,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceApprovalRequestData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MarketplaceApprovalRequestData.DeserializeMarketplaceApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -845,14 +974,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<MarketplaceApprovalRequestData> GetRequestApproval(Guid privateStoreId, string requestApprovalId, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateGetRequestApprovalRequest(privateStoreId, requestApprovalId);
             _pipeline.Send(message, cancellationToken);
@@ -861,7 +983,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceApprovalRequestData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MarketplaceApprovalRequestData.DeserializeMarketplaceApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -870,6 +992,18 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateCreateApprovalRequestRequestUri(Guid privateStoreId, string requestApprovalId, MarketplaceApprovalRequestData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/requestApprovals/", false);
+            uri.AppendPath(requestApprovalId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateCreateApprovalRequestRequest(Guid privateStoreId, string requestApprovalId, MarketplaceApprovalRequestData data)
@@ -888,7 +1022,7 @@ namespace Azure.ResourceManager.Marketplace
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
@@ -903,18 +1037,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<MarketplaceApprovalRequestData>> CreateApprovalRequestAsync(Guid privateStoreId, string requestApprovalId, MarketplaceApprovalRequestData data, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateApprovalRequestRequest(privateStoreId, requestApprovalId, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -923,7 +1047,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceApprovalRequestData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MarketplaceApprovalRequestData.DeserializeMarketplaceApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -941,18 +1065,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<MarketplaceApprovalRequestData> CreateApprovalRequest(Guid privateStoreId, string requestApprovalId, MarketplaceApprovalRequestData data, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateCreateApprovalRequestRequest(privateStoreId, requestApprovalId, data);
             _pipeline.Send(message, cancellationToken);
@@ -961,13 +1075,26 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceApprovalRequestData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MarketplaceApprovalRequestData.DeserializeMarketplaceApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateQueryRequestApprovalRequestUri(Guid privateStoreId, string requestApprovalId, QueryApprovalRequestContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/requestApprovals/", false);
+            uri.AppendPath(requestApprovalId, true);
+            uri.AppendPath("/query", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateQueryRequestApprovalRequest(Guid privateStoreId, string requestApprovalId, QueryApprovalRequestContent content)
@@ -989,7 +1116,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -1005,14 +1132,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<QueryApprovalRequestResult>> QueryRequestApprovalAsync(Guid privateStoreId, string requestApprovalId, QueryApprovalRequestContent content = null, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateQueryRequestApprovalRequest(privateStoreId, requestApprovalId, content);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1021,7 +1141,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryApprovalRequestResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = QueryApprovalRequestResult.DeserializeQueryApprovalRequestResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1039,14 +1159,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<QueryApprovalRequestResult> QueryRequestApproval(Guid privateStoreId, string requestApprovalId, QueryApprovalRequestContent content = null, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateQueryRequestApprovalRequest(privateStoreId, requestApprovalId, content);
             _pipeline.Send(message, cancellationToken);
@@ -1055,13 +1168,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         QueryApprovalRequestResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = QueryApprovalRequestResult.DeserializeQueryApprovalRequestResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateAdminRequestApprovalsListRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/adminRequestApprovals", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateAdminRequestApprovalsListRequest(Guid privateStoreId)
@@ -1093,7 +1217,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MarketplaceAdminApprovalRequestList.DeserializeMarketplaceAdminApprovalRequestList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1114,13 +1238,26 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MarketplaceAdminApprovalRequestList.DeserializeMarketplaceAdminApprovalRequestList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetAdminRequestApprovalRequestUri(Guid privateStoreId, string adminRequestApprovalId, string publisherId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/adminRequestApprovals/", false);
+            uri.AppendPath(adminRequestApprovalId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            uri.AppendQuery("publisherId", publisherId, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetAdminRequestApprovalRequest(Guid privateStoreId, string adminRequestApprovalId, string publisherId)
@@ -1151,18 +1288,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="adminRequestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<MarketplaceAdminApprovalRequestData>> GetAdminRequestApprovalAsync(Guid privateStoreId, string adminRequestApprovalId, string publisherId, CancellationToken cancellationToken = default)
         {
-            if (adminRequestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(adminRequestApprovalId));
-            }
-            if (adminRequestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(adminRequestApprovalId));
-            }
-            if (publisherId == null)
-            {
-                throw new ArgumentNullException(nameof(publisherId));
-            }
+            Argument.AssertNotNullOrEmpty(adminRequestApprovalId, nameof(adminRequestApprovalId));
+            Argument.AssertNotNull(publisherId, nameof(publisherId));
 
             using var message = CreateGetAdminRequestApprovalRequest(privateStoreId, adminRequestApprovalId, publisherId);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1171,7 +1298,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MarketplaceAdminApprovalRequestData.DeserializeMarketplaceAdminApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1191,18 +1318,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="adminRequestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<MarketplaceAdminApprovalRequestData> GetAdminRequestApproval(Guid privateStoreId, string adminRequestApprovalId, string publisherId, CancellationToken cancellationToken = default)
         {
-            if (adminRequestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(adminRequestApprovalId));
-            }
-            if (adminRequestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(adminRequestApprovalId));
-            }
-            if (publisherId == null)
-            {
-                throw new ArgumentNullException(nameof(publisherId));
-            }
+            Argument.AssertNotNullOrEmpty(adminRequestApprovalId, nameof(adminRequestApprovalId));
+            Argument.AssertNotNull(publisherId, nameof(publisherId));
 
             using var message = CreateGetAdminRequestApprovalRequest(privateStoreId, adminRequestApprovalId, publisherId);
             _pipeline.Send(message, cancellationToken);
@@ -1211,7 +1328,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MarketplaceAdminApprovalRequestData.DeserializeMarketplaceAdminApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1220,6 +1337,18 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateUpdateAdminRequestApprovalRequestUri(Guid privateStoreId, string adminRequestApprovalId, MarketplaceAdminApprovalRequestData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/adminRequestApprovals/", false);
+            uri.AppendPath(adminRequestApprovalId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateUpdateAdminRequestApprovalRequest(Guid privateStoreId, string adminRequestApprovalId, MarketplaceAdminApprovalRequestData data)
@@ -1238,7 +1367,7 @@ namespace Azure.ResourceManager.Marketplace
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
@@ -1253,18 +1382,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="adminRequestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<MarketplaceAdminApprovalRequestData>> UpdateAdminRequestApprovalAsync(Guid privateStoreId, string adminRequestApprovalId, MarketplaceAdminApprovalRequestData data, CancellationToken cancellationToken = default)
         {
-            if (adminRequestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(adminRequestApprovalId));
-            }
-            if (adminRequestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(adminRequestApprovalId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(adminRequestApprovalId, nameof(adminRequestApprovalId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateUpdateAdminRequestApprovalRequest(privateStoreId, adminRequestApprovalId, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1273,7 +1392,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MarketplaceAdminApprovalRequestData.DeserializeMarketplaceAdminApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1291,18 +1410,8 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="adminRequestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<MarketplaceAdminApprovalRequestData> UpdateAdminRequestApproval(Guid privateStoreId, string adminRequestApprovalId, MarketplaceAdminApprovalRequestData data, CancellationToken cancellationToken = default)
         {
-            if (adminRequestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(adminRequestApprovalId));
-            }
-            if (adminRequestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(adminRequestApprovalId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(adminRequestApprovalId, nameof(adminRequestApprovalId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateUpdateAdminRequestApprovalRequest(privateStoreId, adminRequestApprovalId, data);
             _pipeline.Send(message, cancellationToken);
@@ -1311,13 +1420,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         MarketplaceAdminApprovalRequestData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MarketplaceAdminApprovalRequestData.DeserializeMarketplaceAdminApprovalRequestData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateQueryNotificationsStateRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/queryNotificationsState", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateQueryNotificationsStateRequest(Guid privateStoreId)
@@ -1349,7 +1469,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreNotificationsState value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = PrivateStoreNotificationsState.DeserializePrivateStoreNotificationsState(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1370,13 +1490,26 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreNotificationsState value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = PrivateStoreNotificationsState.DeserializePrivateStoreNotificationsState(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateAcknowledgeOfferNotificationRequestUri(Guid privateStoreId, string offerId, AcknowledgeOfferNotificationContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/offers/", false);
+            uri.AppendPath(offerId, true);
+            uri.AppendPath("/acknowledgeNotification", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateAcknowledgeOfferNotificationRequest(Guid privateStoreId, string offerId, AcknowledgeOfferNotificationContent content)
@@ -1398,7 +1531,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -1414,14 +1547,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="offerId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> AcknowledgeOfferNotificationAsync(Guid privateStoreId, string offerId, AcknowledgeOfferNotificationContent content = null, CancellationToken cancellationToken = default)
         {
-            if (offerId == null)
-            {
-                throw new ArgumentNullException(nameof(offerId));
-            }
-            if (offerId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(offerId));
-            }
+            Argument.AssertNotNullOrEmpty(offerId, nameof(offerId));
 
             using var message = CreateAcknowledgeOfferNotificationRequest(privateStoreId, offerId, content);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1443,14 +1569,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="offerId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response AcknowledgeOfferNotification(Guid privateStoreId, string offerId, AcknowledgeOfferNotificationContent content = null, CancellationToken cancellationToken = default)
         {
-            if (offerId == null)
-            {
-                throw new ArgumentNullException(nameof(offerId));
-            }
-            if (offerId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(offerId));
-            }
+            Argument.AssertNotNullOrEmpty(offerId, nameof(offerId));
 
             using var message = CreateAcknowledgeOfferNotificationRequest(privateStoreId, offerId, content);
             _pipeline.Send(message, cancellationToken);
@@ -1461,6 +1580,19 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateWithdrawPlanRequestUri(Guid privateStoreId, string requestApprovalId, WithdrawPlanContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/requestApprovals/", false);
+            uri.AppendPath(requestApprovalId, true);
+            uri.AppendPath("/withdrawPlan", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateWithdrawPlanRequest(Guid privateStoreId, string requestApprovalId, WithdrawPlanContent content)
@@ -1482,7 +1614,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content0 = new Utf8JsonRequestContent();
-                content0.JsonWriter.WriteObjectValue(content);
+                content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
                 request.Content = content0;
             }
             _userAgent.Apply(message);
@@ -1498,14 +1630,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> WithdrawPlanAsync(Guid privateStoreId, string requestApprovalId, WithdrawPlanContent content = null, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateWithdrawPlanRequest(privateStoreId, requestApprovalId, content);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1527,14 +1652,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentException"> <paramref name="requestApprovalId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response WithdrawPlan(Guid privateStoreId, string requestApprovalId, WithdrawPlanContent content = null, CancellationToken cancellationToken = default)
         {
-            if (requestApprovalId == null)
-            {
-                throw new ArgumentNullException(nameof(requestApprovalId));
-            }
-            if (requestApprovalId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(requestApprovalId));
-            }
+            Argument.AssertNotNullOrEmpty(requestApprovalId, nameof(requestApprovalId));
 
             using var message = CreateWithdrawPlanRequest(privateStoreId, requestApprovalId, content);
             _pipeline.Send(message, cancellationToken);
@@ -1545,6 +1663,17 @@ namespace Azure.ResourceManager.Marketplace
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateFetchAllSubscriptionsInTenantRequestUri(Guid privateStoreId, string nextPageToken)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/fetchAllSubscriptionsInTenant", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateFetchAllSubscriptionsInTenantRequest(Guid privateStoreId, string nextPageToken)
@@ -1581,7 +1710,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         SubscriptionsResponse value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SubscriptionsResponse.DeserializeSubscriptionsResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1603,13 +1732,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         SubscriptionsResponse value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SubscriptionsResponse.DeserializeSubscriptionsResponse(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNewPlansNotificationsRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/listNewPlansNotifications", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListNewPlansNotificationsRequest(Guid privateStoreId)
@@ -1641,7 +1781,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         NewPlanNotificationListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = NewPlanNotificationListResult.DeserializeNewPlanNotificationListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1662,13 +1802,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         NewPlanNotificationListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = NewPlanNotificationListResult.DeserializeNewPlanNotificationListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListStopSellOffersPlansNotificationsRequestUri(Guid privateStoreId, StopSellSubscriptions stopSellSubscriptions)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/listStopSellOffersPlansNotifications", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListStopSellOffersPlansNotificationsRequest(Guid privateStoreId, StopSellSubscriptions stopSellSubscriptions)
@@ -1688,7 +1839,7 @@ namespace Azure.ResourceManager.Marketplace
             {
                 request.Headers.Add("Content-Type", "application/json");
                 var content = new Utf8JsonRequestContent();
-                content.JsonWriter.WriteObjectValue(stopSellSubscriptions);
+                content.JsonWriter.WriteObjectValue(stopSellSubscriptions, ModelSerializationExtensions.WireOptions);
                 request.Content = content;
             }
             _userAgent.Apply(message);
@@ -1708,7 +1859,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         StopSellOffersPlansNotificationsList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = StopSellOffersPlansNotificationsList.DeserializeStopSellOffersPlansNotificationsList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1730,13 +1881,24 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         StopSellOffersPlansNotificationsList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = StopSellOffersPlansNotificationsList.DeserializeStopSellOffersPlansNotificationsList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListSubscriptionsContextRequestUri(Guid privateStoreId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Marketplace/privateStores/", false);
+            uri.AppendPath(privateStoreId, true);
+            uri.AppendPath("/listSubscriptionsContext", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListSubscriptionsContextRequest(Guid privateStoreId)
@@ -1768,7 +1930,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         SubscriptionsContextList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SubscriptionsContextList.DeserializeSubscriptionsContextList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1789,13 +1951,21 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         SubscriptionsContextList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SubscriptionsContextList.DeserializeSubscriptionsContextList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string useCache)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string useCache)
@@ -1819,10 +1989,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public async Task<Response<PrivateStoreList>> ListNextPageAsync(string nextLink, string useCache = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListNextPageRequest(nextLink, useCache);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1831,7 +1998,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = PrivateStoreList.DeserializePrivateStoreList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1847,10 +2014,7 @@ namespace Azure.ResourceManager.Marketplace
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public Response<PrivateStoreList> ListNextPage(string nextLink, string useCache = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListNextPageRequest(nextLink, useCache);
             _pipeline.Send(message, cancellationToken);
@@ -1859,7 +2023,7 @@ namespace Azure.ResourceManager.Marketplace
                 case 200:
                     {
                         PrivateStoreList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = PrivateStoreList.DeserializePrivateStoreList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

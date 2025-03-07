@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.ContainerServiceFleet
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -85,25 +83,15 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<ContainerServiceFleetResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string fleetName, ContainerServiceFleetData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = await _containerServiceFleetFleetsRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch, cancellationToken).ConfigureAwait(false);
-                var operation = new ContainerServiceFleetArmOperation<ContainerServiceFleetResource>(new ContainerServiceFleetOperationSource(Client), _containerServiceFleetFleetsClientDiagnostics, Pipeline, _containerServiceFleetFleetsRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch).Request, response, OperationFinalStateVia.AzureAsyncOperation, apiVersionOverrideValue: "2016-03-30");
+                var operation = new ContainerServiceFleetArmOperation<ContainerServiceFleetResource>(new ContainerServiceFleetOperationSource(Client), _containerServiceFleetFleetsClientDiagnostics, Pipeline, _containerServiceFleetFleetsRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -128,7 +116,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -146,25 +134,15 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<ContainerServiceFleetResource> CreateOrUpdate(WaitUntil waitUntil, string fleetName, ContainerServiceFleetData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = _containerServiceFleetFleetsRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch, cancellationToken);
-                var operation = new ContainerServiceFleetArmOperation<ContainerServiceFleetResource>(new ContainerServiceFleetOperationSource(Client), _containerServiceFleetFleetsClientDiagnostics, Pipeline, _containerServiceFleetFleetsRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch).Request, response, OperationFinalStateVia.AzureAsyncOperation, apiVersionOverrideValue: "2016-03-30");
+                var operation = new ContainerServiceFleetArmOperation<ContainerServiceFleetResource>(new ContainerServiceFleetOperationSource(Client), _containerServiceFleetFleetsClientDiagnostics, Pipeline, _containerServiceFleetFleetsRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, fleetName, data, ifMatch, ifNoneMatch).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -189,7 +167,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -203,14 +181,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual async Task<Response<ContainerServiceFleetResource>> GetAsync(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.Get");
             scope.Start();
@@ -241,7 +212,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -255,14 +226,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual Response<ContainerServiceFleetResource> Get(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.Get");
             scope.Start();
@@ -293,7 +257,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -323,7 +287,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -353,7 +317,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -367,14 +331,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.Exists");
             scope.Start();
@@ -403,7 +360,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -417,14 +374,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual Response<bool> Exists(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.Exists");
             scope.Start();
@@ -453,7 +403,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -467,14 +417,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual async Task<NullableResponse<ContainerServiceFleetResource>> GetIfExistsAsync(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.GetIfExists");
             scope.Start();
@@ -505,7 +448,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-15</description>
+        /// <description>2024-05-02-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -519,14 +462,7 @@ namespace Azure.ResourceManager.ContainerServiceFleet
         /// <exception cref="ArgumentNullException"> <paramref name="fleetName"/> is null. </exception>
         public virtual NullableResponse<ContainerServiceFleetResource> GetIfExists(string fleetName, CancellationToken cancellationToken = default)
         {
-            if (fleetName == null)
-            {
-                throw new ArgumentNullException(nameof(fleetName));
-            }
-            if (fleetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(fleetName));
-            }
+            Argument.AssertNotNullOrEmpty(fleetName, nameof(fleetName));
 
             using var scope = _containerServiceFleetFleetsClientDiagnostics.CreateScope("ContainerServiceFleetCollection.GetIfExists");
             scope.Start();

@@ -51,14 +51,8 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="workloadProfileType"/> is null. </exception>
         public ContainerAppWorkloadProfile(string name, string workloadProfileType)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (workloadProfileType == null)
-            {
-                throw new ArgumentNullException(nameof(workloadProfileType));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(workloadProfileType, nameof(workloadProfileType));
 
             Name = name;
             WorkloadProfileType = workloadProfileType;
@@ -85,12 +79,16 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> Workload profile type for the workloads to run on. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> Workload profile type for the workloads to run on. </summary>
+        [WirePath("workloadProfileType")]
         public string WorkloadProfileType { get; set; }
         /// <summary> The minimum capacity. </summary>
+        [WirePath("minimumCount")]
         public int? MinimumNodeCount { get; set; }
         /// <summary> The maximum capacity. </summary>
+        [WirePath("maximumCount")]
         public int? MaximumNodeCount { get; set; }
     }
 }

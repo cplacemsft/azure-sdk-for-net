@@ -9,7 +9,6 @@ using System;
 using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Text.Json;
-using Azure;
 using Azure.Core;
 using Azure.ResourceManager.Models;
 using Azure.ResourceManager.NetApp.Models;
@@ -18,17 +17,26 @@ namespace Azure.ResourceManager.NetApp
 {
     public partial class NetAppVolumeData : IUtf8JsonSerializable, IJsonModel<NetAppVolumeData>
     {
-        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<NetAppVolumeData>)this).Write(writer, new ModelReaderWriterOptions("W"));
+        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<NetAppVolumeData>)this).Write(writer, ModelSerializationExtensions.WireOptions);
 
         void IJsonModel<NetAppVolumeData>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+        {
+            writer.WriteStartObject();
+            JsonModelWriteCore(writer, options);
+            writer.WriteEndObject();
+        }
+
+        /// <param name="writer"> The JSON writer. </param>
+        /// <param name="options"> The client options for reading and writing models. </param>
+        protected override void JsonModelWriteCore(Utf8JsonWriter writer, ModelReaderWriterOptions options)
         {
             var format = options.Format == "W" ? ((IPersistableModel<NetAppVolumeData>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support writing '{format}' format.");
             }
 
-            writer.WriteStartObject();
+            base.JsonModelWriteCore(writer, options);
             if (options.Format != "W" && Optional.IsDefined(ETag))
             {
                 writer.WritePropertyName("etag"u8);
@@ -43,39 +51,6 @@ namespace Azure.ResourceManager.NetApp
                     writer.WriteStringValue(item);
                 }
                 writer.WriteEndArray();
-            }
-            if (Optional.IsCollectionDefined(Tags))
-            {
-                writer.WritePropertyName("tags"u8);
-                writer.WriteStartObject();
-                foreach (var item in Tags)
-                {
-                    writer.WritePropertyName(item.Key);
-                    writer.WriteStringValue(item.Value);
-                }
-                writer.WriteEndObject();
-            }
-            writer.WritePropertyName("location"u8);
-            writer.WriteStringValue(Location);
-            if (options.Format != "W")
-            {
-                writer.WritePropertyName("id"u8);
-                writer.WriteStringValue(Id);
-            }
-            if (options.Format != "W")
-            {
-                writer.WritePropertyName("name"u8);
-                writer.WriteStringValue(Name);
-            }
-            if (options.Format != "W")
-            {
-                writer.WritePropertyName("type"u8);
-                writer.WriteStringValue(ResourceType);
-            }
-            if (options.Format != "W" && Optional.IsDefined(SystemData))
-            {
-                writer.WritePropertyName("systemData"u8);
-                JsonSerializer.Serialize(writer, SystemData);
             }
             writer.WritePropertyName("properties"u8);
             writer.WriteStartObject();
@@ -96,7 +71,7 @@ namespace Azure.ResourceManager.NetApp
             if (Optional.IsDefined(ExportPolicy))
             {
                 writer.WritePropertyName("exportPolicy"u8);
-                writer.WriteObjectValue(ExportPolicy);
+                writer.WriteObjectValue(ExportPolicy, options);
             }
             if (Optional.IsCollectionDefined(ProtocolTypes))
             {
@@ -154,6 +129,11 @@ namespace Azure.ResourceManager.NetApp
                 writer.WritePropertyName("networkFeatures"u8);
                 writer.WriteStringValue(NetworkFeatures.Value.ToString());
             }
+            if (options.Format != "W" && Optional.IsDefined(EffectiveNetworkFeatures))
+            {
+                writer.WritePropertyName("effectiveNetworkFeatures"u8);
+                writer.WriteStringValue(EffectiveNetworkFeatures.Value.ToString());
+            }
             if (options.Format != "W" && Optional.IsDefined(NetworkSiblingSetId))
             {
                 writer.WritePropertyName("networkSiblingSetId"u8);
@@ -170,7 +150,7 @@ namespace Azure.ResourceManager.NetApp
                 writer.WriteStartArray();
                 foreach (var item in MountTargets)
                 {
-                    writer.WriteObjectValue(item);
+                    writer.WriteObjectValue(item, options);
                 }
                 writer.WriteEndArray();
             }
@@ -182,7 +162,7 @@ namespace Azure.ResourceManager.NetApp
             if (Optional.IsDefined(DataProtection))
             {
                 writer.WritePropertyName("dataProtection"u8);
-                writer.WriteObjectValue(DataProtection);
+                writer.WriteObjectValue(DataProtection, options);
             }
             if (Optional.IsDefined(IsRestoring))
             {
@@ -277,6 +257,11 @@ namespace Azure.ResourceManager.NetApp
             {
                 writer.WritePropertyName("coolAccessRetrievalPolicy"u8);
                 writer.WriteStringValue(CoolAccessRetrievalPolicy.Value.ToString());
+            }
+            if (Optional.IsDefined(CoolAccessTieringPolicy))
+            {
+                writer.WritePropertyName("coolAccessTieringPolicy"u8);
+                writer.WriteStringValue(CoolAccessTieringPolicy.Value.ToString());
             }
             if (Optional.IsDefined(UnixPermissions))
             {
@@ -383,7 +368,7 @@ namespace Azure.ResourceManager.NetApp
                 writer.WriteStartArray();
                 foreach (var item in PlacementRules)
                 {
-                    writer.WriteObjectValue(item);
+                    writer.WriteObjectValue(item, options);
                 }
                 writer.WriteEndArray();
             }
@@ -421,34 +406,6 @@ namespace Azure.ResourceManager.NetApp
                     writer.WriteNull("originatingResourceId");
                 }
             }
-            if (options.Format != "W" && Optional.IsDefined(InheritedSizeInBytes))
-            {
-                if (InheritedSizeInBytes != null)
-                {
-                    writer.WritePropertyName("inheritedSizeInBytes"u8);
-                    writer.WriteNumberValue(InheritedSizeInBytes.Value);
-                }
-                else
-                {
-                    writer.WriteNull("inheritedSizeInBytes");
-                }
-            }
-            writer.WriteEndObject();
-            if (options.Format != "W" && _serializedAdditionalRawData != null)
-            {
-                foreach (var item in _serializedAdditionalRawData)
-                {
-                    writer.WritePropertyName(item.Key);
-#if NET6_0_OR_GREATER
-				writer.WriteRawValue(item.Value);
-#else
-                    using (JsonDocument document = JsonDocument.Parse(item.Value))
-                    {
-                        JsonSerializer.Serialize(writer, document.RootElement);
-                    }
-#endif
-                }
-            }
             writer.WriteEndObject();
         }
 
@@ -457,7 +414,7 @@ namespace Azure.ResourceManager.NetApp
             var format = options.Format == "W" ? ((IPersistableModel<NetAppVolumeData>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support reading '{format}' format.");
             }
 
             using JsonDocument document = JsonDocument.ParseValue(ref reader);
@@ -466,7 +423,7 @@ namespace Azure.ResourceManager.NetApp
 
         internal static NetAppVolumeData DeserializeNetAppVolumeData(JsonElement element, ModelReaderWriterOptions options = null)
         {
-            options ??= new ModelReaderWriterOptions("W");
+            options ??= ModelSerializationExtensions.WireOptions;
 
             if (element.ValueKind == JsonValueKind.Null)
             {
@@ -493,6 +450,7 @@ namespace Azure.ResourceManager.NetApp
             string baremetalTenantId = default;
             ResourceIdentifier subnetId = default;
             NetAppNetworkFeature? networkFeatures = default;
+            NetAppNetworkFeature? effectiveNetworkFeatures = default;
             Guid? networkSiblingSetId = default;
             NetAppVolumeStorageToNetworkProximity? storageToNetworkProximity = default;
             IReadOnlyList<NetAppVolumeMountTarget> mountTargets = default;
@@ -514,6 +472,7 @@ namespace Azure.ResourceManager.NetApp
             bool? coolAccess = default;
             int? coolnessPeriod = default;
             CoolAccessRetrievalPolicy? coolAccessRetrievalPolicy = default;
+            CoolAccessTieringPolicy? coolAccessTieringPolicy = default;
             string unixPermissions = default;
             int? cloneProgress = default;
             NetAppFileAccessLog? fileAccessLogs = default;
@@ -534,9 +493,8 @@ namespace Azure.ResourceManager.NetApp
             string provisionedAvailabilityZone = default;
             bool? isLargeVolume = default;
             ResourceIdentifier originatingResourceId = default;
-            long? inheritedSizeInBytes = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
-            Dictionary<string, BinaryData> additionalPropertiesDictionary = new Dictionary<string, BinaryData>();
+            Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("etag"u8))
@@ -716,6 +674,15 @@ namespace Azure.ResourceManager.NetApp
                                 continue;
                             }
                             networkFeatures = new NetAppNetworkFeature(property0.Value.GetString());
+                            continue;
+                        }
+                        if (property0.NameEquals("effectiveNetworkFeatures"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            effectiveNetworkFeatures = new NetAppNetworkFeature(property0.Value.GetString());
                             continue;
                         }
                         if (property0.NameEquals("networkSiblingSetId"u8))
@@ -910,6 +877,15 @@ namespace Azure.ResourceManager.NetApp
                             coolAccessRetrievalPolicy = new CoolAccessRetrievalPolicy(property0.Value.GetString());
                             continue;
                         }
+                        if (property0.NameEquals("coolAccessTieringPolicy"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            coolAccessTieringPolicy = new CoolAccessTieringPolicy(property0.Value.GetString());
+                            continue;
+                        }
                         if (property0.NameEquals("unixPermissions"u8))
                         {
                             if (property0.Value.ValueKind == JsonValueKind.Null)
@@ -1099,25 +1075,15 @@ namespace Azure.ResourceManager.NetApp
                             originatingResourceId = new ResourceIdentifier(property0.Value.GetString());
                             continue;
                         }
-                        if (property0.NameEquals("inheritedSizeInBytes"u8))
-                        {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                inheritedSizeInBytes = null;
-                                continue;
-                            }
-                            inheritedSizeInBytes = property0.Value.GetInt64();
-                            continue;
-                        }
                     }
                     continue;
                 }
                 if (options.Format != "W")
                 {
-                    additionalPropertiesDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
+                    rawDataDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
                 }
             }
-            serializedAdditionalRawData = additionalPropertiesDictionary;
+            serializedAdditionalRawData = rawDataDictionary;
             return new NetAppVolumeData(
                 id,
                 name,
@@ -1140,6 +1106,7 @@ namespace Azure.ResourceManager.NetApp
                 baremetalTenantId,
                 subnetId,
                 networkFeatures,
+                effectiveNetworkFeatures,
                 networkSiblingSetId,
                 storageToNetworkProximity,
                 mountTargets ?? new ChangeTrackingList<NetAppVolumeMountTarget>(),
@@ -1161,6 +1128,7 @@ namespace Azure.ResourceManager.NetApp
                 coolAccess,
                 coolnessPeriod,
                 coolAccessRetrievalPolicy,
+                coolAccessTieringPolicy,
                 unixPermissions,
                 cloneProgress,
                 fileAccessLogs,
@@ -1181,7 +1149,6 @@ namespace Azure.ResourceManager.NetApp
                 provisionedAvailabilityZone,
                 isLargeVolume,
                 originatingResourceId,
-                inheritedSizeInBytes,
                 serializedAdditionalRawData);
         }
 
@@ -1194,7 +1161,7 @@ namespace Azure.ResourceManager.NetApp
                 case "J":
                     return ModelReaderWriter.Write(this, options);
                 default:
-                    throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support writing '{options.Format}' format.");
             }
         }
 
@@ -1206,11 +1173,11 @@ namespace Azure.ResourceManager.NetApp
             {
                 case "J":
                     {
-                        using JsonDocument document = JsonDocument.Parse(data);
+                        using JsonDocument document = JsonDocument.Parse(data, ModelSerializationExtensions.JsonDocumentOptions);
                         return DeserializeNetAppVolumeData(document.RootElement, options);
                     }
                 default:
-                    throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(NetAppVolumeData)} does not support reading '{options.Format}' format.");
             }
         }
 

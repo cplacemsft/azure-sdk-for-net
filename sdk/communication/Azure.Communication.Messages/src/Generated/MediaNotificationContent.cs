@@ -10,7 +10,8 @@ using System.Collections.Generic;
 
 namespace Azure.Communication.Messages
 {
-    /// <summary> A request to send a media notification. </summary>
+    /// <summary> @deprecated A request to send an image notification. </summary>
+    [Obsolete("`MediaNotificationContent` is being deprecated, we encourage you to use the new `ImageNotificationContent` for sending images instead.")]
     public partial class MediaNotificationContent : NotificationContent
     {
         /// <summary> Initializes a new instance of <see cref="MediaNotificationContent"/>. </summary>
@@ -20,16 +21,10 @@ namespace Azure.Communication.Messages
         /// <exception cref="ArgumentNullException"> <paramref name="to"/> or <paramref name="mediaUri"/> is null. </exception>
         public MediaNotificationContent(Guid channelRegistrationId, IEnumerable<string> to, Uri mediaUri) : base(channelRegistrationId, to)
         {
-            if (to == null)
-            {
-                throw new ArgumentNullException(nameof(to));
-            }
-            if (mediaUri == null)
-            {
-                throw new ArgumentNullException(nameof(mediaUri));
-            }
+            Argument.AssertNotNull(to, nameof(to));
+            Argument.AssertNotNull(mediaUri, nameof(mediaUri));
 
-            Kind = CommunicationMessageKind.Image;
+            Kind = CommunicationMessageKind.ImageV0;
             MediaUri = mediaUri;
         }
 

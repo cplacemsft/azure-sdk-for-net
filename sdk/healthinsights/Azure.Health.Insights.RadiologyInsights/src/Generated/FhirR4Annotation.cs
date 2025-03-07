@@ -19,12 +19,9 @@ namespace Azure.Health.Insights.RadiologyInsights
         /// <summary> Initializes a new instance of <see cref="FhirR4Annotation"/>. </summary>
         /// <param name="text"> The annotation - text content (as markdown). </param>
         /// <exception cref="ArgumentNullException"> <paramref name="text"/> is null. </exception>
-        public FhirR4Annotation(string text)
+        internal FhirR4Annotation(string text)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException(nameof(text));
-            }
+            Argument.AssertNotNull(text, nameof(text));
 
             Text = text;
         }
@@ -36,7 +33,7 @@ namespace Azure.Health.Insights.RadiologyInsights
         /// <param name="authorString"> Individual responsible for the annotation. </param>
         /// <param name="time"> When the annotation was made. </param>
         /// <param name="text"> The annotation - text content (as markdown). </param>
-        internal FhirR4Annotation(string id, IReadOnlyList<FhirR4Extension> extension, IDictionary<string, BinaryData> serializedAdditionalRawData, string authorString, string time, string text) : base(id, extension, serializedAdditionalRawData)
+        internal FhirR4Annotation(string id, IList<FhirR4Extension> extension, IDictionary<string, BinaryData> serializedAdditionalRawData, string authorString, string time, string text) : base(id, extension, serializedAdditionalRawData)
         {
             AuthorString = authorString;
             Time = time;
@@ -49,10 +46,10 @@ namespace Azure.Health.Insights.RadiologyInsights
         }
 
         /// <summary> Individual responsible for the annotation. </summary>
-        public string AuthorString { get; set; }
+        public string AuthorString { get; }
         /// <summary> When the annotation was made. </summary>
-        public string Time { get; set; }
+        public string Time { get; }
         /// <summary> The annotation - text content (as markdown). </summary>
-        public string Text { get; set; }
+        public string Text { get; }
     }
 }

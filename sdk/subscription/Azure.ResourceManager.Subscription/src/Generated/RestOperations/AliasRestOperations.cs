@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Subscription.Models;
@@ -37,6 +36,16 @@ namespace Azure.ResourceManager.Subscription
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
         }
 
+        internal RequestUriBuilder CreateCreateRequestUri(string aliasName, SubscriptionAliasCreateOrUpdateContent content)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Subscription/aliases/", false);
+            uri.AppendPath(aliasName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
+        }
+
         internal HttpMessage CreateCreateRequest(string aliasName, SubscriptionAliasCreateOrUpdateContent content)
         {
             var message = _pipeline.CreateMessage();
@@ -51,7 +60,7 @@ namespace Azure.ResourceManager.Subscription
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content0 = new Utf8JsonRequestContent();
-            content0.JsonWriter.WriteObjectValue(content);
+            content0.JsonWriter.WriteObjectValue(content, ModelSerializationExtensions.WireOptions);
             request.Content = content0;
             _userAgent.Apply(message);
             return message;
@@ -65,18 +74,8 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> CreateAsync(string aliasName, SubscriptionAliasCreateOrUpdateContent content, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
+            Argument.AssertNotNull(content, nameof(content));
 
             using var message = CreateCreateRequest(aliasName, content);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -98,18 +97,8 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response Create(string aliasName, SubscriptionAliasCreateOrUpdateContent content, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
+            Argument.AssertNotNull(content, nameof(content));
 
             using var message = CreateCreateRequest(aliasName, content);
             _pipeline.Send(message, cancellationToken);
@@ -121,6 +110,16 @@ namespace Azure.ResourceManager.Subscription
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string aliasName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Subscription/aliases/", false);
+            uri.AppendPath(aliasName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string aliasName)
@@ -146,14 +145,7 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<SubscriptionAliasData>> GetAsync(string aliasName, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
 
             using var message = CreateGetRequest(aliasName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -162,7 +154,7 @@ namespace Azure.ResourceManager.Subscription
                 case 200:
                     {
                         SubscriptionAliasData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SubscriptionAliasData.DeserializeSubscriptionAliasData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -180,14 +172,7 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<SubscriptionAliasData> Get(string aliasName, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
 
             using var message = CreateGetRequest(aliasName);
             _pipeline.Send(message, cancellationToken);
@@ -196,7 +181,7 @@ namespace Azure.ResourceManager.Subscription
                 case 200:
                     {
                         SubscriptionAliasData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SubscriptionAliasData.DeserializeSubscriptionAliasData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -205,6 +190,16 @@ namespace Azure.ResourceManager.Subscription
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateDeleteRequestUri(string aliasName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Subscription/aliases/", false);
+            uri.AppendPath(aliasName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateDeleteRequest(string aliasName)
@@ -230,14 +225,7 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response> DeleteAsync(string aliasName, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
 
             using var message = CreateDeleteRequest(aliasName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -258,14 +246,7 @@ namespace Azure.ResourceManager.Subscription
         /// <exception cref="ArgumentException"> <paramref name="aliasName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response Delete(string aliasName, CancellationToken cancellationToken = default)
         {
-            if (aliasName == null)
-            {
-                throw new ArgumentNullException(nameof(aliasName));
-            }
-            if (aliasName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(aliasName));
-            }
+            Argument.AssertNotNullOrEmpty(aliasName, nameof(aliasName));
 
             using var message = CreateDeleteRequest(aliasName);
             _pipeline.Send(message, cancellationToken);
@@ -277,6 +258,15 @@ namespace Azure.ResourceManager.Subscription
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListRequestUri()
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Subscription/aliases", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest()
@@ -305,7 +295,7 @@ namespace Azure.ResourceManager.Subscription
                 case 200:
                     {
                         SubscriptionAliasListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = SubscriptionAliasListResult.DeserializeSubscriptionAliasListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -325,7 +315,7 @@ namespace Azure.ResourceManager.Subscription
                 case 200:
                     {
                         SubscriptionAliasListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = SubscriptionAliasListResult.DeserializeSubscriptionAliasListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

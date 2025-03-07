@@ -53,18 +53,9 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="sourceRepository"/>, <paramref name="sourceTriggerEvents"/> or <paramref name="name"/> is null. </exception>
         public ContainerRegistrySourceTrigger(SourceCodeRepoProperties sourceRepository, IEnumerable<ContainerRegistrySourceTriggerEvent> sourceTriggerEvents, string name)
         {
-            if (sourceRepository == null)
-            {
-                throw new ArgumentNullException(nameof(sourceRepository));
-            }
-            if (sourceTriggerEvents == null)
-            {
-                throw new ArgumentNullException(nameof(sourceTriggerEvents));
-            }
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(sourceRepository, nameof(sourceRepository));
+            Argument.AssertNotNull(sourceTriggerEvents, nameof(sourceTriggerEvents));
+            Argument.AssertNotNull(name, nameof(name));
 
             SourceRepository = sourceRepository;
             SourceTriggerEvents = sourceTriggerEvents.ToList();
@@ -92,12 +83,16 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The properties that describes the source(code) for the task. </summary>
+        [WirePath("sourceRepository")]
         public SourceCodeRepoProperties SourceRepository { get; set; }
         /// <summary> The source event corresponding to the trigger. </summary>
+        [WirePath("sourceTriggerEvents")]
         public IList<ContainerRegistrySourceTriggerEvent> SourceTriggerEvents { get; }
         /// <summary> The current status of trigger. </summary>
+        [WirePath("status")]
         public ContainerRegistryTriggerStatus? Status { get; set; }
         /// <summary> The name of the trigger. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
     }
 }

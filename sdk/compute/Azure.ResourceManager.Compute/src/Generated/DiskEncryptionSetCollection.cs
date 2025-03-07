@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.Compute
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<DiskEncryptionSetResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string diskEncryptionSetName, DiskEncryptionSetData data, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<DiskEncryptionSetResource> CreateOrUpdate(WaitUntil waitUntil, string diskEncryptionSetName, DiskEncryptionSetData data, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual async Task<Response<DiskEncryptionSetResource>> GetAsync(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual Response<DiskEncryptionSetResource> Get(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual Response<bool> Exists(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual async Task<NullableResponse<DiskEncryptionSetResource>> GetIfExistsAsync(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.Compute
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-02</description>
+        /// <description>2024-03-02</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.Compute
         /// <exception cref="ArgumentNullException"> <paramref name="diskEncryptionSetName"/> is null. </exception>
         public virtual NullableResponse<DiskEncryptionSetResource> GetIfExists(string diskEncryptionSetName, CancellationToken cancellationToken = default)
         {
-            if (diskEncryptionSetName == null)
-            {
-                throw new ArgumentNullException(nameof(diskEncryptionSetName));
-            }
-            if (diskEncryptionSetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(diskEncryptionSetName));
-            }
+            Argument.AssertNotNullOrEmpty(diskEncryptionSetName, nameof(diskEncryptionSetName));
 
             using var scope = _diskEncryptionSetClientDiagnostics.CreateScope("DiskEncryptionSetCollection.GetIfExists");
             scope.Start();

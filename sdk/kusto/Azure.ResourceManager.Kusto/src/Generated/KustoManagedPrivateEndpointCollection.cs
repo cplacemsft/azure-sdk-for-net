@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Kusto
 {
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -82,18 +80,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<KustoManagedPrivateEndpointResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string managedPrivateEndpointName, KustoManagedPrivateEndpointData data, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.CreateOrUpdate");
             scope.Start();
@@ -125,7 +113,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -141,18 +129,8 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<KustoManagedPrivateEndpointResource> CreateOrUpdate(WaitUntil waitUntil, string managedPrivateEndpointName, KustoManagedPrivateEndpointData data, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.CreateOrUpdate");
             scope.Start();
@@ -184,7 +162,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -198,14 +176,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual async Task<Response<KustoManagedPrivateEndpointResource>> GetAsync(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.Get");
             scope.Start();
@@ -236,7 +207,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -250,14 +221,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual Response<KustoManagedPrivateEndpointResource> Get(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.Get");
             scope.Start();
@@ -288,7 +252,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -317,7 +281,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -346,7 +310,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -360,14 +324,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.Exists");
             scope.Start();
@@ -396,7 +353,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -410,14 +367,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual Response<bool> Exists(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.Exists");
             scope.Start();
@@ -446,7 +396,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -460,14 +410,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual async Task<NullableResponse<KustoManagedPrivateEndpointResource>> GetIfExistsAsync(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.GetIfExists");
             scope.Start();
@@ -498,7 +441,7 @@ namespace Azure.ResourceManager.Kusto
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-08-15</description>
+        /// <description>2024-04-13</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -512,14 +455,7 @@ namespace Azure.ResourceManager.Kusto
         /// <exception cref="ArgumentNullException"> <paramref name="managedPrivateEndpointName"/> is null. </exception>
         public virtual NullableResponse<KustoManagedPrivateEndpointResource> GetIfExists(string managedPrivateEndpointName, CancellationToken cancellationToken = default)
         {
-            if (managedPrivateEndpointName == null)
-            {
-                throw new ArgumentNullException(nameof(managedPrivateEndpointName));
-            }
-            if (managedPrivateEndpointName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managedPrivateEndpointName));
-            }
+            Argument.AssertNotNullOrEmpty(managedPrivateEndpointName, nameof(managedPrivateEndpointName));
 
             using var scope = _kustoManagedPrivateEndpointManagedPrivateEndpointsClientDiagnostics.CreateScope("KustoManagedPrivateEndpointCollection.GetIfExists");
             scope.Start();

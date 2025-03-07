@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.ContainerRegistry.Models;
 
 namespace Azure.ResourceManager.ContainerRegistry
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> or <paramref name="content"/> is null. </exception>
         public virtual async Task<ArmOperation<ContainerRegistryWebhookResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string webhookName, ContainerRegistryWebhookCreateOrUpdateContent content, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> or <paramref name="content"/> is null. </exception>
         public virtual ArmOperation<ContainerRegistryWebhookResource> CreateOrUpdate(WaitUntil waitUntil, string webhookName, ContainerRegistryWebhookCreateOrUpdateContent content, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
+            Argument.AssertNotNull(content, nameof(content));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual async Task<Response<ContainerRegistryWebhookResource>> GetAsync(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual Response<ContainerRegistryWebhookResource> Get(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual Response<bool> Exists(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual async Task<NullableResponse<ContainerRegistryWebhookResource>> GetIfExistsAsync(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-12-01</description>
+        /// <description>2024-11-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.ContainerRegistry
         /// <exception cref="ArgumentNullException"> <paramref name="webhookName"/> is null. </exception>
         public virtual NullableResponse<ContainerRegistryWebhookResource> GetIfExists(string webhookName, CancellationToken cancellationToken = default)
         {
-            if (webhookName == null)
-            {
-                throw new ArgumentNullException(nameof(webhookName));
-            }
-            if (webhookName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(webhookName));
-            }
+            Argument.AssertNotNullOrEmpty(webhookName, nameof(webhookName));
 
             using var scope = _containerRegistryWebhookWebhooksClientDiagnostics.CreateScope("ContainerRegistryWebhookCollection.GetIfExists");
             scope.Start();

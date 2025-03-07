@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using Azure.Core;
-using Azure.Search.Documents;
 
 namespace Azure.Search.Documents.Indexes.Models
 {
@@ -62,6 +61,30 @@ namespace Azure.Search.Documents.Indexes.Models
                 writer.WritePropertyName("firstLineContainsHeaders"u8);
                 writer.WriteBooleanValue(FirstLineContainsHeaders.Value);
             }
+            if (Optional.IsDefined(MarkdownParsingSubmode))
+            {
+                if (MarkdownParsingSubmode != null)
+                {
+                    writer.WritePropertyName("markdownParsingSubmode"u8);
+                    writer.WriteStringValue(MarkdownParsingSubmode.Value.ToString());
+                }
+                else
+                {
+                    writer.WriteNull("markdownParsingSubmode");
+                }
+            }
+            if (Optional.IsDefined(MarkdownHeaderDepth))
+            {
+                if (MarkdownHeaderDepth != null)
+                {
+                    writer.WritePropertyName("markdownHeaderDepth"u8);
+                    writer.WriteStringValue(MarkdownHeaderDepth.Value.ToString());
+                }
+                else
+                {
+                    writer.WriteNull("markdownHeaderDepth");
+                }
+            }
             if (Optional.IsDefined(DocumentRoot))
             {
                 writer.WritePropertyName("documentRoot"u8);
@@ -100,7 +123,7 @@ namespace Azure.Search.Documents.Indexes.Models
             foreach (var item in AdditionalProperties)
             {
                 writer.WritePropertyName(item.Key);
-                writer.WriteObjectValue(item.Value);
+                writer.WriteObjectValue<object>(item.Value);
             }
             writer.WriteEndObject();
         }
@@ -120,6 +143,8 @@ namespace Azure.Search.Documents.Indexes.Models
             string delimitedTextHeaders = default;
             string delimitedTextDelimiter = default;
             bool? firstLineContainsHeaders = default;
+            MarkdownParsingSubmode? markdownParsingSubmode = default;
+            MarkdownHeaderDepth? markdownHeaderDepth = default;
             string documentRoot = default;
             BlobIndexerDataToExtract? dataToExtract = default;
             BlobIndexerImageAction? imageAction = default;
@@ -196,6 +221,26 @@ namespace Azure.Search.Documents.Indexes.Models
                     firstLineContainsHeaders = property.Value.GetBoolean();
                     continue;
                 }
+                if (property.NameEquals("markdownParsingSubmode"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        markdownParsingSubmode = null;
+                        continue;
+                    }
+                    markdownParsingSubmode = new MarkdownParsingSubmode(property.Value.GetString());
+                    continue;
+                }
+                if (property.NameEquals("markdownHeaderDepth"u8))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        markdownHeaderDepth = null;
+                        continue;
+                    }
+                    markdownHeaderDepth = new MarkdownHeaderDepth(property.Value.GetString());
+                    continue;
+                }
                 if (property.NameEquals("documentRoot"u8))
                 {
                     documentRoot = property.Value.GetString();
@@ -264,6 +309,8 @@ namespace Azure.Search.Documents.Indexes.Models
                 delimitedTextHeaders,
                 delimitedTextDelimiter,
                 firstLineContainsHeaders,
+                markdownParsingSubmode,
+                markdownHeaderDepth,
                 documentRoot,
                 dataToExtract,
                 imageAction,
@@ -272,6 +319,22 @@ namespace Azure.Search.Documents.Indexes.Models
                 executionEnvironment,
                 queryTimeout,
                 additionalProperties);
+        }
+
+        /// <summary> Deserializes the model from a raw response. </summary>
+        /// <param name="response"> The response to deserialize the model from. </param>
+        internal static IndexingParametersConfiguration FromResponse(Response response)
+        {
+            using var document = JsonDocument.Parse(response.Content, ModelSerializationExtensions.JsonDocumentOptions);
+            return DeserializeIndexingParametersConfiguration(document.RootElement);
+        }
+
+        /// <summary> Convert into a <see cref="RequestContent"/>. </summary>
+        internal virtual RequestContent ToRequestContent()
+        {
+            var content = new Utf8JsonRequestContent();
+            content.JsonWriter.WriteObjectValue(this);
+            return content;
         }
     }
 }

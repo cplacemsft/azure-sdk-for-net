@@ -52,14 +52,8 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="ipAddressRange"/> is null. </exception>
         public ContainerAppIPSecurityRestrictionRule(string name, string ipAddressRange, ContainerAppIPRuleAction action)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (ipAddressRange == null)
-            {
-                throw new ArgumentNullException(nameof(ipAddressRange));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(ipAddressRange, nameof(ipAddressRange));
 
             Name = name;
             IPAddressRange = ipAddressRange;
@@ -87,12 +81,16 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> Name for the IP restriction rule. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> Describe the IP restriction rule that is being sent to the container-app. This is an optional field. </summary>
+        [WirePath("description")]
         public string Description { get; set; }
         /// <summary> CIDR notation to match incoming IP address. </summary>
+        [WirePath("ipAddressRange")]
         public string IPAddressRange { get; set; }
         /// <summary> Allow or Deny rules to determine for incoming IP. Note: Rules can only consist of ALL Allow or ALL Deny. </summary>
+        [WirePath("action")]
         public ContainerAppIPRuleAction Action { get; set; }
     }
 }

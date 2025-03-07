@@ -10,10 +10,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.PrivateDns
 {
@@ -104,7 +102,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -144,7 +142,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -184,7 +182,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -227,7 +225,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -270,7 +268,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -285,10 +283,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<VirtualNetworkLinkResource>> UpdateAsync(WaitUntil waitUntil, VirtualNetworkLinkData data, ETag? ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.Update");
             scope.Start();
@@ -320,7 +315,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -335,10 +330,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<VirtualNetworkLinkResource> Update(WaitUntil waitUntil, VirtualNetworkLinkData data, ETag? ifMatch = null, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.Update");
             scope.Start();
@@ -370,7 +362,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -384,14 +376,8 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual async Task<Response<VirtualNetworkLinkResource>> AddTagAsync(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.AddTag");
             scope.Start();
@@ -438,7 +424,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -452,14 +438,8 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> or <paramref name="value"/> is null. </exception>
         public virtual Response<VirtualNetworkLinkResource> AddTag(string key, string value, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(key, nameof(key));
+            Argument.AssertNotNull(value, nameof(value));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.AddTag");
             scope.Start();
@@ -506,7 +486,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -519,10 +499,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual async Task<Response<VirtualNetworkLinkResource>> SetTagsAsync(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.SetTags");
             scope.Start();
@@ -566,7 +543,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -579,10 +556,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="tags"/> is null. </exception>
         public virtual Response<VirtualNetworkLinkResource> SetTags(IDictionary<string, string> tags, CancellationToken cancellationToken = default)
         {
-            if (tags == null)
-            {
-                throw new ArgumentNullException(nameof(tags));
-            }
+            Argument.AssertNotNull(tags, nameof(tags));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.SetTags");
             scope.Start();
@@ -626,7 +600,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -639,10 +613,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual async Task<Response<VirtualNetworkLinkResource>> RemoveTagAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.RemoveTag");
             scope.Start();
@@ -689,7 +660,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2020-06-01</description>
+        /// <description>2024-06-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -702,10 +673,7 @@ namespace Azure.ResourceManager.PrivateDns
         /// <exception cref="ArgumentNullException"> <paramref name="key"/> is null. </exception>
         public virtual Response<VirtualNetworkLinkResource> RemoveTag(string key, CancellationToken cancellationToken = default)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            Argument.AssertNotNull(key, nameof(key));
 
             using var scope = _virtualNetworkLinkClientDiagnostics.CreateScope("VirtualNetworkLinkResource.RemoveTag");
             scope.Start();

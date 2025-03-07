@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using Azure.ResourceManager.ContainerService;
 
 namespace Azure.ResourceManager.ContainerService.Models
 {
@@ -52,10 +51,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="kubernetesVersion"/> is null. </exception>
         internal ManagedClusterPoolUpgradeProfile(string kubernetesVersion, ContainerServiceOSType osType)
         {
-            if (kubernetesVersion == null)
-            {
-                throw new ArgumentNullException(nameof(kubernetesVersion));
-            }
+            Argument.AssertNotNull(kubernetesVersion, nameof(kubernetesVersion));
 
             KubernetesVersion = kubernetesVersion;
             OSType = osType;
@@ -83,12 +79,16 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> The Kubernetes version (major.minor.patch). </summary>
+        [WirePath("kubernetesVersion")]
         public string KubernetesVersion { get; }
         /// <summary> The Agent Pool name. </summary>
+        [WirePath("name")]
         public string Name { get; }
         /// <summary> The operating system type. The default is Linux. </summary>
+        [WirePath("osType")]
         public ContainerServiceOSType OSType { get; }
         /// <summary> List of orchestrator types and versions available for upgrade. </summary>
+        [WirePath("upgrades")]
         public IReadOnlyList<ManagedClusterPoolUpgradeProfileUpgradesItem> Upgrades { get; }
     }
 }

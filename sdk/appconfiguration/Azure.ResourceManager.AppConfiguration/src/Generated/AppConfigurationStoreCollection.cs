@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.AppConfiguration
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<AppConfigurationStoreResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string configStoreName, AppConfigurationStoreData data, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<AppConfigurationStoreResource> CreateOrUpdate(WaitUntil waitUntil, string configStoreName, AppConfigurationStoreData data, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual async Task<Response<AppConfigurationStoreResource>> GetAsync(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual Response<AppConfigurationStoreResource> Get(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -320,7 +284,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -351,7 +315,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -365,14 +329,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.Exists");
             scope.Start();
@@ -401,7 +358,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -415,14 +372,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual Response<bool> Exists(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.Exists");
             scope.Start();
@@ -451,7 +401,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -465,14 +415,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual async Task<NullableResponse<AppConfigurationStoreResource>> GetIfExistsAsync(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.GetIfExists");
             scope.Start();
@@ -503,7 +446,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2024-05-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -517,14 +460,7 @@ namespace Azure.ResourceManager.AppConfiguration
         /// <exception cref="ArgumentNullException"> <paramref name="configStoreName"/> is null. </exception>
         public virtual NullableResponse<AppConfigurationStoreResource> GetIfExists(string configStoreName, CancellationToken cancellationToken = default)
         {
-            if (configStoreName == null)
-            {
-                throw new ArgumentNullException(nameof(configStoreName));
-            }
-            if (configStoreName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(configStoreName));
-            }
+            Argument.AssertNotNullOrEmpty(configStoreName, nameof(configStoreName));
 
             using var scope = _appConfigurationStoreConfigurationStoresClientDiagnostics.CreateScope("AppConfigurationStoreCollection.GetIfExists");
             scope.Start();

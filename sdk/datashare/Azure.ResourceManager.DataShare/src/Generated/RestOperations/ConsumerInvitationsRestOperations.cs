@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.DataShare.Models;
@@ -35,6 +34,19 @@ namespace Azure.ResourceManager.DataShare
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2021-08-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListInvitationsRequestUri(string skipToken)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.DataShare/listInvitations", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (skipToken != null)
+            {
+                uri.AppendQuery("$skipToken", skipToken, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListInvitationsRequest(string skipToken)
@@ -68,7 +80,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         ConsumerInvitationList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ConsumerInvitationList.DeserializeConsumerInvitationList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -89,13 +101,25 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         ConsumerInvitationList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ConsumerInvitationList.DeserializeConsumerInvitationList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(AzureLocation location, Guid invitationId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.DataShare/locations/", false);
+            uri.AppendPath(location, true);
+            uri.AppendPath("/consumerInvitations/", false);
+            uri.AppendPath(invitationId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(AzureLocation location, Guid invitationId)
@@ -129,7 +153,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         DataShareConsumerInvitationData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DataShareConsumerInvitationData.DeserializeDataShareConsumerInvitationData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -153,7 +177,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         DataShareConsumerInvitationData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DataShareConsumerInvitationData.DeserializeDataShareConsumerInvitationData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -162,6 +186,17 @@ namespace Azure.ResourceManager.DataShare
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateRejectInvitationRequestUri(AzureLocation location, DataShareConsumerInvitationData data)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.DataShare/locations/", false);
+            uri.AppendPath(location, true);
+            uri.AppendPath("/rejectInvitation", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateRejectInvitationRequest(AzureLocation location, DataShareConsumerInvitationData data)
@@ -179,7 +214,7 @@ namespace Azure.ResourceManager.DataShare
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
             var content = new Utf8JsonRequestContent();
-            content.JsonWriter.WriteObjectValue(data);
+            content.JsonWriter.WriteObjectValue(data, ModelSerializationExtensions.WireOptions);
             request.Content = content;
             _userAgent.Apply(message);
             return message;
@@ -192,10 +227,7 @@ namespace Azure.ResourceManager.DataShare
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public async Task<Response<DataShareConsumerInvitationData>> RejectInvitationAsync(AzureLocation location, DataShareConsumerInvitationData data, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateRejectInvitationRequest(location, data);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -204,7 +236,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         DataShareConsumerInvitationData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = DataShareConsumerInvitationData.DeserializeDataShareConsumerInvitationData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -220,10 +252,7 @@ namespace Azure.ResourceManager.DataShare
         /// <exception cref="ArgumentNullException"> <paramref name="data"/> is null. </exception>
         public Response<DataShareConsumerInvitationData> RejectInvitation(AzureLocation location, DataShareConsumerInvitationData data, CancellationToken cancellationToken = default)
         {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNull(data, nameof(data));
 
             using var message = CreateRejectInvitationRequest(location, data);
             _pipeline.Send(message, cancellationToken);
@@ -232,13 +261,21 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         DataShareConsumerInvitationData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = DataShareConsumerInvitationData.DeserializeDataShareConsumerInvitationData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListInvitationsNextPageRequestUri(string nextLink, string skipToken)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListInvitationsNextPageRequest(string nextLink, string skipToken)
@@ -262,10 +299,7 @@ namespace Azure.ResourceManager.DataShare
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public async Task<Response<ConsumerInvitationList>> ListInvitationsNextPageAsync(string nextLink, string skipToken = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListInvitationsNextPageRequest(nextLink, skipToken);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -274,7 +308,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         ConsumerInvitationList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ConsumerInvitationList.DeserializeConsumerInvitationList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -290,10 +324,7 @@ namespace Azure.ResourceManager.DataShare
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> is null. </exception>
         public Response<ConsumerInvitationList> ListInvitationsNextPage(string nextLink, string skipToken = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
 
             using var message = CreateListInvitationsNextPageRequest(nextLink, skipToken);
             _pipeline.Send(message, cancellationToken);
@@ -302,7 +333,7 @@ namespace Azure.ResourceManager.DataShare
                 case 200:
                     {
                         ConsumerInvitationList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ConsumerInvitationList.DeserializeConsumerInvitationList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

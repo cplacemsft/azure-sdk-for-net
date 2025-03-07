@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         /// <exception cref="ArgumentNullException"> <paramref name="sasUri"/> is null. </exception>
         public ExportRedisEnterpriseDatabaseContent(Uri sasUri)
         {
-            if (sasUri == null)
-            {
-                throw new ArgumentNullException(nameof(sasUri));
-            }
+            Argument.AssertNotNull(sasUri, nameof(sasUri));
 
             SasUri = sasUri;
         }
@@ -73,6 +70,7 @@ namespace Azure.ResourceManager.RedisEnterprise.Models
         }
 
         /// <summary> SAS URI for the target directory to export to. </summary>
+        [WirePath("sasUri")]
         public Uri SasUri { get; }
     }
 }

@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.Consumption.Models;
@@ -35,6 +34,21 @@ namespace Azure.ResourceManager.Consumption
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2021-10-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateGetByManagementGroupRequestUri(string managementGroupId, string filter)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Management/managementGroups/", false);
+            uri.AppendPath(managementGroupId, true);
+            uri.AppendPath("/providers/Microsoft.Consumption/aggregatedcost", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateGetByManagementGroupRequest(string managementGroupId, string filter)
@@ -66,14 +80,7 @@ namespace Azure.ResourceManager.Consumption
         /// <exception cref="ArgumentException"> <paramref name="managementGroupId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ConsumptionAggregatedCostResult>> GetByManagementGroupAsync(string managementGroupId, string filter = null, CancellationToken cancellationToken = default)
         {
-            if (managementGroupId == null)
-            {
-                throw new ArgumentNullException(nameof(managementGroupId));
-            }
-            if (managementGroupId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managementGroupId));
-            }
+            Argument.AssertNotNullOrEmpty(managementGroupId, nameof(managementGroupId));
 
             using var message = CreateGetByManagementGroupRequest(managementGroupId, filter);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -82,7 +89,7 @@ namespace Azure.ResourceManager.Consumption
                 case 200:
                     {
                         ConsumptionAggregatedCostResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ConsumptionAggregatedCostResult.DeserializeConsumptionAggregatedCostResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -99,14 +106,7 @@ namespace Azure.ResourceManager.Consumption
         /// <exception cref="ArgumentException"> <paramref name="managementGroupId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ConsumptionAggregatedCostResult> GetByManagementGroup(string managementGroupId, string filter = null, CancellationToken cancellationToken = default)
         {
-            if (managementGroupId == null)
-            {
-                throw new ArgumentNullException(nameof(managementGroupId));
-            }
-            if (managementGroupId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managementGroupId));
-            }
+            Argument.AssertNotNullOrEmpty(managementGroupId, nameof(managementGroupId));
 
             using var message = CreateGetByManagementGroupRequest(managementGroupId, filter);
             _pipeline.Send(message, cancellationToken);
@@ -115,13 +115,26 @@ namespace Azure.ResourceManager.Consumption
                 case 200:
                     {
                         ConsumptionAggregatedCostResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ConsumptionAggregatedCostResult.DeserializeConsumptionAggregatedCostResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetForBillingPeriodByManagementGroupRequestUri(string managementGroupId, string billingPeriodName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.Management/managementGroups/", false);
+            uri.AppendPath(managementGroupId, true);
+            uri.AppendPath("/providers/Microsoft.Billing/billingPeriods/", false);
+            uri.AppendPath(billingPeriodName, true);
+            uri.AppendPath("/providers/Microsoft.Consumption/aggregatedCost", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetForBillingPeriodByManagementGroupRequest(string managementGroupId, string billingPeriodName)
@@ -151,22 +164,8 @@ namespace Azure.ResourceManager.Consumption
         /// <exception cref="ArgumentException"> <paramref name="managementGroupId"/> or <paramref name="billingPeriodName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ConsumptionAggregatedCostResult>> GetForBillingPeriodByManagementGroupAsync(string managementGroupId, string billingPeriodName, CancellationToken cancellationToken = default)
         {
-            if (managementGroupId == null)
-            {
-                throw new ArgumentNullException(nameof(managementGroupId));
-            }
-            if (managementGroupId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managementGroupId));
-            }
-            if (billingPeriodName == null)
-            {
-                throw new ArgumentNullException(nameof(billingPeriodName));
-            }
-            if (billingPeriodName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(billingPeriodName));
-            }
+            Argument.AssertNotNullOrEmpty(managementGroupId, nameof(managementGroupId));
+            Argument.AssertNotNullOrEmpty(billingPeriodName, nameof(billingPeriodName));
 
             using var message = CreateGetForBillingPeriodByManagementGroupRequest(managementGroupId, billingPeriodName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -175,7 +174,7 @@ namespace Azure.ResourceManager.Consumption
                 case 200:
                     {
                         ConsumptionAggregatedCostResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ConsumptionAggregatedCostResult.DeserializeConsumptionAggregatedCostResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -192,22 +191,8 @@ namespace Azure.ResourceManager.Consumption
         /// <exception cref="ArgumentException"> <paramref name="managementGroupId"/> or <paramref name="billingPeriodName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ConsumptionAggregatedCostResult> GetForBillingPeriodByManagementGroup(string managementGroupId, string billingPeriodName, CancellationToken cancellationToken = default)
         {
-            if (managementGroupId == null)
-            {
-                throw new ArgumentNullException(nameof(managementGroupId));
-            }
-            if (managementGroupId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(managementGroupId));
-            }
-            if (billingPeriodName == null)
-            {
-                throw new ArgumentNullException(nameof(billingPeriodName));
-            }
-            if (billingPeriodName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(billingPeriodName));
-            }
+            Argument.AssertNotNullOrEmpty(managementGroupId, nameof(managementGroupId));
+            Argument.AssertNotNullOrEmpty(billingPeriodName, nameof(billingPeriodName));
 
             using var message = CreateGetForBillingPeriodByManagementGroupRequest(managementGroupId, billingPeriodName);
             _pipeline.Send(message, cancellationToken);
@@ -216,7 +201,7 @@ namespace Azure.ResourceManager.Consumption
                 case 200:
                     {
                         ConsumptionAggregatedCostResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ConsumptionAggregatedCostResult.DeserializeConsumptionAggregatedCostResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

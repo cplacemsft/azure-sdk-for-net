@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.CostManagement.Models;
@@ -35,6 +34,29 @@ namespace Azure.ResourceManager.CostManagement
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2023-03-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string billingScope, string filter, string orderby, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/", false);
+            uri.AppendPath(billingScope, false);
+            uri.AppendPath("/providers/Microsoft.CostManagement/benefitRecommendations", false);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            if (orderby != null)
+            {
+                uri.AppendQuery("$orderby", orderby, true);
+            }
+            if (expand != null)
+            {
+                uri.AppendQuery("$expand", expand, true);
+            }
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string billingScope, string filter, string orderby, string expand)
@@ -75,10 +97,7 @@ namespace Azure.ResourceManager.CostManagement
         /// <exception cref="ArgumentNullException"> <paramref name="billingScope"/> is null. </exception>
         public async Task<Response<BenefitRecommendationsListResult>> ListAsync(string billingScope, string filter = null, string orderby = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (billingScope == null)
-            {
-                throw new ArgumentNullException(nameof(billingScope));
-            }
+            Argument.AssertNotNull(billingScope, nameof(billingScope));
 
             using var message = CreateListRequest(billingScope, filter, orderby, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -87,7 +106,7 @@ namespace Azure.ResourceManager.CostManagement
                 case 200:
                     {
                         BenefitRecommendationsListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = BenefitRecommendationsListResult.DeserializeBenefitRecommendationsListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -105,10 +124,7 @@ namespace Azure.ResourceManager.CostManagement
         /// <exception cref="ArgumentNullException"> <paramref name="billingScope"/> is null. </exception>
         public Response<BenefitRecommendationsListResult> List(string billingScope, string filter = null, string orderby = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (billingScope == null)
-            {
-                throw new ArgumentNullException(nameof(billingScope));
-            }
+            Argument.AssertNotNull(billingScope, nameof(billingScope));
 
             using var message = CreateListRequest(billingScope, filter, orderby, expand);
             _pipeline.Send(message, cancellationToken);
@@ -117,13 +133,21 @@ namespace Azure.ResourceManager.CostManagement
                 case 200:
                     {
                         BenefitRecommendationsListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = BenefitRecommendationsListResult.DeserializeBenefitRecommendationsListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string billingScope, string filter, string orderby, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string billingScope, string filter, string orderby, string expand)
@@ -150,14 +174,8 @@ namespace Azure.ResourceManager.CostManagement
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> or <paramref name="billingScope"/> is null. </exception>
         public async Task<Response<BenefitRecommendationsListResult>> ListNextPageAsync(string nextLink, string billingScope, string filter = null, string orderby = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (billingScope == null)
-            {
-                throw new ArgumentNullException(nameof(billingScope));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNull(billingScope, nameof(billingScope));
 
             using var message = CreateListNextPageRequest(nextLink, billingScope, filter, orderby, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -166,7 +184,7 @@ namespace Azure.ResourceManager.CostManagement
                 case 200:
                     {
                         BenefitRecommendationsListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = BenefitRecommendationsListResult.DeserializeBenefitRecommendationsListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -185,14 +203,8 @@ namespace Azure.ResourceManager.CostManagement
         /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/> or <paramref name="billingScope"/> is null. </exception>
         public Response<BenefitRecommendationsListResult> ListNextPage(string nextLink, string billingScope, string filter = null, string orderby = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (billingScope == null)
-            {
-                throw new ArgumentNullException(nameof(billingScope));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNull(billingScope, nameof(billingScope));
 
             using var message = CreateListNextPageRequest(nextLink, billingScope, filter, orderby, expand);
             _pipeline.Send(message, cancellationToken);
@@ -201,7 +213,7 @@ namespace Azure.ResourceManager.CostManagement
                 case 200:
                     {
                         BenefitRecommendationsListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = BenefitRecommendationsListResult.DeserializeBenefitRecommendationsListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

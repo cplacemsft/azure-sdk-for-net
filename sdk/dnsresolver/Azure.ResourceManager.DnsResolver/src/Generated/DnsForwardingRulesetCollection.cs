@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.DnsResolver
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -85,18 +83,8 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<DnsForwardingRulesetResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string rulesetName, DnsForwardingRulesetData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.CreateOrUpdate");
             scope.Start();
@@ -128,7 +116,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -146,18 +134,8 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<DnsForwardingRulesetResource> CreateOrUpdate(WaitUntil waitUntil, string rulesetName, DnsForwardingRulesetData data, string ifMatch = null, string ifNoneMatch = null, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.CreateOrUpdate");
             scope.Start();
@@ -189,7 +167,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -203,14 +181,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual async Task<Response<DnsForwardingRulesetResource>> GetAsync(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.Get");
             scope.Start();
@@ -241,7 +212,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -255,14 +226,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual Response<DnsForwardingRulesetResource> Get(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.Get");
             scope.Start();
@@ -293,7 +257,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -324,7 +288,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -355,7 +319,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -369,14 +333,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.Exists");
             scope.Start();
@@ -405,7 +362,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -419,14 +376,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual Response<bool> Exists(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.Exists");
             scope.Start();
@@ -455,7 +405,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -469,14 +419,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual async Task<NullableResponse<DnsForwardingRulesetResource>> GetIfExistsAsync(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.GetIfExists");
             scope.Start();
@@ -507,7 +450,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2022-07-01</description>
+        /// <description>2023-07-01-preview</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -521,14 +464,7 @@ namespace Azure.ResourceManager.DnsResolver
         /// <exception cref="ArgumentNullException"> <paramref name="rulesetName"/> is null. </exception>
         public virtual NullableResponse<DnsForwardingRulesetResource> GetIfExists(string rulesetName, CancellationToken cancellationToken = default)
         {
-            if (rulesetName == null)
-            {
-                throw new ArgumentNullException(nameof(rulesetName));
-            }
-            if (rulesetName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(rulesetName));
-            }
+            Argument.AssertNotNullOrEmpty(rulesetName, nameof(rulesetName));
 
             using var scope = _dnsForwardingRulesetClientDiagnostics.CreateScope("DnsForwardingRulesetCollection.GetIfExists");
             scope.Start();

@@ -7,8 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using Azure.Analytics.Synapse.Artifacts;
-using Azure.Core;
 
 namespace Azure.Analytics.Synapse.Artifacts.Models
 {
@@ -21,14 +19,8 @@ namespace Azure.Analytics.Synapse.Artifacts.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="sparkJob"/> is null. </exception>
         public SynapseSparkJobDefinitionActivity(string name, SynapseSparkJobReference sparkJob) : base(name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (sparkJob == null)
-            {
-                throw new ArgumentNullException(nameof(sparkJob));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(sparkJob, nameof(sparkJob));
 
             SparkJob = sparkJob;
             Arguments = new ChangeTrackingList<object>();
@@ -66,7 +58,8 @@ namespace Azure.Analytics.Synapse.Artifacts.Models
         /// <param name="configurationType"> The type of the spark config. </param>
         /// <param name="targetSparkConfiguration"> The spark configuration of the spark job. </param>
         /// <param name="sparkConfig"> Spark configuration property. </param>
-        internal SynapseSparkJobDefinitionActivity(string name, string type, string description, ActivityState? state, ActivityOnInactiveMarkAs? onInactiveMarkAs, IList<ActivityDependency> dependsOn, IList<UserProperty> userProperties, IDictionary<string, object> additionalProperties, LinkedServiceReference linkedServiceName, ActivityPolicy policy, SynapseSparkJobReference sparkJob, IList<object> arguments, object file, object scanFolder, object className, IList<object> files, IList<object> pythonCodeReference, IList<object> filesV2, BigDataPoolParametrizationReference targetBigDataPool, object executorSize, object conf, object driverSize, object numExecutors, ConfigurationType? configurationType, SparkConfigurationParametrizationReference targetSparkConfiguration, IDictionary<string, object> sparkConfig) : base(name, type, description, state, onInactiveMarkAs, dependsOn, userProperties, additionalProperties, linkedServiceName, policy)
+        /// <param name="authentication"> Authentication method used for executing the Spark job definition. </param>
+        internal SynapseSparkJobDefinitionActivity(string name, string type, string description, ActivityState? state, ActivityOnInactiveMarkAs? onInactiveMarkAs, IList<ActivityDependency> dependsOn, IList<UserProperty> userProperties, IDictionary<string, object> additionalProperties, LinkedServiceReference linkedServiceName, ActivityPolicy policy, SynapseSparkJobReference sparkJob, IList<object> arguments, object file, object scanFolder, object className, IList<object> files, IList<object> pythonCodeReference, IList<object> filesV2, BigDataPoolParametrizationReference targetBigDataPool, object executorSize, object conf, object driverSize, object numExecutors, ConfigurationType? configurationType, SparkConfigurationParametrizationReference targetSparkConfiguration, IDictionary<string, object> sparkConfig, SynapseActivityAuthentication authentication) : base(name, type, description, state, onInactiveMarkAs, dependsOn, userProperties, additionalProperties, linkedServiceName, policy)
         {
             SparkJob = sparkJob;
             Arguments = arguments;
@@ -84,6 +77,7 @@ namespace Azure.Analytics.Synapse.Artifacts.Models
             ConfigurationType = configurationType;
             TargetSparkConfiguration = targetSparkConfiguration;
             SparkConfig = sparkConfig;
+            Authentication = authentication;
             Type = type ?? "SparkJob";
         }
 
@@ -119,5 +113,7 @@ namespace Azure.Analytics.Synapse.Artifacts.Models
         public SparkConfigurationParametrizationReference TargetSparkConfiguration { get; set; }
         /// <summary> Spark configuration property. </summary>
         public IDictionary<string, object> SparkConfig { get; }
+        /// <summary> Authentication method used for executing the Spark job definition. </summary>
+        public SynapseActivityAuthentication Authentication { get; set; }
     }
 }

@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         internal MachineLearningSkuSetting(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             Name = name;
         }
@@ -75,8 +72,10 @@ namespace Azure.ResourceManager.MachineLearning.Models
         }
 
         /// <summary> [Required] The name of the SKU. Ex - P3. It is typically a letter+number code. </summary>
+        [WirePath("name")]
         public string Name { get; }
         /// <summary> This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT. </summary>
+        [WirePath("tier")]
         public MachineLearningSkuTier? Tier { get; }
     }
 }

@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="publicKeys"/> is null. </exception>
         public ContainerServiceSshConfiguration(IEnumerable<ContainerServiceSshPublicKey> publicKeys)
         {
-            if (publicKeys == null)
-            {
-                throw new ArgumentNullException(nameof(publicKeys));
-            }
+            Argument.AssertNotNull(publicKeys, nameof(publicKeys));
 
             PublicKeys = publicKeys.ToList();
         }
@@ -74,6 +71,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> The list of SSH public keys used to authenticate with Linux-based VMs. A maximum of 1 key may be specified. </summary>
+        [WirePath("publicKeys")]
         public IList<ContainerServiceSshPublicKey> PublicKeys { get; }
     }
 }

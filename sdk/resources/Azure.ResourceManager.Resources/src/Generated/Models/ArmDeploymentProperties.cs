@@ -61,8 +61,9 @@ namespace Azure.ResourceManager.Resources.Models
         /// <param name="debugSetting"> The debug setting of the deployment. </param>
         /// <param name="errorDeployment"> The deployment on error behavior. </param>
         /// <param name="expressionEvaluation"> Specifies whether template expressions are evaluated within the scope of the parent template or nested template. Only applicable to nested templates. If not specified, default value is outer. </param>
+        /// <param name="validationLevel"> The validation level of the deployment. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal ArmDeploymentProperties(BinaryData template, ArmDeploymentTemplateLink templateLink, BinaryData parameters, ArmDeploymentParametersLink parametersLink, ArmDeploymentMode mode, DebugSetting debugSetting, ErrorDeployment errorDeployment, ExpressionEvaluationOptions expressionEvaluation, IDictionary<string, BinaryData> serializedAdditionalRawData)
+        internal ArmDeploymentProperties(BinaryData template, ArmDeploymentTemplateLink templateLink, BinaryData parameters, ArmDeploymentParametersLink parametersLink, ArmDeploymentMode mode, DebugSetting debugSetting, ErrorDeployment errorDeployment, ExpressionEvaluationOptions expressionEvaluation, ValidationLevel? validationLevel, IDictionary<string, BinaryData> serializedAdditionalRawData)
         {
             Template = template;
             TemplateLink = templateLink;
@@ -72,6 +73,7 @@ namespace Azure.ResourceManager.Resources.Models
             DebugSetting = debugSetting;
             ErrorDeployment = errorDeployment;
             ExpressionEvaluation = expressionEvaluation;
+            ValidationLevel = validationLevel;
             _serializedAdditionalRawData = serializedAdditionalRawData;
         }
 
@@ -110,8 +112,10 @@ namespace Azure.ResourceManager.Resources.Models
         /// </list>
         /// </para>
         /// </summary>
+        [WirePath("template")]
         public BinaryData Template { get; set; }
         /// <summary> The URI of the template. Use either the templateLink property or the template property, but not both. </summary>
+        [WirePath("templateLink")]
         public ArmDeploymentTemplateLink TemplateLink { get; set; }
         /// <summary>
         /// Name and value pairs that define the deployment parameters for the template. You use this element when you want to provide the parameter values directly in the request rather than link to an existing parameter file. Use either the parametersLink property or the parameters property, but not both. It can be a JObject or a well formed JSON string.
@@ -143,14 +147,18 @@ namespace Azure.ResourceManager.Resources.Models
         /// </list>
         /// </para>
         /// </summary>
+        [WirePath("parameters")]
         public BinaryData Parameters { get; set; }
         /// <summary> The URI of parameters file. You use this element to link to an existing parameters file. Use either the parametersLink property or the parameters property, but not both. </summary>
+        [WirePath("parametersLink")]
         public ArmDeploymentParametersLink ParametersLink { get; set; }
         /// <summary> The mode that is used to deploy resources. This value can be either Incremental or Complete. In Incremental mode, resources are deployed without deleting existing resources that are not included in the template. In Complete mode, resources are deployed and existing resources in the resource group that are not included in the template are deleted. Be careful when using Complete mode as you may unintentionally delete resources. </summary>
+        [WirePath("mode")]
         public ArmDeploymentMode Mode { get; }
         /// <summary> The debug setting of the deployment. </summary>
         internal DebugSetting DebugSetting { get; set; }
         /// <summary> Specifies the type of information to log for debugging. The permitted values are none, requestContent, responseContent, or both requestContent and responseContent separated by a comma. The default is none. When setting this value, carefully consider the type of information you are passing in during deployment. By logging information about the request or response, you could potentially expose sensitive data that is retrieved through the deployment operations. </summary>
+        [WirePath("debugSetting.detailLevel")]
         public string DebugSettingDetailLevel
         {
             get => DebugSetting is null ? default : DebugSetting.DetailLevel;
@@ -163,10 +171,12 @@ namespace Azure.ResourceManager.Resources.Models
         }
 
         /// <summary> The deployment on error behavior. </summary>
+        [WirePath("onErrorDeployment")]
         public ErrorDeployment ErrorDeployment { get; set; }
         /// <summary> Specifies whether template expressions are evaluated within the scope of the parent template or nested template. Only applicable to nested templates. If not specified, default value is outer. </summary>
         internal ExpressionEvaluationOptions ExpressionEvaluation { get; set; }
         /// <summary> The scope to be used for evaluation of parameters, variables and functions in a nested template. </summary>
+        [WirePath("expressionEvaluationOptions.scope")]
         public ExpressionEvaluationScope? ExpressionEvaluationScope
         {
             get => ExpressionEvaluation is null ? default : ExpressionEvaluation.Scope;
@@ -177,5 +187,9 @@ namespace Azure.ResourceManager.Resources.Models
                 ExpressionEvaluation.Scope = value;
             }
         }
+
+        /// <summary> The validation level of the deployment. </summary>
+        [WirePath("validationLevel")]
+        public ValidationLevel? ValidationLevel { get; set; }
     }
 }

@@ -18,10 +18,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="file"/> is null. </exception>
         public SparkJobPythonEntry(string file)
         {
-            if (file == null)
-            {
-                throw new ArgumentNullException(nameof(file));
-            }
+            Argument.AssertNotNull(file, nameof(file));
 
             File = file;
             SparkJobEntryType = SparkJobEntryType.SparkJobPythonEntry;
@@ -43,6 +40,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         }
 
         /// <summary> [Required] Relative python file path for job entry point. </summary>
+        [WirePath("file")]
         public string File { get; set; }
     }
 }

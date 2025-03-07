@@ -12,17 +12,15 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Hci
 {
     /// <summary>
     /// A class representing a collection of <see cref="HciSkuResource"/> and their operations.
-    /// Each <see cref="HciSkuResource"/> in the collection will belong to the same instance of <see cref="OfferResource"/>.
-    /// To get a <see cref="HciSkuCollection"/> instance call the GetHciSkus method from an instance of <see cref="OfferResource"/>.
+    /// Each <see cref="HciSkuResource"/> in the collection will belong to the same instance of <see cref="HciClusterOfferResource"/>.
+    /// To get a <see cref="HciSkuCollection"/> instance call the GetHciSkus method from an instance of <see cref="HciClusterOfferResource"/>.
     /// </summary>
     public partial class HciSkuCollection : ArmCollection, IEnumerable<HciSkuResource>, IAsyncEnumerable<HciSkuResource>
     {
@@ -49,8 +47,8 @@ namespace Azure.ResourceManager.Hci
 
         internal static void ValidateResourceId(ResourceIdentifier id)
         {
-            if (id.ResourceType != OfferResource.ResourceType)
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid resource type {0} expected {1}", id.ResourceType, OfferResource.ResourceType), nameof(id));
+            if (id.ResourceType != HciClusterOfferResource.ResourceType)
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid resource type {0} expected {1}", id.ResourceType, HciClusterOfferResource.ResourceType), nameof(id));
         }
 
         /// <summary>
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -81,14 +79,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual async Task<Response<HciSkuResource>> GetAsync(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.Get");
             scope.Start();
@@ -119,7 +110,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -134,14 +125,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual Response<HciSkuResource> Get(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.Get");
             scope.Start();
@@ -172,7 +156,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -203,7 +187,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -234,7 +218,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -249,14 +233,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.Exists");
             scope.Start();
@@ -285,7 +262,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -300,14 +277,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual Response<bool> Exists(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.Exists");
             scope.Start();
@@ -336,7 +306,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -351,14 +321,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual async Task<NullableResponse<HciSkuResource>> GetIfExistsAsync(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.GetIfExists");
             scope.Start();
@@ -389,7 +352,7 @@ namespace Azure.ResourceManager.Hci
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-02-01</description>
+        /// <description>2024-04-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -404,14 +367,7 @@ namespace Azure.ResourceManager.Hci
         /// <exception cref="ArgumentNullException"> <paramref name="skuName"/> is null. </exception>
         public virtual NullableResponse<HciSkuResource> GetIfExists(string skuName, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (skuName == null)
-            {
-                throw new ArgumentNullException(nameof(skuName));
-            }
-            if (skuName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(skuName));
-            }
+            Argument.AssertNotNullOrEmpty(skuName, nameof(skuName));
 
             using var scope = _hciSkuSkusClientDiagnostics.CreateScope("HciSkuCollection.GetIfExists");
             scope.Start();

@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.CognitiveServices
 {
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -82,25 +80,17 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<CommitmentPlanResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string commitmentPlanName, CommitmentPlanData data, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = await _commitmentPlanRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, commitmentPlanName, data, cancellationToken).ConfigureAwait(false);
-                var operation = new CognitiveServicesArmOperation<CommitmentPlanResource>(Response.FromValue(new CommitmentPlanResource(Client, response), response.GetRawResponse()));
+                var uri = _commitmentPlanRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, commitmentPlanName, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new CognitiveServicesArmOperation<CommitmentPlanResource>(Response.FromValue(new CommitmentPlanResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -125,7 +115,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -141,25 +131,17 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<CommitmentPlanResource> CreateOrUpdate(WaitUntil waitUntil, string commitmentPlanName, CommitmentPlanData data, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = _commitmentPlanRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, commitmentPlanName, data, cancellationToken);
-                var operation = new CognitiveServicesArmOperation<CommitmentPlanResource>(Response.FromValue(new CommitmentPlanResource(Client, response), response.GetRawResponse()));
+                var uri = _commitmentPlanRestClient.CreateCreateOrUpdateRequestUri(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, commitmentPlanName, data);
+                var rehydrationToken = NextLinkOperationImplementation.GetRehydrationToken(RequestMethod.Put, uri.ToUri(), uri.ToString(), "None", null, OperationFinalStateVia.OriginalUri.ToString());
+                var operation = new CognitiveServicesArmOperation<CommitmentPlanResource>(Response.FromValue(new CommitmentPlanResource(Client, response), response.GetRawResponse()), rehydrationToken);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -184,7 +166,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -198,14 +180,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual async Task<Response<CommitmentPlanResource>> GetAsync(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.Get");
             scope.Start();
@@ -236,7 +211,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -250,14 +225,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual Response<CommitmentPlanResource> Get(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.Get");
             scope.Start();
@@ -288,7 +256,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -318,7 +286,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -348,7 +316,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -362,14 +330,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.Exists");
             scope.Start();
@@ -398,7 +359,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -412,14 +373,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual Response<bool> Exists(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.Exists");
             scope.Start();
@@ -448,7 +402,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -462,14 +416,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual async Task<NullableResponse<CommitmentPlanResource>> GetIfExistsAsync(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.GetIfExists");
             scope.Start();
@@ -500,7 +447,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-05-01</description>
+        /// <description>2024-10-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -514,14 +461,7 @@ namespace Azure.ResourceManager.CognitiveServices
         /// <exception cref="ArgumentNullException"> <paramref name="commitmentPlanName"/> is null. </exception>
         public virtual NullableResponse<CommitmentPlanResource> GetIfExists(string commitmentPlanName, CancellationToken cancellationToken = default)
         {
-            if (commitmentPlanName == null)
-            {
-                throw new ArgumentNullException(nameof(commitmentPlanName));
-            }
-            if (commitmentPlanName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(commitmentPlanName));
-            }
+            Argument.AssertNotNullOrEmpty(commitmentPlanName, nameof(commitmentPlanName));
 
             using var scope = _commitmentPlanClientDiagnostics.CreateScope("CommitmentPlanCollection.GetIfExists");
             scope.Start();

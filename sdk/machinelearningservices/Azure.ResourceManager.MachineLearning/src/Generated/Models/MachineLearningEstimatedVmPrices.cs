@@ -53,10 +53,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="values"/> is null. </exception>
         internal MachineLearningEstimatedVmPrices(MachineLearningBillingCurrency billingCurrency, MachineLearningUnitOfMeasure unitOfMeasure, IEnumerable<MachineLearningEstimatedVmPrice> values)
         {
-            if (values == null)
-            {
-                throw new ArgumentNullException(nameof(values));
-            }
+            Argument.AssertNotNull(values, nameof(values));
 
             BillingCurrency = billingCurrency;
             UnitOfMeasure = unitOfMeasure;
@@ -82,10 +79,13 @@ namespace Azure.ResourceManager.MachineLearning.Models
         }
 
         /// <summary> Three lettered code specifying the currency of the VM price. Example: USD. </summary>
+        [WirePath("billingCurrency")]
         public MachineLearningBillingCurrency BillingCurrency { get; }
         /// <summary> The unit of time measurement for the specified VM price. Example: OneHour. </summary>
+        [WirePath("unitOfMeasure")]
         public MachineLearningUnitOfMeasure UnitOfMeasure { get; }
         /// <summary> The list of estimated prices for using a VM of a particular OS type, tier, etc. </summary>
+        [WirePath("values")]
         public IReadOnlyList<MachineLearningEstimatedVmPrice> Values { get; }
     }
 }

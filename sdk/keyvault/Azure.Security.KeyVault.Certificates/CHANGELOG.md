@@ -1,14 +1,22 @@
 # Release History
 
-## 4.7.0-beta.1 (Unreleased)
+## 4.8.0-beta.1 (Unreleased)
 
 ### Features Added
 
 ### Breaking Changes
 
 ### Bugs Fixed
+- Corrected a typo in the documentation for `CertificatePolicy.KeySize`, changing the RSA key length from "4092" to "4096".
+- Removed an extra `/` when building the request Uri for `CertificateClient.ImportCertificate` and `CertificateClient.ImportCertificateAsync`.
 
 ### Other Changes
+
+## 4.7.0 (2024-10-14)
+
+### Features Added
+
+- Support for Continuous Access Evaluation (CAE).
 
 ## 4.6.0 (2024-02-14)
 

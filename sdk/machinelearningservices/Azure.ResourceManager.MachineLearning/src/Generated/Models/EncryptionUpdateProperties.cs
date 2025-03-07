@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="keyVaultProperties"/> is null. </exception>
         public EncryptionUpdateProperties(EncryptionKeyVaultUpdateProperties keyVaultProperties)
         {
-            if (keyVaultProperties == null)
-            {
-                throw new ArgumentNullException(nameof(keyVaultProperties));
-            }
+            Argument.AssertNotNull(keyVaultProperties, nameof(keyVaultProperties));
 
             KeyVaultProperties = keyVaultProperties;
         }
@@ -75,6 +72,7 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <summary> Gets the key vault properties. </summary>
         internal EncryptionKeyVaultUpdateProperties KeyVaultProperties { get; }
         /// <summary> Gets the key identifier. </summary>
+        [WirePath("keyVaultProperties.keyIdentifier")]
         public string KeyIdentifier
         {
             get => KeyVaultProperties?.KeyIdentifier;

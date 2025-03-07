@@ -51,14 +51,8 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> or <paramref name="value"/> is null. </exception>
         public ContainerRegistryRunArgument(string name, string value)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            Argument.AssertNotNull(name, nameof(name));
+            Argument.AssertNotNull(value, nameof(value));
 
             Name = name;
             Value = value;
@@ -83,10 +77,13 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The name of the argument. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> The value of the argument. </summary>
+        [WirePath("value")]
         public string Value { get; set; }
         /// <summary> Flag to indicate whether the argument represents a secret and want to be removed from build logs. </summary>
+        [WirePath("isSecret")]
         public bool? IsSecret { get; set; }
     }
 }

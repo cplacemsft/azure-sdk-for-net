@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.ContainerService.Models
         /// <exception cref="ArgumentNullException"> <paramref name="osType"/> is null. </exception>
         internal ContainerServiceOSOptionProperty(string osType, bool enableFipsImage)
         {
-            if (osType == null)
-            {
-                throw new ArgumentNullException(nameof(osType));
-            }
+            Argument.AssertNotNull(osType, nameof(osType));
 
             OSType = osType;
             EnableFipsImage = enableFipsImage;
@@ -77,8 +74,10 @@ namespace Azure.ResourceManager.ContainerService.Models
         }
 
         /// <summary> The OS type. </summary>
+        [WirePath("os-type")]
         public string OSType { get; }
         /// <summary> Whether the image is FIPS-enabled. </summary>
+        [WirePath("enable-fips-image")]
         public bool EnableFipsImage { get; }
     }
 }

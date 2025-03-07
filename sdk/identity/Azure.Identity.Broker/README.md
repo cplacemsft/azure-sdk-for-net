@@ -57,13 +57,13 @@ var credential = new InteractiveBrowserCredential(
 var client = new SecretClient(new Uri("https://myvault.vault.azure.net/"), credential);
 ```
 
-To bypass the account selection dialog and use the account currently signed in to the operating system, set the [InteractiveBrowserCredentialBrokerOptions.UseOperatingSystemAccount](https://learn.microsoft.com/dotnet/api/azure.identity.broker.interactivebrowsercredentialbrokeroptions.useoperatingsystemaccount) property:
+To bypass the account selection dialog and use the default broker account, set the [InteractiveBrowserCredentialBrokerOptions.UseDefaultBrokerAccount](https://learn.microsoft.com/dotnet/api/azure.identity.broker.interactivebrowsercredentialbrokeroptions) property:
 
 ```C# Snippet:ConfigureInteractiveBrowserToUseDefaultOsAccount
 var credential = new InteractiveBrowserCredential(
     new InteractiveBrowserCredentialBrokerOptions(parentWindowHandle)
     {
-        UseOperatingSystemAccount = true,
+        UseDefaultBrokerAccount = true,
     });
 ```
 
@@ -165,5 +165,3 @@ This project has adopted the [Microsoft Open Source Code of Conduct][code_of_con
 [code_of_conduct_faq]: https://opensource.microsoft.com/codeofconduct/faq/
 [nuget]: https://www.nuget.org/
 [identity_api_docs]: https://learn.microsoft.com/dotnet/api/azure.identity?view=azure-dotnet
-
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-net%2Fsdk%2Fidentity%2FAzure.Identity%2FREADME.png)

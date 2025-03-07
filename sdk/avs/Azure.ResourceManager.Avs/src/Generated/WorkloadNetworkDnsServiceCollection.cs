@@ -12,17 +12,15 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Avs
 {
     /// <summary>
     /// A class representing a collection of <see cref="WorkloadNetworkDnsServiceResource"/> and their operations.
-    /// Each <see cref="WorkloadNetworkDnsServiceResource"/> in the collection will belong to the same instance of <see cref="AvsPrivateCloudResource"/>.
-    /// To get a <see cref="WorkloadNetworkDnsServiceCollection"/> instance call the GetWorkloadNetworkDnsServices method from an instance of <see cref="AvsPrivateCloudResource"/>.
+    /// Each <see cref="WorkloadNetworkDnsServiceResource"/> in the collection will belong to the same instance of <see cref="WorkloadNetworkResource"/>.
+    /// To get a <see cref="WorkloadNetworkDnsServiceCollection"/> instance call the GetWorkloadNetworkDnsServices method from an instance of <see cref="WorkloadNetworkResource"/>.
     /// </summary>
     public partial class WorkloadNetworkDnsServiceCollection : ArmCollection, IEnumerable<WorkloadNetworkDnsServiceResource>, IAsyncEnumerable<WorkloadNetworkDnsServiceResource>
     {
@@ -49,12 +47,12 @@ namespace Azure.ResourceManager.Avs
 
         internal static void ValidateResourceId(ResourceIdentifier id)
         {
-            if (id.ResourceType != AvsPrivateCloudResource.ResourceType)
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid resource type {0} expected {1}", id.ResourceType, AvsPrivateCloudResource.ResourceType), nameof(id));
+            if (id.ResourceType != WorkloadNetworkResource.ResourceType)
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid resource type {0} expected {1}", id.ResourceType, WorkloadNetworkResource.ResourceType), nameof(id));
         }
 
         /// <summary>
-        /// Create a DNS service by id in a private cloud workload network.
+        /// Create a WorkloadNetworkDnsService
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -75,32 +73,22 @@ namespace Azure.ResourceManager.Avs
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
-        /// <param name="data"> NSX DNS Service. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<WorkloadNetworkDnsServiceResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string dnsServiceId, WorkloadNetworkDnsServiceData data, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.CreateOrUpdate");
             scope.Start();
             try
             {
-                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, data, cancellationToken).ConfigureAwait(false);
-                var operation = new AvsArmOperation<WorkloadNetworkDnsServiceResource>(new WorkloadNetworkDnsServiceOperationSource(Client), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateCreateDnsServiceRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, data).Request, response, OperationFinalStateVia.Location);
+                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, data, cancellationToken).ConfigureAwait(false);
+                var operation = new AvsArmOperation<WorkloadNetworkDnsServiceResource>(new WorkloadNetworkDnsServiceOperationSource(Client), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateCreateDnsServiceRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -113,7 +101,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Create a DNS service by id in a private cloud workload network.
+        /// Create a WorkloadNetworkDnsService
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -125,7 +113,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -134,32 +122,22 @@ namespace Azure.ResourceManager.Avs
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
-        /// <param name="data"> NSX DNS Service. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<WorkloadNetworkDnsServiceResource> CreateOrUpdate(WaitUntil waitUntil, string dnsServiceId, WorkloadNetworkDnsServiceData data, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.CreateOrUpdate");
             scope.Start();
             try
             {
-                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, data, cancellationToken);
-                var operation = new AvsArmOperation<WorkloadNetworkDnsServiceResource>(new WorkloadNetworkDnsServiceOperationSource(Client), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateCreateDnsServiceRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, data).Request, response, OperationFinalStateVia.Location);
+                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, data, cancellationToken);
+                var operation = new AvsArmOperation<WorkloadNetworkDnsServiceResource>(new WorkloadNetworkDnsServiceOperationSource(Client), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateCreateDnsServiceRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -172,7 +150,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a DNS service by id in a private cloud workload network.
+        /// Get a WorkloadNetworkDnsService
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -184,7 +162,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -192,26 +170,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual async Task<Response<WorkloadNetworkDnsServiceResource>> GetAsync(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.Get");
             scope.Start();
             try
             {
-                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken).ConfigureAwait(false);
+                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken).ConfigureAwait(false);
                 if (response.Value == null)
                     throw new RequestFailedException(response.GetRawResponse());
                 return Response.FromValue(new WorkloadNetworkDnsServiceResource(Client, response.Value), response.GetRawResponse());
@@ -224,7 +195,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a DNS service by id in a private cloud workload network.
+        /// Get a WorkloadNetworkDnsService
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -236,7 +207,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -244,26 +215,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual Response<WorkloadNetworkDnsServiceResource> Get(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.Get");
             scope.Start();
             try
             {
-                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken);
+                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken);
                 if (response.Value == null)
                     throw new RequestFailedException(response.GetRawResponse());
                 return Response.FromValue(new WorkloadNetworkDnsServiceResource(Client, response.Value), response.GetRawResponse());
@@ -276,7 +240,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// List of DNS services in a private cloud workload network.
+        /// List WorkloadNetworkDnsService resources by WorkloadNetwork
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -288,7 +252,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -300,13 +264,13 @@ namespace Azure.ResourceManager.Avs
         /// <returns> An async collection of <see cref="WorkloadNetworkDnsServiceResource"/> that may take multiple service requests to iterate over. </returns>
         public virtual AsyncPageable<WorkloadNetworkDnsServiceResource> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesNextPageRequest(nextLink, Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesNextPageRequest(nextLink, Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name);
             return GeneratorPageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, e => new WorkloadNetworkDnsServiceResource(Client, WorkloadNetworkDnsServiceData.DeserializeWorkloadNetworkDnsServiceData(e)), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, "WorkloadNetworkDnsServiceCollection.GetAll", "value", "nextLink", cancellationToken);
         }
 
         /// <summary>
-        /// List of DNS services in a private cloud workload network.
+        /// List WorkloadNetworkDnsService resources by WorkloadNetwork
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -318,7 +282,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -330,8 +294,8 @@ namespace Azure.ResourceManager.Avs
         /// <returns> A collection of <see cref="WorkloadNetworkDnsServiceResource"/> that may take multiple service requests to iterate over. </returns>
         public virtual Pageable<WorkloadNetworkDnsServiceResource> GetAll(CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesNextPageRequest(nextLink, Id.SubscriptionId, Id.ResourceGroupName, Id.Name);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => _workloadNetworkDnsServiceWorkloadNetworksRestClient.CreateListDnsServicesNextPageRequest(nextLink, Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name);
             return GeneratorPageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, e => new WorkloadNetworkDnsServiceResource(Client, WorkloadNetworkDnsServiceData.DeserializeWorkloadNetworkDnsServiceData(e)), _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics, Pipeline, "WorkloadNetworkDnsServiceCollection.GetAll", "value", "nextLink", cancellationToken);
         }
 
@@ -348,7 +312,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -356,26 +320,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.Exists");
             scope.Start();
             try
             {
-                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken: cancellationToken).ConfigureAwait(false);
                 return Response.FromValue(response.Value != null, response.GetRawResponse());
             }
             catch (Exception e)
@@ -398,7 +355,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -406,26 +363,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual Response<bool> Exists(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.Exists");
             scope.Start();
             try
             {
-                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken: cancellationToken);
+                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken: cancellationToken);
                 return Response.FromValue(response.Value != null, response.GetRawResponse());
             }
             catch (Exception e)
@@ -448,7 +398,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -456,26 +406,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual async Task<NullableResponse<WorkloadNetworkDnsServiceResource>> GetIfExistsAsync(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.GetIfExists");
             scope.Start();
             try
             {
-                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken: cancellationToken).ConfigureAwait(false);
+                var response = await _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsServiceAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken: cancellationToken).ConfigureAwait(false);
                 if (response.Value == null)
                     return new NoValueResponse<WorkloadNetworkDnsServiceResource>(response.GetRawResponse());
                 return Response.FromValue(new WorkloadNetworkDnsServiceResource(Client, response.Value), response.GetRawResponse());
@@ -500,7 +443,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -508,26 +451,19 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="dnsServiceId"> NSX DNS Service identifier. Generally the same as the DNS Service's display name. </param>
+        /// <param name="dnsServiceId"> ID of the DNS service. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="dnsServiceId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="dnsServiceId"/> is null. </exception>
         public virtual NullableResponse<WorkloadNetworkDnsServiceResource> GetIfExists(string dnsServiceId, CancellationToken cancellationToken = default)
         {
-            if (dnsServiceId == null)
-            {
-                throw new ArgumentNullException(nameof(dnsServiceId));
-            }
-            if (dnsServiceId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(dnsServiceId));
-            }
+            Argument.AssertNotNullOrEmpty(dnsServiceId, nameof(dnsServiceId));
 
             using var scope = _workloadNetworkDnsServiceWorkloadNetworksClientDiagnostics.CreateScope("WorkloadNetworkDnsServiceCollection.GetIfExists");
             scope.Start();
             try
             {
-                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Name, dnsServiceId, cancellationToken: cancellationToken);
+                var response = _workloadNetworkDnsServiceWorkloadNetworksRestClient.GetDnsService(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, dnsServiceId, cancellationToken: cancellationToken);
                 if (response.Value == null)
                     return new NoValueResponse<WorkloadNetworkDnsServiceResource>(response.GetRawResponse());
                 return Response.FromValue(new WorkloadNetworkDnsServiceResource(Client, response.Value), response.GetRawResponse());

@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 
 namespace Azure.ResourceManager.Avs
 {
@@ -54,7 +52,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Create or update a placement policy in a private cloud cluster
+        /// Create a PlacementPolicy
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -66,7 +64,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -75,32 +73,22 @@ namespace Azure.ResourceManager.Avs
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
-        /// <param name="data"> A placement policy in the private cloud cluster. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<PlacementPolicyResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string placementPolicyName, PlacementPolicyData data, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = await _placementPolicyRestClient.CreateOrUpdateAsync(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data, cancellationToken).ConfigureAwait(false);
-                var operation = new AvsArmOperation<PlacementPolicyResource>(new PlacementPolicyOperationSource(Client), _placementPolicyClientDiagnostics, Pipeline, _placementPolicyRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data).Request, response, OperationFinalStateVia.Location);
+                var operation = new AvsArmOperation<PlacementPolicyResource>(new PlacementPolicyOperationSource(Client), _placementPolicyClientDiagnostics, Pipeline, _placementPolicyRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
                 return operation;
@@ -113,7 +101,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Create or update a placement policy in a private cloud cluster
+        /// Create a PlacementPolicy
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -125,7 +113,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -134,32 +122,22 @@ namespace Azure.ResourceManager.Avs
         /// </list>
         /// </summary>
         /// <param name="waitUntil"> <see cref="WaitUntil.Completed"/> if the method should wait to return until the long-running operation has completed on the service; <see cref="WaitUntil.Started"/> if it should return after starting the operation. For more information on long-running operations, please see <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/LongRunningOperations.md"> Azure.Core Long-Running Operation samples</see>. </param>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
-        /// <param name="data"> A placement policy in the private cloud cluster. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
+        /// <param name="data"> Resource create parameters. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<PlacementPolicyResource> CreateOrUpdate(WaitUntil waitUntil, string placementPolicyName, PlacementPolicyData data, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.CreateOrUpdate");
             scope.Start();
             try
             {
                 var response = _placementPolicyRestClient.CreateOrUpdate(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data, cancellationToken);
-                var operation = new AvsArmOperation<PlacementPolicyResource>(new PlacementPolicyOperationSource(Client), _placementPolicyClientDiagnostics, Pipeline, _placementPolicyRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data).Request, response, OperationFinalStateVia.Location);
+                var operation = new AvsArmOperation<PlacementPolicyResource>(new PlacementPolicyOperationSource(Client), _placementPolicyClientDiagnostics, Pipeline, _placementPolicyRestClient.CreateCreateOrUpdateRequest(Id.SubscriptionId, Id.ResourceGroupName, Id.Parent.Name, Id.Name, placementPolicyName, data).Request, response, OperationFinalStateVia.AzureAsyncOperation);
                 if (waitUntil == WaitUntil.Completed)
                     operation.WaitForCompletion(cancellationToken);
                 return operation;
@@ -172,7 +150,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a placement policy by name in a private cloud cluster
+        /// Get a PlacementPolicy
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -184,7 +162,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -192,20 +170,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual async Task<Response<PlacementPolicyResource>> GetAsync(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.Get");
             scope.Start();
@@ -224,7 +195,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// Get a placement policy by name in a private cloud cluster
+        /// Get a PlacementPolicy
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -236,7 +207,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -244,20 +215,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual Response<PlacementPolicyResource> Get(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.Get");
             scope.Start();
@@ -276,7 +240,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// List placement policies in a private cloud cluster
+        /// List PlacementPolicy resources by Cluster
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -288,7 +252,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -306,7 +270,7 @@ namespace Azure.ResourceManager.Avs
         }
 
         /// <summary>
-        /// List placement policies in a private cloud cluster
+        /// List PlacementPolicy resources by Cluster
         /// <list type="bullet">
         /// <item>
         /// <term>Request Path</term>
@@ -318,7 +282,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -348,7 +312,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -356,20 +320,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.Exists");
             scope.Start();
@@ -398,7 +355,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -406,20 +363,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual Response<bool> Exists(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.Exists");
             scope.Start();
@@ -448,7 +398,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -456,20 +406,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual async Task<NullableResponse<PlacementPolicyResource>> GetIfExistsAsync(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.GetIfExists");
             scope.Start();
@@ -500,7 +443,7 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-03-01</description>
+        /// <description>2023-09-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -508,20 +451,13 @@ namespace Azure.ResourceManager.Avs
         /// </item>
         /// </list>
         /// </summary>
-        /// <param name="placementPolicyName"> Name of the VMware vSphere Distributed Resource Scheduler (DRS) placement policy. </param>
+        /// <param name="placementPolicyName"> Name of the placement policy. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="placementPolicyName"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="placementPolicyName"/> is null. </exception>
         public virtual NullableResponse<PlacementPolicyResource> GetIfExists(string placementPolicyName, CancellationToken cancellationToken = default)
         {
-            if (placementPolicyName == null)
-            {
-                throw new ArgumentNullException(nameof(placementPolicyName));
-            }
-            if (placementPolicyName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(placementPolicyName));
-            }
+            Argument.AssertNotNullOrEmpty(placementPolicyName, nameof(placementPolicyName));
 
             using var scope = _placementPolicyClientDiagnostics.CreateScope("PlacementPolicyCollection.GetIfExists");
             scope.Start();

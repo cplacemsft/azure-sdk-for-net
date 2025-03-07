@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 
@@ -34,6 +33,26 @@ namespace Azure.ResourceManager.ResourceHealth
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2023-10-01-preview";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateGetBySubscriptionIdAndTrackingIdRequestUri(string subscriptionId, string eventTrackingId, string filter, string queryStartTime)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.ResourceHealth/events/", false);
+            uri.AppendPath(eventTrackingId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            if (queryStartTime != null)
+            {
+                uri.AppendQuery("queryStartTime", queryStartTime, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateGetBySubscriptionIdAndTrackingIdRequest(string subscriptionId, string eventTrackingId, string filter, string queryStartTime)
@@ -72,22 +91,8 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ResourceHealthEventData>> GetBySubscriptionIdAndTrackingIdAsync(string subscriptionId, string eventTrackingId, string filter = null, string queryStartTime = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateGetBySubscriptionIdAndTrackingIdRequest(subscriptionId, eventTrackingId, filter, queryStartTime);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -96,7 +101,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -117,22 +122,8 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ResourceHealthEventData> GetBySubscriptionIdAndTrackingId(string subscriptionId, string eventTrackingId, string filter = null, string queryStartTime = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateGetBySubscriptionIdAndTrackingIdRequest(subscriptionId, eventTrackingId, filter, queryStartTime);
             _pipeline.Send(message, cancellationToken);
@@ -141,7 +132,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -150,6 +141,19 @@ namespace Azure.ResourceManager.ResourceHealth
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateFetchDetailsBySubscriptionIdAndTrackingIdRequestUri(string subscriptionId, string eventTrackingId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/providers/Microsoft.ResourceHealth/events/", false);
+            uri.AppendPath(eventTrackingId, true);
+            uri.AppendPath("/fetchEventDetails", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateFetchDetailsBySubscriptionIdAndTrackingIdRequest(string subscriptionId, string eventTrackingId)
@@ -179,22 +183,8 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ResourceHealthEventData>> FetchDetailsBySubscriptionIdAndTrackingIdAsync(string subscriptionId, string eventTrackingId, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateFetchDetailsBySubscriptionIdAndTrackingIdRequest(subscriptionId, eventTrackingId);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -203,7 +193,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -220,22 +210,8 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/> or <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ResourceHealthEventData> FetchDetailsBySubscriptionIdAndTrackingId(string subscriptionId, string eventTrackingId, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateFetchDetailsBySubscriptionIdAndTrackingIdRequest(subscriptionId, eventTrackingId);
             _pipeline.Send(message, cancellationToken);
@@ -244,13 +220,31 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetByTenantIdAndTrackingIdRequestUri(string eventTrackingId, string filter, string queryStartTime)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.ResourceHealth/events/", false);
+            uri.AppendPath(eventTrackingId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            if (queryStartTime != null)
+            {
+                uri.AppendQuery("queryStartTime", queryStartTime, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateGetByTenantIdAndTrackingIdRequest(string eventTrackingId, string filter, string queryStartTime)
@@ -286,14 +280,7 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ResourceHealthEventData>> GetByTenantIdAndTrackingIdAsync(string eventTrackingId, string filter = null, string queryStartTime = null, CancellationToken cancellationToken = default)
         {
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateGetByTenantIdAndTrackingIdRequest(eventTrackingId, filter, queryStartTime);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -302,7 +289,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -322,14 +309,7 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ResourceHealthEventData> GetByTenantIdAndTrackingId(string eventTrackingId, string filter = null, string queryStartTime = null, CancellationToken cancellationToken = default)
         {
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateGetByTenantIdAndTrackingIdRequest(eventTrackingId, filter, queryStartTime);
             _pipeline.Send(message, cancellationToken);
@@ -338,7 +318,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -347,6 +327,17 @@ namespace Azure.ResourceManager.ResourceHealth
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateFetchDetailsByTenantIdAndTrackingIdRequestUri(string eventTrackingId)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/providers/Microsoft.ResourceHealth/events/", false);
+            uri.AppendPath(eventTrackingId, true);
+            uri.AppendPath("/fetchEventDetails", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateFetchDetailsByTenantIdAndTrackingIdRequest(string eventTrackingId)
@@ -373,14 +364,7 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ResourceHealthEventData>> FetchDetailsByTenantIdAndTrackingIdAsync(string eventTrackingId, CancellationToken cancellationToken = default)
         {
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateFetchDetailsByTenantIdAndTrackingIdRequest(eventTrackingId);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -389,7 +373,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -405,14 +389,7 @@ namespace Azure.ResourceManager.ResourceHealth
         /// <exception cref="ArgumentException"> <paramref name="eventTrackingId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ResourceHealthEventData> FetchDetailsByTenantIdAndTrackingId(string eventTrackingId, CancellationToken cancellationToken = default)
         {
-            if (eventTrackingId == null)
-            {
-                throw new ArgumentNullException(nameof(eventTrackingId));
-            }
-            if (eventTrackingId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(eventTrackingId));
-            }
+            Argument.AssertNotNullOrEmpty(eventTrackingId, nameof(eventTrackingId));
 
             using var message = CreateFetchDetailsByTenantIdAndTrackingIdRequest(eventTrackingId);
             _pipeline.Send(message, cancellationToken);
@@ -421,7 +398,7 @@ namespace Azure.ResourceManager.ResourceHealth
                 case 200:
                     {
                         ResourceHealthEventData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ResourceHealthEventData.DeserializeResourceHealthEventData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

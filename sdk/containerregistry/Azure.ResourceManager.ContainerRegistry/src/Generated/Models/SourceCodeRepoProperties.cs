@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         /// <exception cref="ArgumentNullException"> <paramref name="repositoryUri"/> is null. </exception>
         public SourceCodeRepoProperties(SourceControlType sourceControlType, Uri repositoryUri)
         {
-            if (repositoryUri == null)
-            {
-                throw new ArgumentNullException(nameof(repositoryUri));
-            }
+            Argument.AssertNotNull(repositoryUri, nameof(repositoryUri));
 
             SourceControlType = sourceControlType;
             RepositoryUri = repositoryUri;
@@ -84,15 +81,19 @@ namespace Azure.ResourceManager.ContainerRegistry.Models
         }
 
         /// <summary> The type of source control service. </summary>
+        [WirePath("sourceControlType")]
         public SourceControlType SourceControlType { get; set; }
         /// <summary> The full URL to the source code repository. </summary>
+        [WirePath("repositoryUrl")]
         public Uri RepositoryUri { get; set; }
         /// <summary> The branch name of the source code. </summary>
+        [WirePath("branch")]
         public string Branch { get; set; }
         /// <summary>
         /// The authorization properties for accessing the source code repository and to set up
         /// webhooks for notifications.
         /// </summary>
+        [WirePath("sourceControlAuthProperties")]
         public SourceCodeRepoAuthInfo SourceControlAuthProperties { get; set; }
     }
 }

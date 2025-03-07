@@ -50,10 +50,7 @@ namespace Azure.ResourceManager.SecurityInsights.Models
         /// <exception cref="ArgumentNullException"> <paramref name="labelName"/> is null. </exception>
         public SecurityInsightsIncidentLabel(string labelName)
         {
-            if (labelName == null)
-            {
-                throw new ArgumentNullException(nameof(labelName));
-            }
+            Argument.AssertNotNull(labelName, nameof(labelName));
 
             LabelName = labelName;
         }
@@ -75,8 +72,10 @@ namespace Azure.ResourceManager.SecurityInsights.Models
         }
 
         /// <summary> The name of the label. </summary>
+        [WirePath("labelName")]
         public string LabelName { get; set; }
         /// <summary> The type of the label. </summary>
+        [WirePath("labelType")]
         public SecurityInsightsIncidentLabelType? LabelType { get; }
     }
 }

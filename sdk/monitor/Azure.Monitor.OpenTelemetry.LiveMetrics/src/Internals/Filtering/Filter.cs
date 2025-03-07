@@ -55,12 +55,13 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
             "TryParse",
             new[] { typeof(string), typeof(NumberStyles), typeof(IFormatProvider), typeof(double).MakeByRefType() });
 
-        private static readonly MethodInfo DictionaryStringStringTryGetValueMethodInfo = typeof(IDictionary<string, string>).GetMethod("TryGetValue");
+        private static readonly MethodInfo ListStringTryGetValueMethodInfo =
+            GetMethodInfo<IList<KeyValuePairString>, string, string>((list, key) => Filter<int>.TryGetString(list, key));
 
         private static readonly MethodInfo DictionaryStringDoubleTryGetValueMethodInfo = typeof(IDictionary<string, double>).GetMethod("TryGetValue");
 
-        private static readonly MethodInfo DictionaryStringStringScanMethodInfo =
-            GetMethodInfo<IDictionary<string, string>, string, bool>((dict, searchValue) => Filter<int>.ScanDictionary(dict, searchValue));
+        private static readonly MethodInfo ListKeyValuePairStringScanMethodInfo =
+            GetMethodInfo<IList<KeyValuePairString>, string, bool>((list, searchValue) => Filter<int>.ScanList(list, searchValue));
 
         private static readonly MethodInfo DictionaryStringDoubleScanMethodInfo =
            GetMethodInfo<IDictionary<string, double>, string, bool>((dict, searchValue) => Filter<int>.ScanDictionary(dict, searchValue));
@@ -88,28 +89,68 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
         {
             ValidateInput(filterInfo);
 
-            this.info = filterInfo;
+            info = filterInfo;
 
-            this.fieldName = filterInfo.FieldName;
-            this.predicate = (Predicate)FilterInfoPredicateUtility.ToPredicate(filterInfo.Predicate);
-            this.comparand = filterInfo.Comparand;
+            if (typeof(TTelemetry) == typeof(Request))
+            {
+                if (filterInfo.FieldName == "Success")
+                {
+                    filterInfo = new FilterInfo(nameof(Request.Extension_IsSuccess), filterInfo.Predicate, filterInfo.Comparand);
+                }
+            }
+            else if (typeof(TTelemetry) == typeof(RemoteDependency))
+            {
+                var fieldName = filterInfo.FieldName;
+                if (fieldName == "Type" || fieldName == "Target")
+                {
+                    Expression<Func<TTelemetry, bool>> lambdaExpression = Expression.Lambda<Func<TTelemetry, bool>>(Expression.Constant(true), Expression.Variable(typeof(TTelemetry)));
+                    filterLambda = lambdaExpression.Compile();
+                    return;
+                }
+                else if (fieldName == "Success")
+                {
+                    filterInfo = new FilterInfo(nameof(RemoteDependency.Extension_IsSuccess), filterInfo.Predicate, filterInfo.Comparand);
+                }
+                else if (fieldName == "Data")
+                {
+                    filterInfo = new FilterInfo(nameof(RemoteDependency.CommandName), filterInfo.Predicate, filterInfo.Comparand);
+                }
+            }
+            else if (typeof(TTelemetry) == typeof(Models.Exception))
+            {
+                var fieldName = filterInfo.FieldName;
+                if (fieldName == "Exception.StackTrace")
+                {
+                    Expression<Func<TTelemetry, bool>> lambdaExpression = Expression.Lambda<Func<TTelemetry, bool>>(Expression.Constant(true), Expression.Variable(typeof(TTelemetry)));
+                    filterLambda = lambdaExpression.Compile();
+                    return;
+                }
+                else if (fieldName == "Exception.Message")
+                {
+                    filterInfo = new FilterInfo(nameof(Models.Exception.ExceptionMessage), filterInfo.Predicate, filterInfo.Comparand);
+                }
+            }
+
+            fieldName = filterInfo.FieldName;
+            predicate = (Predicate)FilterInfoPredicateUtility.ToPredicate(filterInfo.Predicate);
+            comparand = filterInfo.Comparand;
 
             FieldNameType fieldNameType;
             Type fieldType = GetFieldType(filterInfo.FieldName, out fieldNameType);
-            this.ThrowOnInvalidFilter(
+            ThrowOnInvalidFilter(
                 null,
-                fieldNameType == FieldNameType.AnyField && this.predicate != Predicate.Contains && this.predicate != Predicate.DoesNotContain);
+                fieldNameType == FieldNameType.AnyField && predicate != Predicate.Contains && predicate != Predicate.DoesNotContain);
 
             double comparandDouble;
-            this.comparandDouble = double.TryParse(filterInfo.Comparand, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent, CultureInfo.InvariantCulture, out comparandDouble) ? comparandDouble : (double?)null;
+            this.comparandDouble = double.TryParse(filterInfo.Comparand, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent, CultureInfo.InvariantCulture, out comparandDouble) ? comparandDouble : null;
 
             bool comparandBoolean;
-            this.comparandBoolean = bool.TryParse(filterInfo.Comparand, out comparandBoolean) ? comparandBoolean : (bool?)null;
+            this.comparandBoolean = bool.TryParse(filterInfo.Comparand, out comparandBoolean) ? comparandBoolean : null;
 
             TimeSpan comparandTimeSpan;
             this.comparandTimeSpan = TimeSpan.TryParse(filterInfo.Comparand, CultureInfo.InvariantCulture, out comparandTimeSpan)
                                          ? comparandTimeSpan
-                                         : (TimeSpan?)null;
+                                         : null;
 
             ParameterExpression documentExpression = Expression.Variable(typeof(TTelemetry));
 
@@ -120,14 +161,14 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                 if (fieldNameType == FieldNameType.AnyField)
                 {
                     // multiple fields => multiple comparison expressions connected with ORs
-                    comparisonExpression = this.ProduceComparatorExpressionForAnyFieldCondition(documentExpression);
+                    comparisonExpression = ProduceComparatorExpressionForAnyFieldCondition(documentExpression);
                 }
                 else
                 {
                     // a single field filterInfo.FieldName of type fieldType => a single comparison expression
                     Expression fieldExpression = ProduceFieldExpression(documentExpression, filterInfo.FieldName, fieldNameType);
 
-                    comparisonExpression = this.ProduceComparatorExpressionForSingleFieldCondition(fieldExpression, fieldType);
+                    comparisonExpression = ProduceComparatorExpressionForSingleFieldCondition(fieldExpression, fieldType);
                 }
             }
             catch (System.Exception e)
@@ -141,7 +182,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     comparisonExpression,
                     documentExpression);
 
-                this.filterLambda = lambdaExpression.Compile();
+                filterLambda = lambdaExpression.Compile();
             }
             catch (System.Exception e)
             {
@@ -164,7 +205,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
         {
             try
             {
-                return this.filterLambda(document);
+                return filterLambda(document);
             }
             catch (System.Exception e)
             {
@@ -174,7 +215,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
 
         public override string ToString()
         {
-            return this.info?.ToString() ?? string.Empty;
+            return info?.ToString() ?? string.Empty;
         }
 
         internal static Expression ProduceFieldExpression(ParameterExpression documentExpression, string fieldName, FieldNameType fieldNameType)
@@ -199,10 +240,10 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                         FieldNameCustomDimensionsPrefix.Length,
                         fieldName.Length - FieldNameCustomDimensionsPrefix.Length);
 
-                    return CreateDictionaryAccessExpression(
+                    return CreateListAccessExpression(
                         documentExpression,
                         CustomDimensionsPropertyName,
-                        DictionaryStringStringTryGetValueMethodInfo,
+                        ListStringTryGetValueMethodInfo,
                         typeof(string),
                         customDimensionName);
                 default:
@@ -233,6 +274,13 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
             // no special case in filterInfo.FieldName, treat it as the name of a property in TTelemetry type
             fieldNameType = FieldNameType.FieldName;
             return GetPropertyTypeFromFieldName(fieldName);
+        }
+
+        private static Expression CreateListAccessExpression(ParameterExpression documentExpression, string listName, MethodInfo tryGetValueMethodInfo, Type valueType, string keyValue)
+        {
+            // return Filter<int>.TryGetString(document.listName, keyValue)
+            MemberExpression properties = Expression.Property(documentExpression, listName);
+            return Expression.Call(tryGetValueMethodInfo, properties, Expression.Constant(keyValue));
         }
 
         private static Expression CreateDictionaryAccessExpression(ParameterExpression documentExpression, string dictionaryName, MethodInfo tryGetValueMethodInfo, Type valueType, string keyValue)
@@ -278,6 +326,11 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                         typeof(TTelemetry),
                         (type, propertyName) => type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).PropertyType);
 
+                if (fieldName == "Duration")
+                {
+                    propertyType = typeof(TimeSpan);
+                }
+
                 if (propertyType == null)
                 {
                     string propertyNotFoundMessage = string.Format(
@@ -318,9 +371,21 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
             }
         }
 
-        private static bool ScanDictionary(IDictionary<string, string> dict, string searchValue)
+        private static string TryGetString(IList<KeyValuePairString> list, string keyValue)
         {
-            return dict?.Values.Any(val => (val ?? string.Empty).IndexOf(searchValue ?? string.Empty, StringComparison.OrdinalIgnoreCase) != -1)
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (string.Equals(list[i].Key, keyValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    return list[i].Value;
+                }
+            }
+            return null;
+        }
+
+        private static bool ScanList(IList<KeyValuePairString> list, string searchValue)
+        {
+            return list?.Any(val => (val.Value ?? string.Empty).IndexOf(searchValue ?? string.Empty, StringComparison.OrdinalIgnoreCase) != -1)
                    ?? false;
         }
 
@@ -338,18 +403,18 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
             {
                 case TypeCode.Boolean:
                     {
-                        this.ThrowOnInvalidFilter(fieldType, !this.comparandBoolean.HasValue);
+                        ThrowOnInvalidFilter(fieldType, !comparandBoolean.HasValue);
 
-                        switch (this.predicate)
+                        switch (predicate)
                         {
                             case Predicate.Equal:
                                 // fieldValue == this.comparandBoolean.Value;
-                                return Expression.Equal(fieldExpression, Expression.Constant(this.comparandBoolean.Value, isFieldTypeNullable ? typeof(bool?) : typeof(bool)));
+                                return Expression.Equal(fieldExpression, Expression.Constant(comparandBoolean.Value, isFieldTypeNullable ? typeof(bool?) : typeof(bool)));
                             case Predicate.NotEqual:
                                 // fieldValue != this.comparandBoolean.Value;
-                                return Expression.NotEqual(fieldExpression, Expression.Constant(this.comparandBoolean.Value, isFieldTypeNullable ? typeof(bool?) : typeof(bool)));
+                                return Expression.NotEqual(fieldExpression, Expression.Constant(comparandBoolean.Value, isFieldTypeNullable ? typeof(bool?) : typeof(bool)));
                             default:
-                                this.ThrowOnInvalidFilter(fieldType);
+                                ThrowOnInvalidFilter(fieldType);
                                 break;
                         }
                     }
@@ -372,17 +437,17 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                             object enumValue = null;
                             try
                             {
-                                enumValue = Enum.Parse(fieldType, this.comparand, true);
+                                enumValue = Enum.Parse(fieldType, comparand, true);
                             }
                             catch (System.Exception)
                             {
                                 // we must throw unless this.predicate is either Contains or DoesNotContain, in which case it's ok
-                                this.ThrowOnInvalidFilter(fieldType, this.predicate != Predicate.Contains && this.predicate != Predicate.DoesNotContain);
+                                ThrowOnInvalidFilter(fieldType, predicate != Predicate.Contains && predicate != Predicate.DoesNotContain);
                             }
 
                             Type enumUnderlyingType = fieldType.GetTypeInfo().GetEnumUnderlyingType();
 
-                            switch (this.predicate)
+                            switch (predicate)
                             {
                                 case Predicate.Equal:
                                     // fieldValue == enumValue
@@ -421,15 +486,15 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                                 case Predicate.Contains:
                                     // fieldValue.ToString(CultureInfo.InvariantCulture).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) != -1
                                     Expression toStringCall = Expression.Call(fieldExpression, isFieldTypeNullable ? ValueTypeToStringMethodInfo : ObjectToStringMethodInfo);
-                                    Expression indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                    Expression indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                                     return Expression.NotEqual(indexOfCall, Expression.Constant(-1));
                                 case Predicate.DoesNotContain:
                                     // fieldValue.ToString(CultureInfo.InvariantCulture).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) == -1
                                     toStringCall = Expression.Call(fieldExpression, isFieldTypeNullable ? ValueTypeToStringMethodInfo : ObjectToStringMethodInfo);
-                                    indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                    indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                                     return Expression.Equal(indexOfCall, Expression.Constant(-1));
                                 default:
-                                    this.ThrowOnInvalidFilter(fieldType);
+                                    ThrowOnInvalidFilter(fieldType);
                                     break;
                             }
                         }
@@ -442,54 +507,54 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                                                                       ? fieldExpression
                                                                       : Expression.ConvertChecked(fieldExpression, isFieldTypeNullable ? typeof(double?) : typeof(double));
 
-                            switch (this.predicate)
+                            switch (predicate)
                             {
                                 case Predicate.Equal:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.Equal(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.NotEqual:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.NotEqual(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.LessThan:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.LessThan(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.GreaterThan:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.GreaterThan(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.LessThanOrEqual:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.LessThanOrEqual(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.GreaterThanOrEqual:
-                                    this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
+                                    ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
                                     return Expression.GreaterThanOrEqual(
                                         fieldConvertedExpression,
-                                        Expression.Constant(this.comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
+                                        Expression.Constant(comparandDouble.Value, isFieldTypeNullable ? typeof(Nullable<>).MakeGenericType(typeof(double)) : typeof(double)));
                                 case Predicate.Contains:
                                     // fieldValue.ToString(CultureInfo.InvariantCulture).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) != -1
                                     Expression toStringCall = isFieldTypeNullable
                                                                   ? Expression.Call(fieldConvertedExpression, NullableDoubleToStringMethodInfo)
                                                                   : Expression.Call(fieldConvertedExpression, DoubleToStringMethodInfo, Expression.Constant(CultureInfo.InvariantCulture));
-                                    Expression indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                    Expression indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                                     return Expression.NotEqual(indexOfCall, Expression.Constant(-1));
                                 case Predicate.DoesNotContain:
                                     // fieldValue.ToString(CultureInfo.InvariantCulture).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) == -1
                                     toStringCall = isFieldTypeNullable
                                                        ? Expression.Call(fieldConvertedExpression, NullableDoubleToStringMethodInfo)
                                                        : Expression.Call(fieldConvertedExpression, DoubleToStringMethodInfo, Expression.Constant(CultureInfo.InvariantCulture));
-                                    indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                    indexOfCall = Expression.Call(toStringCall, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                                     return Expression.Equal(indexOfCall, Expression.Constant(-1));
                                 default:
-                                    this.ThrowOnInvalidFilter(fieldType);
+                                    ThrowOnInvalidFilter(fieldType);
                                     break;
                             }
                         }
@@ -500,23 +565,23 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     {
                         Expression fieldValueOrEmptyString = Expression.Condition(Expression.Equal(fieldExpression, Expression.Constant(null)), Expression.Constant(string.Empty), fieldExpression);
 
-                        Expression indexOfCall = Expression.Call(fieldValueOrEmptyString, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                        Expression indexOfCall = Expression.Call(fieldValueOrEmptyString, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
 
-                        switch (this.predicate)
+                        switch (predicate)
                         {
                             case Predicate.Equal:
                                 // (fieldValue ?? string.Empty).Equals(this.comparand, StringComparison.OrdinalIgnoreCase)
-                                return Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                return Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                             case Predicate.NotEqual:
                                 // !(fieldValue ?? string.Empty).Equals(this.comparand, StringComparison.OrdinalIgnoreCase)
-                                return Expression.Not(Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase)));
+                                return Expression.Not(Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase)));
                             case Predicate.LessThan:
                             case Predicate.GreaterThan:
                             case Predicate.LessThanOrEqual:
                             case Predicate.GreaterThanOrEqual:
                                 // double.TryParse(fieldValue, out temp) && temp {<, <=, >, >=} comparandDouble
-                                this.ThrowOnInvalidFilter(fieldType, !this.comparandDouble.HasValue);
-                                return this.CreateStringToDoubleComparisonBlock(fieldExpression, this.predicate);
+                                ThrowOnInvalidFilter(fieldType, !comparandDouble.HasValue);
+                                return CreateStringToDoubleComparisonBlock(fieldExpression, predicate);
                             case Predicate.Contains:
                                 // fieldValue => (fieldValue ?? string.Empty).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) != -1;
                                 return Expression.NotEqual(indexOfCall, Expression.Constant(-1));
@@ -524,7 +589,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                                 // fieldValue => (fieldValue ?? string.Empty).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) == -1;
                                 return Expression.Equal(indexOfCall, Expression.Constant(-1));
                             default:
-                                this.ThrowOnInvalidFilter(fieldType);
+                                ThrowOnInvalidFilter(fieldType);
                                 break;
                         }
                     }
@@ -534,30 +599,35 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     Type nullableUnderlyingType;
                     if (fieldType == typeof(TimeSpan))
                     {
-                        this.ThrowOnInvalidFilter(fieldType, !this.comparandTimeSpan.HasValue);
+                        ThrowOnInvalidFilter(fieldType, !comparandTimeSpan.HasValue);
+                        if (fieldExpression.Type == typeof(string))
+                        {
+                            MethodInfo parseMethod = typeof(TimeSpan).GetMethod("Parse", new[] { typeof(string) });
+                            fieldExpression = Expression.Call(parseMethod, fieldExpression);
+                        }
 
-                        switch (this.predicate)
+                        switch (predicate)
                         {
                             case Predicate.Equal:
-                                Func<TimeSpan, bool> comparator = fieldValue => fieldValue == this.comparandTimeSpan.Value;
+                                Func<TimeSpan, bool> comparator = fieldValue => fieldValue == comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             case Predicate.NotEqual:
-                                comparator = fieldValue => fieldValue != this.comparandTimeSpan.Value;
+                                comparator = fieldValue => fieldValue != comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             case Predicate.LessThan:
-                                comparator = fieldValue => fieldValue < this.comparandTimeSpan.Value;
+                                comparator = fieldValue => fieldValue < comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             case Predicate.GreaterThan:
-                                comparator = fieldValue => fieldValue > this.comparandTimeSpan.Value;
+                                comparator = fieldValue => fieldValue > comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             case Predicate.LessThanOrEqual:
-                                comparator = fieldValue => fieldValue <= this.comparandTimeSpan.Value;
+                                comparator = fieldValue => fieldValue <= comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             case Predicate.GreaterThanOrEqual:
-                                comparator = fieldValue => fieldValue >= this.comparandTimeSpan.Value;
+                                comparator = fieldValue => fieldValue >= comparandTimeSpan.Value;
                                 return Expression.Call(Expression.Constant(comparator.Target), comparator.GetMethodInfo(), fieldExpression);
                             default:
-                                this.ThrowOnInvalidFilter(fieldType);
+                                ThrowOnInvalidFilter(fieldType);
                                 break;
                         }
                     }
@@ -567,16 +637,16 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
 
                         Expression fieldValueOrEmptyString = Expression.Condition(Expression.Equal(fieldExpression, Expression.Constant(null)), Expression.Constant(string.Empty), toStringCall);
 
-                        Expression indexOfCall = Expression.Call(fieldValueOrEmptyString, StringIndexOfMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                        Expression indexOfCall = Expression.Call(fieldValueOrEmptyString, StringIndexOfMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
 
-                        switch (this.predicate)
+                        switch (predicate)
                         {
                             case Predicate.Equal:
                                 // (fieldValue?.ToString() ?? string.Empty).Equals(this.comparand, StringComparison.OrdinalIgnoreCase)
-                                return Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
+                                return Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase));
                             case Predicate.NotEqual:
                                 // !(fieldValue?.ToString() ?? string.Empty).Equals(this.comparand, StringComparison.OrdinalIgnoreCase)
-                                return Expression.Not(Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(this.comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase)));
+                                return Expression.Not(Expression.Call(fieldValueOrEmptyString, StringEqualsMethodInfo, Expression.Constant(comparand), Expression.Constant(StringComparison.OrdinalIgnoreCase)));
                             case Predicate.Contains:
                                 // fieldValue => (fieldValue?.ToString() ?? string.Empty).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) != -1;
                                 return Expression.NotEqual(indexOfCall, Expression.Constant(-1));
@@ -584,7 +654,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                                 // fieldValue => (fieldValue?.ToString() ?? string.Empty).IndexOf(this.comparand, StringComparison.OrdinalIgnoreCase) == -1;
                                 return Expression.Equal(indexOfCall, Expression.Constant(-1));
                             default:
-                                this.ThrowOnInvalidFilter(fieldType);
+                                ThrowOnInvalidFilter(fieldType);
                                 break;
                         }
                     }
@@ -595,7 +665,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     }
                     else
                     {
-                        this.ThrowOnInvalidFilter(fieldType);
+                        ThrowOnInvalidFilter(fieldType);
                     }
 
                     break;
@@ -607,13 +677,13 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
         private Expression ProduceComparatorExpressionForAnyFieldCondition(ParameterExpression documentExpression)
         {
             // this.predicate is either Predicate.Contains or Predicate.DoesNotContain at this point
-            if (this.predicate != Predicate.Contains && this.predicate != Predicate.DoesNotContain)
+            if (predicate != Predicate.Contains && predicate != Predicate.DoesNotContain)
             {
                 throw new InvalidOperationException(
                     "ProduceComparatorExpressionForAnyFieldCondition is called while this.predicate is neither Predicate.Contains nor Predicate.DoesNotContain");
             }
 
-            Expression comparisonExpression = this.predicate == Predicate.Contains ? Expression.Constant(false) : Expression.Constant(true);
+            Expression comparisonExpression = predicate == Predicate.Contains ? Expression.Constant(false) : Expression.Constant(true);
 
             foreach (PropertyInfo propertyInfo in typeof(TTelemetry).GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
@@ -622,15 +692,15 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     Expression propertyComparatorExpression;
                     if (string.Equals(propertyInfo.Name, CustomDimensionsPropertyName, StringComparison.Ordinal))
                     {
-                        // ScanDictionary(document.<CustomDimensionsPropertyName>, <this.comparand>)
+                        // ScanList(document.<CustomDimensionsPropertyName>, <this.comparand>)
                         MemberExpression customDimensionsProperty = Expression.Property(documentExpression, CustomDimensionsPropertyName);
                         propertyComparatorExpression = Expression.Call(
                             null,
-                            DictionaryStringStringScanMethodInfo,
+                            ListKeyValuePairStringScanMethodInfo,
                             customDimensionsProperty,
-                            Expression.Constant(this.comparand));
+                            Expression.Constant(comparand));
 
-                        if (this.predicate == Predicate.DoesNotContain)
+                        if (predicate == Predicate.DoesNotContain)
                         {
                             propertyComparatorExpression = Expression.Not(propertyComparatorExpression);
                         }
@@ -643,9 +713,9 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                             null,
                             DictionaryStringDoubleScanMethodInfo,
                             customMetricsProperty,
-                            Expression.Constant(this.comparand));
+                            Expression.Constant(comparand));
 
-                        if (this.predicate == Predicate.DoesNotContain)
+                        if (predicate == Predicate.DoesNotContain)
                         {
                             propertyComparatorExpression = Expression.Not(propertyComparatorExpression);
                         }
@@ -654,10 +724,10 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
                     {
                         // regular property, create a comparator
                         Expression fieldExpression = ProduceFieldExpression(documentExpression, propertyInfo.Name, FieldNameType.FieldName);
-                        propertyComparatorExpression = this.ProduceComparatorExpressionForSingleFieldCondition(fieldExpression, propertyInfo.PropertyType);
+                        propertyComparatorExpression = ProduceComparatorExpressionForSingleFieldCondition(fieldExpression, propertyInfo.PropertyType);
                     }
 
-                    comparisonExpression = this.predicate == Predicate.Contains
+                    comparisonExpression = predicate == Predicate.Contains
                                                ? Expression.OrElse(comparisonExpression, propertyComparatorExpression)
                                                : Expression.AndAlso(comparisonExpression, propertyComparatorExpression);
                 }
@@ -679,16 +749,16 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
             switch (predicate)
             {
                 case Predicate.LessThan:
-                    comparisonExpression = Expression.LessThan(tempVariable, Expression.Constant(this.comparandDouble.Value));
+                    comparisonExpression = Expression.LessThan(tempVariable, Expression.Constant(comparandDouble.Value));
                     break;
                 case Predicate.LessThanOrEqual:
-                    comparisonExpression = Expression.LessThanOrEqual(tempVariable, Expression.Constant(this.comparandDouble.Value));
+                    comparisonExpression = Expression.LessThanOrEqual(tempVariable, Expression.Constant(comparandDouble.Value));
                     break;
                 case Predicate.GreaterThan:
-                    comparisonExpression = Expression.GreaterThan(tempVariable, Expression.Constant(this.comparandDouble.Value));
+                    comparisonExpression = Expression.GreaterThan(tempVariable, Expression.Constant(comparandDouble.Value));
                     break;
                 case Predicate.GreaterThanOrEqual:
-                    comparisonExpression = Expression.GreaterThanOrEqual(tempVariable, Expression.Constant(this.comparandDouble.Value));
+                    comparisonExpression = Expression.GreaterThanOrEqual(tempVariable, Expression.Constant(comparandDouble.Value));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(predicate));
@@ -705,7 +775,7 @@ namespace Azure.Monitor.OpenTelemetry.LiveMetrics.Internals.Filtering
         {
             if (conditionToThrow)
             {
-                throw new ArgumentOutOfRangeException(string.Format(CultureInfo.InvariantCulture, "The filter is invalid. Field: '{0}', field type: '{1}', predicate: '{2}', comparand: '{3}', document type: '{4}'", this.fieldName, fieldType?.FullName ?? "---", this.predicate, this.comparand, typeof(TTelemetry).FullName));
+                throw new ArgumentOutOfRangeException(string.Format(CultureInfo.InvariantCulture, "The filter is invalid. Field: '{0}', field type: '{1}', predicate: '{2}', comparand: '{3}', document type: '{4}'", fieldName, fieldType?.FullName ?? "---", predicate, comparand, typeof(TTelemetry).FullName));
             }
         }
     }

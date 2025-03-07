@@ -18,19 +18,16 @@ namespace Azure.ResourceManager.MachineLearning.Models
         /// <exception cref="ArgumentNullException"> <paramref name="artifactName"/> is null. </exception>
         public LakeHouseArtifact(string artifactName) : base(artifactName)
         {
-            if (artifactName == null)
-            {
-                throw new ArgumentNullException(nameof(artifactName));
-            }
+            Argument.AssertNotNull(artifactName, nameof(artifactName));
 
             ArtifactType = OneLakeArtifactType.LakeHouse;
         }
 
         /// <summary> Initializes a new instance of <see cref="LakeHouseArtifact"/>. </summary>
-        /// <param name="artifactName"> [Required] OneLake artifact name. </param>
         /// <param name="artifactType"> [Required] OneLake artifact type. </param>
+        /// <param name="artifactName"> [Required] OneLake artifact name. </param>
         /// <param name="serializedAdditionalRawData"> Keeps track of any properties unknown to the library. </param>
-        internal LakeHouseArtifact(string artifactName, OneLakeArtifactType artifactType, IDictionary<string, BinaryData> serializedAdditionalRawData) : base(artifactName, artifactType, serializedAdditionalRawData)
+        internal LakeHouseArtifact(OneLakeArtifactType artifactType, string artifactName, IDictionary<string, BinaryData> serializedAdditionalRawData) : base(artifactType, artifactName, serializedAdditionalRawData)
         {
             ArtifactType = artifactType;
         }

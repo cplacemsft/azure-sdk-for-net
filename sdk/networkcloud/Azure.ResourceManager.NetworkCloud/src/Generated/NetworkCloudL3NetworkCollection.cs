@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.NetworkCloud
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<NetworkCloudL3NetworkResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string l3NetworkName, NetworkCloudL3NetworkData data, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<NetworkCloudL3NetworkResource> CreateOrUpdate(WaitUntil waitUntil, string l3NetworkName, NetworkCloudL3NetworkData data, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual async Task<Response<NetworkCloudL3NetworkResource>> GetAsync(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual Response<NetworkCloudL3NetworkResource> Get(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual Response<bool> Exists(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual async Task<NullableResponse<NetworkCloudL3NetworkResource>> GetIfExistsAsync(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-07-01</description>
+        /// <description>2024-07-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.NetworkCloud
         /// <exception cref="ArgumentNullException"> <paramref name="l3NetworkName"/> is null. </exception>
         public virtual NullableResponse<NetworkCloudL3NetworkResource> GetIfExists(string l3NetworkName, CancellationToken cancellationToken = default)
         {
-            if (l3NetworkName == null)
-            {
-                throw new ArgumentNullException(nameof(l3NetworkName));
-            }
-            if (l3NetworkName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(l3NetworkName));
-            }
+            Argument.AssertNotNullOrEmpty(l3NetworkName, nameof(l3NetworkName));
 
             using var scope = _networkCloudL3NetworkL3NetworksClientDiagnostics.CreateScope("NetworkCloudL3NetworkCollection.GetIfExists");
             scope.Start();

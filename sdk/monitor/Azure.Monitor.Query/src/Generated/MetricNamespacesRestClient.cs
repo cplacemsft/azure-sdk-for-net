@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Monitor.Query.Models;
@@ -75,7 +74,7 @@ namespace Azure.Monitor.Query
                 case 200:
                     {
                         MetricNamespaceCollection value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = MetricNamespaceCollection.DeserializeMetricNamespaceCollection(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -103,7 +102,7 @@ namespace Azure.Monitor.Query
                 case 200:
                     {
                         MetricNamespaceCollection value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = MetricNamespaceCollection.DeserializeMetricNamespaceCollection(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

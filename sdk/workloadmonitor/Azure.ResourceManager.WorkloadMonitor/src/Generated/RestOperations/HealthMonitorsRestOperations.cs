@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.WorkloadMonitor.Models;
@@ -35,6 +34,33 @@ namespace Azure.ResourceManager.WorkloadMonitor
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2020-01-13-preview";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateListRequestUri(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/", false);
+            uri.AppendPath(providerName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceCollectionName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceName, true);
+            uri.AppendPath("/providers/Microsoft.WorkloadMonitor/monitors", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            if (expand != null)
+            {
+                uri.AppendQuery("$expand", expand, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListRequest(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter, string expand)
@@ -83,46 +109,11 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/> or <paramref name="resourceName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorList>> ListAsync(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, filter, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -131,7 +122,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorList.DeserializeHealthMonitorList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -153,46 +144,11 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/> or <paramref name="resourceName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorList> List(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
 
             using var message = CreateListRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, filter, expand);
             _pipeline.Send(message, cancellationToken);
@@ -201,13 +157,37 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorList.DeserializeHealthMonitorList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/", false);
+            uri.AppendPath(providerName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceCollectionName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceName, true);
+            uri.AppendPath("/providers/Microsoft.WorkloadMonitor/monitors/", false);
+            uri.AppendPath(monitorId, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (expand != null)
+            {
+                uri.AppendQuery("$expand", expand, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string expand)
@@ -253,54 +233,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorData>> GetAsync(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -309,7 +247,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorData.DeserializeHealthMonitorData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -333,54 +271,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorData> Get(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, expand);
             _pipeline.Send(message, cancellationToken);
@@ -389,7 +285,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorData.DeserializeHealthMonitorData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -398,6 +294,43 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListStateChangesRequestUri(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter, string expand, DateTimeOffset? startTimestampUtc, DateTimeOffset? endTimestampUtc)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/", false);
+            uri.AppendPath(providerName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceCollectionName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceName, true);
+            uri.AppendPath("/providers/Microsoft.WorkloadMonitor/monitors/", false);
+            uri.AppendPath(monitorId, true);
+            uri.AppendPath("/history", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (filter != null)
+            {
+                uri.AppendQuery("$filter", filter, true);
+            }
+            if (expand != null)
+            {
+                uri.AppendQuery("$expand", expand, true);
+            }
+            if (startTimestampUtc != null)
+            {
+                uri.AppendQuery("startTimestampUtc", startTimestampUtc.Value, "O", true);
+            }
+            if (endTimestampUtc != null)
+            {
+                uri.AppendQuery("endTimestampUtc", endTimestampUtc.Value, "O", true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateListStateChangesRequest(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter, string expand, DateTimeOffset? startTimestampUtc, DateTimeOffset? endTimestampUtc)
@@ -459,54 +392,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorStateChangeList>> ListStateChangesAsync(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter = null, string expand = null, DateTimeOffset? startTimestampUtc = null, DateTimeOffset? endTimestampUtc = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateListStateChangesRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, filter, expand, startTimestampUtc, endTimestampUtc);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -515,7 +406,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorStateChangeList.DeserializeHealthMonitorStateChangeList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -540,54 +431,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorStateChangeList> ListStateChanges(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter = null, string expand = null, DateTimeOffset? startTimestampUtc = null, DateTimeOffset? endTimestampUtc = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateListStateChangesRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, filter, expand, startTimestampUtc, endTimestampUtc);
             _pipeline.Send(message, cancellationToken);
@@ -596,13 +445,39 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorStateChangeList.DeserializeHealthMonitorStateChangeList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateGetStateChangeRequestUri(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string timestampUnix, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/", false);
+            uri.AppendPath(providerName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceCollectionName, true);
+            uri.AppendPath("/", false);
+            uri.AppendPath(resourceName, true);
+            uri.AppendPath("/providers/Microsoft.WorkloadMonitor/monitors/", false);
+            uri.AppendPath(monitorId, true);
+            uri.AppendPath("/history/", false);
+            uri.AppendPath(timestampUnix, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            if (expand != null)
+            {
+                uri.AppendQuery("$expand", expand, true);
+            }
+            return uri;
         }
 
         internal HttpMessage CreateGetStateChangeRequest(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string timestampUnix, string expand)
@@ -651,62 +526,13 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/>, <paramref name="monitorId"/> or <paramref name="timestampUnix"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorStateChangeData>> GetStateChangeAsync(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string timestampUnix, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
-            if (timestampUnix == null)
-            {
-                throw new ArgumentNullException(nameof(timestampUnix));
-            }
-            if (timestampUnix.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(timestampUnix));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
+            Argument.AssertNotNullOrEmpty(timestampUnix, nameof(timestampUnix));
 
             using var message = CreateGetStateChangeRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, timestampUnix, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -715,7 +541,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorStateChangeData.DeserializeHealthMonitorStateChangeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -740,62 +566,13 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/>, <paramref name="monitorId"/> or <paramref name="timestampUnix"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorStateChangeData> GetStateChange(string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string timestampUnix, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
-            if (timestampUnix == null)
-            {
-                throw new ArgumentNullException(nameof(timestampUnix));
-            }
-            if (timestampUnix.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(timestampUnix));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
+            Argument.AssertNotNullOrEmpty(timestampUnix, nameof(timestampUnix));
 
             using var message = CreateGetStateChangeRequest(subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, timestampUnix, expand);
             _pipeline.Send(message, cancellationToken);
@@ -804,7 +581,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorStateChangeData.DeserializeHealthMonitorStateChangeData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -813,6 +590,14 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter, string expand)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter, string expand)
@@ -843,50 +628,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/> or <paramref name="resourceName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorList>> ListNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, filter, expand);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -895,7 +642,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorList.DeserializeHealthMonitorList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -918,50 +665,12 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/> or <paramref name="resourceName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorList> ListNextPage(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string filter = null, string expand = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
 
             using var message = CreateListNextPageRequest(nextLink, subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, filter, expand);
             _pipeline.Send(message, cancellationToken);
@@ -970,13 +679,21 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorList.DeserializeHealthMonitorList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListStateChangesNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter, string expand, DateTimeOffset? startTimestampUtc, DateTimeOffset? endTimestampUtc)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListStateChangesNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter, string expand, DateTimeOffset? startTimestampUtc, DateTimeOffset? endTimestampUtc)
@@ -1010,58 +727,13 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<HealthMonitorStateChangeList>> ListStateChangesNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter = null, string expand = null, DateTimeOffset? startTimestampUtc = null, DateTimeOffset? endTimestampUtc = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateListStateChangesNextPageRequest(nextLink, subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, filter, expand, startTimestampUtc, endTimestampUtc);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -1070,7 +742,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeList value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = HealthMonitorStateChangeList.DeserializeHealthMonitorStateChangeList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -1096,58 +768,13 @@ namespace Azure.ResourceManager.WorkloadMonitor
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="providerName"/>, <paramref name="resourceCollectionName"/>, <paramref name="resourceName"/> or <paramref name="monitorId"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<HealthMonitorStateChangeList> ListStateChangesNextPage(string nextLink, string subscriptionId, string resourceGroupName, string providerName, string resourceCollectionName, string resourceName, string monitorId, string filter = null, string expand = null, DateTimeOffset? startTimestampUtc = null, DateTimeOffset? endTimestampUtc = null, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (providerName == null)
-            {
-                throw new ArgumentNullException(nameof(providerName));
-            }
-            if (providerName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(providerName));
-            }
-            if (resourceCollectionName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceCollectionName));
-            }
-            if (resourceCollectionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceCollectionName));
-            }
-            if (resourceName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceName));
-            }
-            if (resourceName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceName));
-            }
-            if (monitorId == null)
-            {
-                throw new ArgumentNullException(nameof(monitorId));
-            }
-            if (monitorId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(monitorId));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(providerName, nameof(providerName));
+            Argument.AssertNotNullOrEmpty(resourceCollectionName, nameof(resourceCollectionName));
+            Argument.AssertNotNullOrEmpty(resourceName, nameof(resourceName));
+            Argument.AssertNotNullOrEmpty(monitorId, nameof(monitorId));
 
             using var message = CreateListStateChangesNextPageRequest(nextLink, subscriptionId, resourceGroupName, providerName, resourceCollectionName, resourceName, monitorId, filter, expand, startTimestampUtc, endTimestampUtc);
             _pipeline.Send(message, cancellationToken);
@@ -1156,7 +783,7 @@ namespace Azure.ResourceManager.WorkloadMonitor
                 case 200:
                     {
                         HealthMonitorStateChangeList value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = HealthMonitorStateChangeList.DeserializeHealthMonitorStateChangeList(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }

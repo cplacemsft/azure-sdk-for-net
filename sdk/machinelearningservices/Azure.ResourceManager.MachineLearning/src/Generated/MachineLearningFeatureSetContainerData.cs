@@ -56,10 +56,7 @@ namespace Azure.ResourceManager.MachineLearning
         /// <exception cref="ArgumentNullException"> <paramref name="properties"/> is null. </exception>
         public MachineLearningFeatureSetContainerData(MachineLearningFeatureSetContainerProperties properties)
         {
-            if (properties == null)
-            {
-                throw new ArgumentNullException(nameof(properties));
-            }
+            Argument.AssertNotNull(properties, nameof(properties));
 
             Properties = properties;
         }
@@ -83,6 +80,7 @@ namespace Azure.ResourceManager.MachineLearning
         }
 
         /// <summary> [Required] Additional attributes of the entity. </summary>
+        [WirePath("properties")]
         public MachineLearningFeatureSetContainerProperties Properties { get; set; }
     }
 }

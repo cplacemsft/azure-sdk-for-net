@@ -10,23 +10,30 @@ using System.ClientModel.Primitives;
 using System.Collections.Generic;
 using System.Text.Json;
 using Azure.Core;
-using Azure.ResourceManager.ApiManagement;
 
 namespace Azure.ResourceManager.ApiManagement.Models
 {
     public partial class ApiCreateOrUpdateContent : IUtf8JsonSerializable, IJsonModel<ApiCreateOrUpdateContent>
     {
-        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<ApiCreateOrUpdateContent>)this).Write(writer, new ModelReaderWriterOptions("W"));
+        void IUtf8JsonSerializable.Write(Utf8JsonWriter writer) => ((IJsonModel<ApiCreateOrUpdateContent>)this).Write(writer, ModelSerializationExtensions.WireOptions);
 
         void IJsonModel<ApiCreateOrUpdateContent>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+        {
+            writer.WriteStartObject();
+            JsonModelWriteCore(writer, options);
+            writer.WriteEndObject();
+        }
+
+        /// <param name="writer"> The JSON writer. </param>
+        /// <param name="options"> The client options for reading and writing models. </param>
+        protected virtual void JsonModelWriteCore(Utf8JsonWriter writer, ModelReaderWriterOptions options)
         {
             var format = options.Format == "W" ? ((IPersistableModel<ApiCreateOrUpdateContent>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support writing '{format}' format.");
             }
 
-            writer.WriteStartObject();
             writer.WritePropertyName("properties"u8);
             writer.WriteStartObject();
             if (Optional.IsDefined(Description))
@@ -37,12 +44,12 @@ namespace Azure.ResourceManager.ApiManagement.Models
             if (Optional.IsDefined(AuthenticationSettings))
             {
                 writer.WritePropertyName("authenticationSettings"u8);
-                writer.WriteObjectValue(AuthenticationSettings);
+                writer.WriteObjectValue(AuthenticationSettings, options);
             }
             if (Optional.IsDefined(SubscriptionKeyParameterNames))
             {
                 writer.WritePropertyName("subscriptionKeyParameterNames"u8);
-                writer.WriteObjectValue(SubscriptionKeyParameterNames);
+                writer.WriteObjectValue(SubscriptionKeyParameterNames, options);
             }
             if (Optional.IsDefined(ApiType))
             {
@@ -89,20 +96,20 @@ namespace Azure.ResourceManager.ApiManagement.Models
                 writer.WritePropertyName("subscriptionRequired"u8);
                 writer.WriteBooleanValue(IsSubscriptionRequired.Value);
             }
-            if (Optional.IsDefined(TermsOfServiceUri))
+            if (Optional.IsDefined(TermsOfServiceLink))
             {
                 writer.WritePropertyName("termsOfServiceUrl"u8);
-                writer.WriteStringValue(TermsOfServiceUri.AbsoluteUri);
+                writer.WriteStringValue(TermsOfServiceLink);
             }
             if (Optional.IsDefined(Contact))
             {
                 writer.WritePropertyName("contact"u8);
-                writer.WriteObjectValue(Contact);
+                writer.WriteObjectValue(Contact, options);
             }
             if (Optional.IsDefined(License))
             {
                 writer.WritePropertyName("license"u8);
-                writer.WriteObjectValue(License);
+                writer.WriteObjectValue(License, options);
             }
             if (Optional.IsDefined(SourceApiId))
             {
@@ -114,10 +121,10 @@ namespace Azure.ResourceManager.ApiManagement.Models
                 writer.WritePropertyName("displayName"u8);
                 writer.WriteStringValue(DisplayName);
             }
-            if (Optional.IsDefined(ServiceUri))
+            if (Optional.IsDefined(ServiceLink))
             {
                 writer.WritePropertyName("serviceUrl"u8);
-                writer.WriteStringValue(ServiceUri.AbsoluteUri);
+                writer.WriteStringValue(ServiceLink);
             }
             if (Optional.IsDefined(Path))
             {
@@ -137,7 +144,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
             if (Optional.IsDefined(ApiVersionSet))
             {
                 writer.WritePropertyName("apiVersionSet"u8);
-                writer.WriteObjectValue(ApiVersionSet);
+                writer.WriteObjectValue(ApiVersionSet, options);
             }
             if (Optional.IsDefined(Value))
             {
@@ -152,12 +159,17 @@ namespace Azure.ResourceManager.ApiManagement.Models
             if (Optional.IsDefined(WsdlSelector))
             {
                 writer.WritePropertyName("wsdlSelector"u8);
-                writer.WriteObjectValue(WsdlSelector);
+                writer.WriteObjectValue(WsdlSelector, options);
             }
             if (Optional.IsDefined(SoapApiType))
             {
                 writer.WritePropertyName("apiType"u8);
                 writer.WriteStringValue(SoapApiType.Value.ToString());
+            }
+            if (Optional.IsDefined(TranslateRequiredQueryParametersConduct))
+            {
+                writer.WritePropertyName("translateRequiredQueryParameters"u8);
+                writer.WriteStringValue(TranslateRequiredQueryParametersConduct.Value.ToString());
             }
             writer.WriteEndObject();
             if (options.Format != "W" && _serializedAdditionalRawData != null)
@@ -168,14 +180,13 @@ namespace Azure.ResourceManager.ApiManagement.Models
 #if NET6_0_OR_GREATER
 				writer.WriteRawValue(item.Value);
 #else
-                    using (JsonDocument document = JsonDocument.Parse(item.Value))
+                    using (JsonDocument document = JsonDocument.Parse(item.Value, ModelSerializationExtensions.JsonDocumentOptions))
                     {
                         JsonSerializer.Serialize(writer, document.RootElement);
                     }
 #endif
                 }
             }
-            writer.WriteEndObject();
         }
 
         ApiCreateOrUpdateContent IJsonModel<ApiCreateOrUpdateContent>.Create(ref Utf8JsonReader reader, ModelReaderWriterOptions options)
@@ -183,7 +194,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
             var format = options.Format == "W" ? ((IPersistableModel<ApiCreateOrUpdateContent>)this).GetFormatFromOptions(options) : options.Format;
             if (format != "J")
             {
-                throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support '{format}' format.");
+                throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support reading '{format}' format.");
             }
 
             using JsonDocument document = JsonDocument.ParseValue(ref reader);
@@ -192,7 +203,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
 
         internal static ApiCreateOrUpdateContent DeserializeApiCreateOrUpdateContent(JsonElement element, ModelReaderWriterOptions options = null)
         {
-            options ??= new ModelReaderWriterOptions("W");
+            options ??= ModelSerializationExtensions.WireOptions;
 
             if (element.ValueKind == JsonValueKind.Null)
             {
@@ -210,12 +221,12 @@ namespace Azure.ResourceManager.ApiManagement.Models
             string apiVersionDescription = default;
             ResourceIdentifier apiVersionSetId = default;
             bool? subscriptionRequired = default;
-            Uri termsOfServiceUri = default;
+            string termsOfServiceUri = default;
             ApiContactInformation contact = default;
             ApiLicenseInformation license = default;
             ResourceIdentifier sourceApiId = default;
             string displayName = default;
-            Uri serviceUri = default;
+            string serviceUri = default;
             string path = default;
             IList<ApiOperationInvokableProtocol> protocols = default;
             ApiVersionSetContractDetails apiVersionSet = default;
@@ -223,8 +234,9 @@ namespace Azure.ResourceManager.ApiManagement.Models
             ContentFormat? format = default;
             ApiCreateOrUpdatePropertiesWsdlSelector wsdlSelector = default;
             SoapApiType? apiType = default;
+            TranslateRequiredQueryParametersConduct? translateRequiredQueryParameters = default;
             IDictionary<string, BinaryData> serializedAdditionalRawData = default;
-            Dictionary<string, BinaryData> additionalPropertiesDictionary = new Dictionary<string, BinaryData>();
+            Dictionary<string, BinaryData> rawDataDictionary = new Dictionary<string, BinaryData>();
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("properties"u8))
@@ -326,11 +338,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
                         }
                         if (property0.NameEquals("termsOfServiceUrl"u8))
                         {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                continue;
-                            }
-                            termsOfServiceUri = new Uri(property0.Value.GetString());
+                            termsOfServiceUri = property0.Value.GetString();
                             continue;
                         }
                         if (property0.NameEquals("contact"u8))
@@ -367,11 +375,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
                         }
                         if (property0.NameEquals("serviceUrl"u8))
                         {
-                            if (property0.Value.ValueKind == JsonValueKind.Null)
-                            {
-                                continue;
-                            }
-                            serviceUri = new Uri(property0.Value.GetString());
+                            serviceUri = property0.Value.GetString();
                             continue;
                         }
                         if (property0.NameEquals("path"u8))
@@ -434,15 +438,24 @@ namespace Azure.ResourceManager.ApiManagement.Models
                             apiType = new SoapApiType(property0.Value.GetString());
                             continue;
                         }
+                        if (property0.NameEquals("translateRequiredQueryParameters"u8))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                continue;
+                            }
+                            translateRequiredQueryParameters = new TranslateRequiredQueryParametersConduct(property0.Value.GetString());
+                            continue;
+                        }
                     }
                     continue;
                 }
                 if (options.Format != "W")
                 {
-                    additionalPropertiesDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
+                    rawDataDictionary.Add(property.Name, BinaryData.FromString(property.Value.GetRawText()));
                 }
             }
-            serializedAdditionalRawData = additionalPropertiesDictionary;
+            serializedAdditionalRawData = rawDataDictionary;
             return new ApiCreateOrUpdateContent(
                 description,
                 authenticationSettings,
@@ -469,6 +482,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
                 format,
                 wsdlSelector,
                 apiType,
+                translateRequiredQueryParameters,
                 serializedAdditionalRawData);
         }
 
@@ -481,7 +495,7 @@ namespace Azure.ResourceManager.ApiManagement.Models
                 case "J":
                     return ModelReaderWriter.Write(this, options);
                 default:
-                    throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support writing '{options.Format}' format.");
             }
         }
 
@@ -493,11 +507,11 @@ namespace Azure.ResourceManager.ApiManagement.Models
             {
                 case "J":
                     {
-                        using JsonDocument document = JsonDocument.Parse(data);
+                        using JsonDocument document = JsonDocument.Parse(data, ModelSerializationExtensions.JsonDocumentOptions);
                         return DeserializeApiCreateOrUpdateContent(document.RootElement, options);
                     }
                 default:
-                    throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support '{options.Format}' format.");
+                    throw new FormatException($"The model {nameof(ApiCreateOrUpdateContent)} does not support reading '{options.Format}' format.");
             }
         }
 

@@ -12,10 +12,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Autorest.CSharp.Core;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.ConnectedVMwarevSphere
@@ -67,7 +65,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -83,18 +81,8 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> or <paramref name="data"/> is null. </exception>
         public virtual async Task<ArmOperation<VMwareResourcePoolResource>> CreateOrUpdateAsync(WaitUntil waitUntil, string resourcePoolName, VMwareResourcePoolData data, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.CreateOrUpdate");
             scope.Start();
@@ -126,7 +114,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -142,18 +130,8 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> or <paramref name="data"/> is null. </exception>
         public virtual ArmOperation<VMwareResourcePoolResource> CreateOrUpdate(WaitUntil waitUntil, string resourcePoolName, VMwareResourcePoolData data, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
+            Argument.AssertNotNull(data, nameof(data));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.CreateOrUpdate");
             scope.Start();
@@ -185,7 +163,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -199,14 +177,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual async Task<Response<VMwareResourcePoolResource>> GetAsync(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.Get");
             scope.Start();
@@ -237,7 +208,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -251,14 +222,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual Response<VMwareResourcePoolResource> Get(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.Get");
             scope.Start();
@@ -289,7 +253,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -319,7 +283,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -349,7 +313,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -363,14 +327,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual async Task<Response<bool>> ExistsAsync(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.Exists");
             scope.Start();
@@ -399,7 +356,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -413,14 +370,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual Response<bool> Exists(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.Exists");
             scope.Start();
@@ -449,7 +399,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -463,14 +413,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual async Task<NullableResponse<VMwareResourcePoolResource>> GetIfExistsAsync(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.GetIfExists");
             scope.Start();
@@ -501,7 +444,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// </item>
         /// <item>
         /// <term>Default Api Version</term>
-        /// <description>2023-10-01</description>
+        /// <description>2023-12-01</description>
         /// </item>
         /// <item>
         /// <term>Resource</term>
@@ -515,14 +458,7 @@ namespace Azure.ResourceManager.ConnectedVMwarevSphere
         /// <exception cref="ArgumentNullException"> <paramref name="resourcePoolName"/> is null. </exception>
         public virtual NullableResponse<VMwareResourcePoolResource> GetIfExists(string resourcePoolName, CancellationToken cancellationToken = default)
         {
-            if (resourcePoolName == null)
-            {
-                throw new ArgumentNullException(nameof(resourcePoolName));
-            }
-            if (resourcePoolName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourcePoolName));
-            }
+            Argument.AssertNotNullOrEmpty(resourcePoolName, nameof(resourcePoolName));
 
             using var scope = _vMwareResourcePoolResourcePoolsClientDiagnostics.CreateScope("VMwareResourcePoolCollection.GetIfExists");
             scope.Start();

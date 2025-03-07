@@ -51,10 +51,7 @@ namespace Azure.ResourceManager.AppContainers.Models
         /// <exception cref="ArgumentNullException"> <paramref name="name"/> is null. </exception>
         public ContainerAppCustomDomain(string name)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            Argument.AssertNotNull(name, nameof(name));
 
             Name = name;
         }
@@ -78,10 +75,13 @@ namespace Azure.ResourceManager.AppContainers.Models
         }
 
         /// <summary> Hostname. </summary>
+        [WirePath("name")]
         public string Name { get; set; }
         /// <summary> Custom Domain binding type. </summary>
+        [WirePath("bindingType")]
         public ContainerAppCustomDomainBindingType? BindingType { get; set; }
         /// <summary> Resource Id of the Certificate to be bound to this hostname. Must exist in the Managed Environment. </summary>
+        [WirePath("certificateId")]
         public ResourceIdentifier CertificateId { get; set; }
     }
 }

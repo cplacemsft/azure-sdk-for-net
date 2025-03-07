@@ -9,7 +9,6 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.ResourceManager.HybridNetwork.Models;
@@ -35,6 +34,22 @@ namespace Azure.ResourceManager.HybridNetwork
             _endpoint = endpoint ?? new Uri("https://management.azure.com");
             _apiVersion = apiVersion ?? "2023-09-01";
             _userAgent = new TelemetryDetails(GetType().Assembly, applicationId);
+        }
+
+        internal RequestUriBuilder CreateGetRequestUri(string subscriptionId, string resourceGroupName, string networkFunctionName, string componentName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.HybridNetwork/networkFunctions/", false);
+            uri.AppendPath(networkFunctionName, true);
+            uri.AppendPath("/components/", false);
+            uri.AppendPath(componentName, true);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateGetRequest(string subscriptionId, string resourceGroupName, string networkFunctionName, string componentName)
@@ -69,38 +84,10 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="networkFunctionName"/> or <paramref name="componentName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ComponentData>> GetAsync(string subscriptionId, string resourceGroupName, string networkFunctionName, string componentName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
-            if (componentName == null)
-            {
-                throw new ArgumentNullException(nameof(componentName));
-            }
-            if (componentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(componentName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
+            Argument.AssertNotNullOrEmpty(componentName, nameof(componentName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, networkFunctionName, componentName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -109,7 +96,7 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentData value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ComponentData.DeserializeComponentData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -130,38 +117,10 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/>, <paramref name="networkFunctionName"/> or <paramref name="componentName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ComponentData> Get(string subscriptionId, string resourceGroupName, string networkFunctionName, string componentName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
-            if (componentName == null)
-            {
-                throw new ArgumentNullException(nameof(componentName));
-            }
-            if (componentName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(componentName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
+            Argument.AssertNotNullOrEmpty(componentName, nameof(componentName));
 
             using var message = CreateGetRequest(subscriptionId, resourceGroupName, networkFunctionName, componentName);
             _pipeline.Send(message, cancellationToken);
@@ -170,7 +129,7 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentData value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ComponentData.DeserializeComponentData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -179,6 +138,21 @@ namespace Azure.ResourceManager.HybridNetwork
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListByNetworkFunctionRequestUri(string subscriptionId, string resourceGroupName, string networkFunctionName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.HybridNetwork/networkFunctions/", false);
+            uri.AppendPath(networkFunctionName, true);
+            uri.AppendPath("/components", false);
+            uri.AppendQuery("api-version", _apiVersion, true);
+            return uri;
         }
 
         internal HttpMessage CreateListByNetworkFunctionRequest(string subscriptionId, string resourceGroupName, string networkFunctionName)
@@ -211,30 +185,9 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="networkFunctionName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ComponentListResult>> ListByNetworkFunctionAsync(string subscriptionId, string resourceGroupName, string networkFunctionName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
 
             using var message = CreateListByNetworkFunctionRequest(subscriptionId, resourceGroupName, networkFunctionName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -243,7 +196,7 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ComponentListResult.DeserializeComponentListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -261,30 +214,9 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="networkFunctionName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ComponentListResult> ListByNetworkFunction(string subscriptionId, string resourceGroupName, string networkFunctionName, CancellationToken cancellationToken = default)
         {
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
 
             using var message = CreateListByNetworkFunctionRequest(subscriptionId, resourceGroupName, networkFunctionName);
             _pipeline.Send(message, cancellationToken);
@@ -293,13 +225,21 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ComponentListResult.DeserializeComponentListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
                     throw new RequestFailedException(message.Response);
             }
+        }
+
+        internal RequestUriBuilder CreateListByNetworkFunctionNextPageRequestUri(string nextLink, string subscriptionId, string resourceGroupName, string networkFunctionName)
+        {
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(_endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            return uri;
         }
 
         internal HttpMessage CreateListByNetworkFunctionNextPageRequest(string nextLink, string subscriptionId, string resourceGroupName, string networkFunctionName)
@@ -326,34 +266,10 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="networkFunctionName"/> is an empty string, and was expected to be non-empty. </exception>
         public async Task<Response<ComponentListResult>> ListByNetworkFunctionNextPageAsync(string nextLink, string subscriptionId, string resourceGroupName, string networkFunctionName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
 
             using var message = CreateListByNetworkFunctionNextPageRequest(nextLink, subscriptionId, resourceGroupName, networkFunctionName);
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
@@ -362,7 +278,7 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentListResult value = default;
-                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions, cancellationToken).ConfigureAwait(false);
                         value = ComponentListResult.DeserializeComponentListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
@@ -381,34 +297,10 @@ namespace Azure.ResourceManager.HybridNetwork
         /// <exception cref="ArgumentException"> <paramref name="subscriptionId"/>, <paramref name="resourceGroupName"/> or <paramref name="networkFunctionName"/> is an empty string, and was expected to be non-empty. </exception>
         public Response<ComponentListResult> ListByNetworkFunctionNextPage(string nextLink, string subscriptionId, string resourceGroupName, string networkFunctionName, CancellationToken cancellationToken = default)
         {
-            if (nextLink == null)
-            {
-                throw new ArgumentNullException(nameof(nextLink));
-            }
-            if (subscriptionId == null)
-            {
-                throw new ArgumentNullException(nameof(subscriptionId));
-            }
-            if (subscriptionId.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(subscriptionId));
-            }
-            if (resourceGroupName == null)
-            {
-                throw new ArgumentNullException(nameof(resourceGroupName));
-            }
-            if (resourceGroupName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(resourceGroupName));
-            }
-            if (networkFunctionName == null)
-            {
-                throw new ArgumentNullException(nameof(networkFunctionName));
-            }
-            if (networkFunctionName.Length == 0)
-            {
-                throw new ArgumentException("Value cannot be an empty string.", nameof(networkFunctionName));
-            }
+            Argument.AssertNotNull(nextLink, nameof(nextLink));
+            Argument.AssertNotNullOrEmpty(subscriptionId, nameof(subscriptionId));
+            Argument.AssertNotNullOrEmpty(resourceGroupName, nameof(resourceGroupName));
+            Argument.AssertNotNullOrEmpty(networkFunctionName, nameof(networkFunctionName));
 
             using var message = CreateListByNetworkFunctionNextPageRequest(nextLink, subscriptionId, resourceGroupName, networkFunctionName);
             _pipeline.Send(message, cancellationToken);
@@ -417,7 +309,7 @@ namespace Azure.ResourceManager.HybridNetwork
                 case 200:
                     {
                         ComponentListResult value = default;
-                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        using var document = JsonDocument.Parse(message.Response.ContentStream, ModelSerializationExtensions.JsonDocumentOptions);
                         value = ComponentListResult.DeserializeComponentListResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
